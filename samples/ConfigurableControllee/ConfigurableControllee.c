@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ *  * Copyright (c) Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright (c) Open Connectivity Foundation and Contributors to AllSeen
+ *    Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 /**
@@ -880,8 +893,8 @@ AJ_Status CdmInterfaceSetProperty(AJ_BusAttachment* busAttachment, const char* o
             printf("CdmInterfaceGetProperty: undefined property name %s\n", proprietyDescriptor->name);
         }
     } else if (strcmp(interfaceName, "OnOffStatus") == 0) {
-        if (strcmp(proprietyDescriptor->name, "OnOff") == 0) {
-            status = Cdm_OnOffStatusInterfaceSetOnOff(busAttachment, CDM_OBJECT_PATH_CONTROLLEE, bVar);
+        if (strcmp(proprietyDescriptor->name, "IsOn") == 0) {
+            status = Cdm_OnOffStatusInterfaceSetIsOn(busAttachment, CDM_OBJECT_PATH_CONTROLLEE, bVar);
         } else {
             printf("CdmInterfaceSetProperty: undefined property name %s\n", proprietyDescriptor->name);
         }
@@ -1276,8 +1289,8 @@ AJ_Status CdmInterfaceGetProperty(const char* objPath, const char* interfaceName
             printf("CdmInterfaceGetProperty: undefined property name %s\n", proprietyDescriptor->name);
         }
     } else if (strcmp(interfaceName, "OnOffStatus") == 0) {
-        if (strcmp(proprietyDescriptor->name, "OnOff") == 0) {
-            status = Cdm_OnOffStatusInterfaceGetOnOff(CDM_OBJECT_PATH_CONTROLLEE, bVarPtr);
+        if (strcmp(proprietyDescriptor->name, "IsOn") == 0) {
+            status = Cdm_OnOffStatusInterfaceGetIsOn(CDM_OBJECT_PATH_CONTROLLEE, bVarPtr);
         } else {
             printf("CdmInterfaceGetProperty: undefined property name %s\n", proprietyDescriptor->name);
         }
@@ -2713,11 +2726,11 @@ AJ_Status InitCdmOnOffStatusProperties(AJ_BusAttachment* busAttachment)
     AJ_Status getStatus = AJ_OK;
     AJ_Status setStatus = AJ_OK;
     uint8_t i = 0;
-    bool onOff = true;
-    bool onOffRead;
+    bool isOn = true;
+    bool isOnRead;
     const char* const interfaceName = "OnOffStatus";
     const CDM_ProprietyDescriptor proprietyDescriptor[] = {
-        { "OnOff" , 0 , 'b' , &onOff , &onOffRead , 1 },
+        { "IsOn" , 0 , 'b' , &isOn , &isOnRead , 1 },
     };
     printf("\n");
     for (i = 0; i < sizeof(proprietyDescriptor)/sizeof(proprietyDescriptor[0]); i++) {
@@ -4066,7 +4079,7 @@ int AJ_Main(void)
 
 #if defined(ENABLE_OPERATION_ON_OFF_STATUS_IF)
     /* Operation.OnOffStatus */
-    onOffStatusListener.OnGetOnOff = NULL;
+    onOffStatusListener.OnGetIsOn = NULL;
     status = Cdm_CreateInterface(ON_OFF_STATUS_INTERFACE, CDM_OBJECT_PATH_CONTROLLEE, &onOffStatusListener);
 #endif
 
@@ -4277,4 +4290,3 @@ int main()
     return AJ_Main();
 }
 #endif
-
