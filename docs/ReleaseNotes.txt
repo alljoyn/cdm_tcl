@@ -1,0 +1,68 @@
+AllSeen Common Device Models (CDM) Service Framework 16.04 Release Notes
+========================================================================
+
+Platform Support
+----------------
+1) Linux Ubuntu 14.04 LTS (64 bit)
+
+Features added in Version 16.04
+--------------------------------
+45 interfaces are included in this release.
+
+ * Environment
+     - CurrentAirQuality
+     - CurrentAirQualityLevel
+     - CurrentHumidity
+     - CurrentTemperature
+     - TargetHumidity
+     - TargetTemperature
+     - TargetTemperatureLevel
+     - WaterLevel
+     - WindDirection
+ * Operation
+     -  Hid
+     -  AirRecirculationMode
+     -  Alerts
+     -  AudioVideoInput
+     -  AudioVolume
+     -  BatteryStatus
+     -  Channel
+     -  ClimateControlMode
+     -  ClosedStatus
+     -  CurrentPower
+     -  CycleControl
+     -  DishWashingCyclePhase
+     -  EnergyUsage
+     -  FanSpeedLevel
+     -  FilterStatus
+     -  HeatingZone
+     -  HvacFanMode
+     -  LaundryCyclePhase
+     -  MoistureOutputLevel
+     -  OffControl
+     -  OnControl
+     -  OnOffStatus
+     -  OvenCyclePhase
+     -  PlugInUnits
+     -  RapidMode
+     -  RapidModeTimed
+     -  RemoteControllability
+     -  RepeatMode
+     -  ResourceSaving
+     -  RobotCleaningCyclePhase
+     -  SoilLevel
+     -  SpinSpeedLevel
+     -  Timer
+ * UserInterfaceSettings
+     - LanguageDisplay
+     - TemperatureDisplay
+     - TimeDisplay
+
+Integrated controllee is supported for TCL.
+
+Compatibility
+-------------
+
+Change history
+--------------
+16.04 - 1st release
