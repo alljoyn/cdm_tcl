@@ -561,7 +561,11 @@ AJSVC_ServiceStatus Cdm_MessageProcessor(AJ_BusAttachment* busAttachment, AJ_Mes
         CdmInterfaceInfo* intfInfo = GetInterfaceInfo(objInfo, intfIndex);
 
         if (objInfo && intfInfo && intfInfo->handler && intfInfo->handler->OnMethodHandler) {
-            *status = intfInfo->handler->OnMethodHandler(msg, objInfo->path, memberIndex);
+            AJ_Message replyMsg;
+            *status = AJ_MarshalReplyMsg(msg, &replyMsg);
+            if (*status == AJ_OK) {
+                *status = intfInfo->handler->OnMethodHandler(msg, &replyMsg, objInfo->path, memberIndex);
+            }
         } else {
             *status = AJ_ERR_NULL;
         }

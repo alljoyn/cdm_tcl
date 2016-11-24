@@ -106,7 +106,7 @@ typedef struct {
 
     /**
      * Handler called when getting property value is requested.
-     * @param[in] replyMsg reply message
+     * @param[in] replyMsg put the reply in here and call AJ_DeliverMsg
      * @param[in] objPath the object path including the interface
      * @param[in] memberIndex index of the property in the interface description
      * @return AJ_OK on success
@@ -115,22 +115,23 @@ typedef struct {
 
     /**
      * Handler called when setting property value is requested.
-     * @param[in] busAttachment bus attachment
-     * @param[in] replyMsg reply message
+     * @param[in] busAttachment bus attachment in case a signal is to be emitted
+     * @param[in] msg the original message containing the propery value
      * @param[in] objPath the object path including the interface
      * @param[in] memberIndex index of the property in the interface description
      * @return AJ_OK on success
      */
-    AJ_Status (*OnSetProperty)(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex);
+    AJ_Status (*OnSetProperty)(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex);
 
     /**
      * Handler called when method is called.
-     * @param[in] msg message
+     * @param[in] msg message with the method args
+     * @param[in] replyMsg put the reply in here and call AJ_DeliverMsg
      * @param[in] objPath the object path including the interface
      * @param[in] memberIndex index of the method in the interface description
      * @return AJ_OK on success
      */
-    AJ_Status (*OnMethodHandler)(AJ_Message* msg, const char* objPath, uint8_t memberIndex);
+    AJ_Status (*OnMethodHandler)(AJ_Message* msg, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex);
 } InterfaceHandler;
 
 #ifdef USE_DEPRECATED_INTERFACE_TYPES
