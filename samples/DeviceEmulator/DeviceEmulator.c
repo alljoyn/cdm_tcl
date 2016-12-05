@@ -27,6 +27,7 @@
 #include <ajtcl/cdm/interfaces/operation/OnOffStatusInterface.h>
 
 #include "DeviceConfig.h"
+#include "InterfaceFactory.h"
 #include "../Utils/HAL.h"
 
 #include "Models/operation/OnOffStatusModelImpl.h"
@@ -63,14 +64,18 @@ static const uint32_t suites[4] = { AUTH_SUITE_ECDHE_ECDSA, AUTH_SUITE_ECDHE_SPE
 static const char ecspeke_password[] = "1234";
 static const char psk_password[] = "faaa0af3dd3f1e0379da046a3ab6ca44";
 
-static AJ_Status CreateInterfaces()
+static void CreateInterfaces(DEM_Config* config)
 {
-    AJ_Status status = AJ_OK;
+    for (int i = 0; i < config->numObjects; ++i) {
+        DEM_Object* obj = &config->objects[i];
 
-    status = Cdm_AddInterface("/cdm/emulated", ON_OFF_STATUS, intfDescOperationOnOffStatus, &intfHandlerOperationOnOffStatus, GetOnOffStatusModel());
-
-    return status;
+        for (int j = 0; j < obj->numInterfaces; ++j) {
+            createInterface("/cdm/emulated", obj->interfaces[j].name);
+        }
+    }
 }
+
+
 
 int main(int argc, char *argv[])
 {
@@ -105,7 +110,7 @@ int main(int argc, char *argv[])
         goto CLEANUP;
     }
 
-    CreateInterfaces();
+    CreateInterfaces(config);
 
     bus.isConnected = 0;
     CDM_SetDefaultRoutingNodeParams(&routingNodeParams);
