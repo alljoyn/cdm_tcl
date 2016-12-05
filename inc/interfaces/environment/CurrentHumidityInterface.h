@@ -36,8 +36,8 @@ typedef enum {
 
 
 
-extern const char* const intfDescOperationCurrentHumidity[CURRENTHUMIDITY_MEMBER_COUNT + 2];
-extern const InterfaceHandler intfHandlerOperationCurrentHumidity;
+extern const char* const intfDescEnvironmentCurrentHumidity[CURRENTHUMIDITY_MEMBER_COUNT + 2];
+extern const InterfaceHandler intfHandlerEnvironmentCurrentHumidity;
 
 
 /**

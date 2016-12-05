@@ -26,7 +26,7 @@
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME TARGET_TEMPERATURE_LEVEL
 
-const char* const intfDescOperationTargetTemperatureLevel[] = {
+const char* const intfDescEnvironmentTargetTemperatureLevel[] = {
     "$org.alljoyn.SmartSpaces.Environment.TargetTemperatureLevel",
     "@Version>q",
     "@MaxLevel>y",
@@ -237,7 +237,7 @@ static AJ_Status TargetTemperatureLevel_OnMethodHandler(AJ_BusAttachment* busAtt
 
 
 
-const InterfaceHandler intfHandlerOperationTargetTemperatureLevel = {
+const InterfaceHandler intfHandlerEnvironmentTargetTemperatureLevel = {
     TargetTemperatureLevel_OnGetProperty,
     TargetTemperatureLevel_OnSetProperty,
     TargetTemperatureLevel_OnMethodHandler

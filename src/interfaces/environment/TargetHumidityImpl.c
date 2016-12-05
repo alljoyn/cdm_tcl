@@ -26,7 +26,7 @@
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME TARGET_HUMIDITY
 
-const char* const intfDescOperationTargetHumidity[] = {
+const char* const intfDescEnvironmentTargetHumidity[] = {
     "$org.alljoyn.SmartSpaces.Environment.TargetHumidity",
     "@Version>q",
     "@TargetValue=y",
@@ -321,7 +321,7 @@ static AJ_Status TargetHumidity_OnMethodHandler(AJ_BusAttachment* busAttachment,
 
 
 
-const InterfaceHandler intfHandlerOperationTargetHumidity = {
+const InterfaceHandler intfHandlerEnvironmentTargetHumidity = {
     TargetHumidity_OnGetProperty,
     TargetHumidity_OnSetProperty,
     TargetHumidity_OnMethodHandler

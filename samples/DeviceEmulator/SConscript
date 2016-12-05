@@ -20,6 +20,7 @@ Import('env')
 srcs = env.Glob('*.c')
 srcs += env.Glob('../Utils/*.c')
 srcs += env.Glob('Models/operation/*.c')
+srcs += env.Glob('Models/environment/*.c')
 
 objs = env.Object(srcs)
 

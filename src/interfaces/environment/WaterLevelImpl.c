@@ -26,7 +26,7 @@
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME WATER_LEVEL
 
-const char* const intfDescOperationWaterLevel[] = {
+const char* const intfDescEnvironmentWaterLevel[] = {
     "$org.alljoyn.SmartSpaces.Environment.WaterLevel",
     "@Version>q",
     "@SupplySource>y",
@@ -229,7 +229,7 @@ static AJ_Status WaterLevel_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_
 
 
 
-const InterfaceHandler intfHandlerOperationWaterLevel = {
+const InterfaceHandler intfHandlerEnvironmentWaterLevel = {
     WaterLevel_OnGetProperty,
     WaterLevel_OnSetProperty,
     WaterLevel_OnMethodHandler

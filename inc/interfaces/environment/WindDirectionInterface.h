@@ -74,8 +74,8 @@ extern size_t ExtendArray_WindDirection_AutoMode(Array_WindDirection_AutoMode* v
 
 
 
-extern const char* const intfDescOperationWindDirection[WINDDIRECTION_MEMBER_COUNT + 2];
-extern const InterfaceHandler intfHandlerOperationWindDirection;
+extern const char* const intfDescEnvironmentWindDirection[WINDDIRECTION_MEMBER_COUNT + 2];
+extern const InterfaceHandler intfHandlerEnvironmentWindDirection;
 
 
 /**

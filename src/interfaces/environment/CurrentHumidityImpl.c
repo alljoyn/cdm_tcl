@@ -26,7 +26,7 @@
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME CURRENT_HUMIDITY
 
-const char* const intfDescOperationCurrentHumidity[] = {
+const char* const intfDescEnvironmentCurrentHumidity[] = {
     "$org.alljoyn.SmartSpaces.Environment.CurrentHumidity",
     "@Version>q",
     "@CurrentValue>y",
@@ -162,7 +162,7 @@ static AJ_Status CurrentHumidity_OnMethodHandler(AJ_BusAttachment* busAttachment
 
 
 
-const InterfaceHandler intfHandlerOperationCurrentHumidity = {
+const InterfaceHandler intfHandlerEnvironmentCurrentHumidity = {
     CurrentHumidity_OnGetProperty,
     CurrentHumidity_OnSetProperty,
     CurrentHumidity_OnMethodHandler

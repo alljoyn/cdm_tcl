@@ -77,8 +77,8 @@ extern size_t ExtendArray_CurrentAirQuality_ContaminantType(Array_CurrentAirQual
 
 
 
-extern const char* const intfDescOperationCurrentAirQuality[CURRENTAIRQUALITY_MEMBER_COUNT + 2];
-extern const InterfaceHandler intfHandlerOperationCurrentAirQuality;
+extern const char* const intfDescEnvironmentCurrentAirQuality[CURRENTAIRQUALITY_MEMBER_COUNT + 2];
+extern const InterfaceHandler intfHandlerEnvironmentCurrentAirQuality;
 
 
 /**

@@ -26,7 +26,7 @@
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME CURRENT_TEMPERATURE
 
-const char* const intfDescOperationCurrentTemperature[] = {
+const char* const intfDescEnvironmentCurrentTemperature[] = {
     "$org.alljoyn.SmartSpaces.Environment.CurrentTemperature",
     "@Version>q",
     "@CurrentValue>d",
@@ -204,7 +204,7 @@ static AJ_Status CurrentTemperature_OnMethodHandler(AJ_BusAttachment* busAttachm
 
 
 
-const InterfaceHandler intfHandlerOperationCurrentTemperature = {
+const InterfaceHandler intfHandlerEnvironmentCurrentTemperature = {
     CurrentTemperature_OnGetProperty,
     CurrentTemperature_OnSetProperty,
     CurrentTemperature_OnMethodHandler

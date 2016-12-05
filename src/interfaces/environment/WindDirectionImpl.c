@@ -26,7 +26,7 @@
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME WIND_DIRECTION
 
-const char* const intfDescOperationWindDirection[] = {
+const char* const intfDescEnvironmentWindDirection[] = {
     "$org.alljoyn.SmartSpaces.Environment.WindDirection",
     "@Version>q",
     "@HorizontalDirection=q",
@@ -487,7 +487,7 @@ static AJ_Status WindDirection_OnMethodHandler(AJ_BusAttachment* busAttachment, 
 
 
 
-const InterfaceHandler intfHandlerOperationWindDirection = {
+const InterfaceHandler intfHandlerEnvironmentWindDirection = {
     WindDirection_OnGetProperty,
     WindDirection_OnSetProperty,
     WindDirection_OnMethodHandler

@@ -71,8 +71,8 @@ extern size_t ExtendArray_WaterLevel_SupplySource(Array_WaterLevel_SupplySource*
 
 
 
-extern const char* const intfDescOperationWaterLevel[WATERLEVEL_MEMBER_COUNT + 2];
-extern const InterfaceHandler intfHandlerOperationWaterLevel;
+extern const char* const intfDescEnvironmentWaterLevel[WATERLEVEL_MEMBER_COUNT + 2];
+extern const InterfaceHandler intfHandlerEnvironmentWaterLevel;
 
 
 /**

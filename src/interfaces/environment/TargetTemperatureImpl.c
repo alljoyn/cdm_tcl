@@ -26,7 +26,7 @@
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME TARGET_TEMPERATURE
 
-const char* const intfDescOperationTargetTemperature[] = {
+const char* const intfDescEnvironmentTargetTemperature[] = {
     "$org.alljoyn.SmartSpaces.Environment.TargetTemperature",
     "@Version>q",
     "@TargetValue=d",
@@ -279,7 +279,7 @@ static AJ_Status TargetTemperature_OnMethodHandler(AJ_BusAttachment* busAttachme
 
 
 
-const InterfaceHandler intfHandlerOperationTargetTemperature = {
+const InterfaceHandler intfHandlerEnvironmentTargetTemperature = {
     TargetTemperature_OnGetProperty,
     TargetTemperature_OnSetProperty,
     TargetTemperature_OnMethodHandler

@@ -26,7 +26,7 @@
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME CURRENT_AIR_QUALITY
 
-const char* const intfDescOperationCurrentAirQuality[] = {
+const char* const intfDescEnvironmentCurrentAirQuality[] = {
     "$org.alljoyn.SmartSpaces.Environment.CurrentAirQuality",
     "@Version>q",
     "@ContaminantType>y",
@@ -355,7 +355,7 @@ static AJ_Status CurrentAirQuality_OnMethodHandler(AJ_BusAttachment* busAttachme
 
 
 
-const InterfaceHandler intfHandlerOperationCurrentAirQuality = {
+const InterfaceHandler intfHandlerEnvironmentCurrentAirQuality = {
     CurrentAirQuality_OnGetProperty,
     CurrentAirQuality_OnSetProperty,
     CurrentAirQuality_OnMethodHandler

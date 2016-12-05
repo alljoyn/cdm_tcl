@@ -37,8 +37,8 @@ typedef enum {
 
 
 
-extern const char* const intfDescOperationCurrentTemperature[CURRENTTEMPERATURE_MEMBER_COUNT + 2];
-extern const InterfaceHandler intfHandlerOperationCurrentTemperature;
+extern const char* const intfDescEnvironmentCurrentTemperature[CURRENTTEMPERATURE_MEMBER_COUNT + 2];
+extern const InterfaceHandler intfHandlerEnvironmentCurrentTemperature;
 
 
 /**
