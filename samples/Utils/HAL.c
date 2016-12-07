@@ -476,15 +476,17 @@ static void readToWS(FILE* fp, Buf* buf)
 
 
 
-static bool lookahead(FILE* fp, const char* token)
+static int lookahead(FILE* fp, const char* token)
 {
     /* Read ahead looking for WS followed by the token.
        If found then the file will be left at the following
        character. If not found then the file's position will not
        be changed.
+
+       Returns 1 for found, 0 for not found, -1 for eof.
     */
     long start = ftell(fp);
-    bool found = true;
+    int  result = 1;
 
     skipWS(fp);
 
@@ -492,21 +494,27 @@ static bool lookahead(FILE* fp, const char* token)
     {
         int c = fgetc(fp);
 
-        if (c < 0 || c != *token)
+        if (c < 0)
         {
-            found = false;
+            result = -1;
+            break;
+        }
+
+        if (c != *token)
+        {
+            result = 0;
             break;
         }
 
         ++token;
     }
 
-    if (!found)
+    if (result != 1)
     {
         fseek(fp, start, SEEK_SET);
     }
 
-    return found;
+    return result;
 }
 
 
@@ -753,7 +761,8 @@ void HAL_Decode_OpenArray(FILE *fp)
 
 bool HAL_Decode_TestCloseArray(FILE *fp)
 {
-    return lookahead(fp, "]");
+    // Treat eof as the closing of an array
+    return lookahead(fp, "]") != 0;
 }
 
 
