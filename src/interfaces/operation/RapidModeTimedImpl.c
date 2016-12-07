@@ -179,7 +179,7 @@ static AJ_Status RapidModeTimed_OnSetProperty(AJ_BusAttachment* busAttachment, A
 
 
 
-static AJ_Status RapidModeTimed_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
+static AJ_Status RapidModeTimed_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
 

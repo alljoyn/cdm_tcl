@@ -211,7 +211,7 @@ static AJ_Status HvacFanMode_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_M
 
 
 
-static AJ_Status HvacFanMode_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
+static AJ_Status HvacFanMode_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
 

@@ -126,12 +126,11 @@ typedef struct {
     /**
      * Handler called when method is called.
      * @param[in] msg message with the method args
-     * @param[in] replyMsg put the reply in here and call AJ_DeliverMsg
      * @param[in] objPath the object path including the interface
      * @param[in] memberIndex index of the method in the interface description
      * @return AJ_OK on success
      */
-    AJ_Status (*OnMethodHandler)(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex);
+    AJ_Status (*OnMethodHandler)(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex);
 } InterfaceHandler;
 
 #ifdef USE_DEPRECATED_INTERFACE_TYPES

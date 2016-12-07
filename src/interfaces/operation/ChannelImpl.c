@@ -259,7 +259,7 @@ static AJ_Status Channel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Messa
 
 
 
-static AJ_Status Channel_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
+static AJ_Status Channel_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -283,10 +283,13 @@ static AJ_Status Channel_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Mes
 
         status = Cdm_Channel_CallGetChannelList(busAttachment, objPath, starting_record, num_records, &list_of_channel_info_records);
 
+        AJ_Message reply;
+        AJ_MarshalReplyMsg(msg, &reply);
+
         if (status == AJ_OK) {
-            status |= AJ_MarshalArgs(replyMsg, "a(sss)", list_of_channel_info_records.elems, list_of_channel_info_records.numElems);
+            status |= AJ_MarshalArgs(&reply, "a(sss)", list_of_channel_info_records.elems, list_of_channel_info_records.numElems);
             if (status == AJ_OK) {
-                status = AJ_DeliverMsg(replyMsg);
+                status = AJ_DeliverMsg(&reply);
             }
         }
 

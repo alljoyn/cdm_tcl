@@ -224,7 +224,7 @@ static AJ_Status OvenCyclePhase_OnSetProperty(AJ_BusAttachment* busAttachment, A
 
 
 
-static AJ_Status OvenCyclePhase_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
+static AJ_Status OvenCyclePhase_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -242,10 +242,13 @@ static AJ_Status OvenCyclePhase_OnMethodHandler(AJ_BusAttachment* busAttachment,
 
         status = Cdm_OvenCyclePhase_CallGetVendorPhasesDescription(busAttachment, objPath, language_tag, &phases_description);
 
+        AJ_Message reply;
+        AJ_MarshalReplyMsg(msg, &reply);
+
         if (status == AJ_OK) {
-            status |= AJ_MarshalArgs(replyMsg, "a(yss)", phases_description.elems, phases_description.numElems);
+            status |= AJ_MarshalArgs(&reply, "a(yss)", phases_description.elems, phases_description.numElems);
             if (status == AJ_OK) {
-                status = AJ_DeliverMsg(replyMsg);
+                status = AJ_DeliverMsg(&reply);
             }
         }
 

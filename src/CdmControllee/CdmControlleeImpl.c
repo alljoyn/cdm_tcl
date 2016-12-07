@@ -516,7 +516,8 @@ static AJ_Status PropGetHandler(AJ_Message* msg, AJ_BusAttachment* busAttachment
         /**
          * OnGetProperty must attempt to deliver the message for memory management reasons.
          * If it returns an error it may have attempted to deliver the message
-         * but failed.
+         * but failed. Be careful that nothing else attempts to marshal a message until this
+         * reply has been delivered.
          */
         if (objInfo && intfInfo && intfInfo->handler && intfInfo->handler->OnGetProperty) {
             uint8_t memberIndex = GetMemberIndex(propId);
@@ -596,14 +597,10 @@ AJSVC_ServiceStatus Cdm_MessageProcessor(AJ_BusAttachment* busAttachment, AJ_Mes
         CdmObjectInfo* objInfo = GetObjectInfoByIndex(objIndex);
         CdmInterfaceInfo* intfInfo = GetInterfaceInfo(objInfo, intfIndex);
 
-        // Prepare a reply message to be filled in and delivered by OnMethodHandler
-        AJ_Message replyMsg;
-        *status = AJ_MarshalReplyMsg(msg, &replyMsg);
-
         if (*status == AJ_OK) {
             if (objInfo && intfInfo && intfInfo->handler && intfInfo->handler->OnMethodHandler) {
                 if (*status == AJ_OK) {
-                    *status = intfInfo->handler->OnMethodHandler(busAttachment, msg, &replyMsg, objInfo->path, memberIndex);
+                    *status = intfInfo->handler->OnMethodHandler(busAttachment, msg, objInfo->path, memberIndex);
                 }
             } else {
                 *status = AJ_ERR_NULL;

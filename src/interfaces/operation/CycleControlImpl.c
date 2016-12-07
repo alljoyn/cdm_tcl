@@ -251,7 +251,7 @@ static AJ_Status CycleControl_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_
 
 
 
-static AJ_Status CycleControl_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
+static AJ_Status CycleControl_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -268,8 +268,11 @@ static AJ_Status CycleControl_OnMethodHandler(AJ_BusAttachment* busAttachment, A
 
         status = Cdm_CycleControl_CallExecuteOperationalCommand(busAttachment, objPath, command);
 
+        AJ_Message reply;
+        AJ_MarshalReplyMsg(msg, &reply);
+
         if (status == AJ_OK) {
-            status = AJ_DeliverMsg(replyMsg);
+            status = AJ_DeliverMsg(&reply);
         }
 
         break;

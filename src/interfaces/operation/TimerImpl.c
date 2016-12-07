@@ -340,7 +340,7 @@ static AJ_Status Timer_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message
 
 
 
-static AJ_Status Timer_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
+static AJ_Status Timer_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -357,8 +357,11 @@ static AJ_Status Timer_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Messa
 
         status = Cdm_Timer_CallSetTargetTimeToStart(busAttachment, objPath, target_time_to_start);
 
+        AJ_Message reply;
+        AJ_MarshalReplyMsg(msg, &reply);
+
         if (status == AJ_OK) {
-            status = AJ_DeliverMsg(replyMsg);
+            status = AJ_DeliverMsg(&reply);
         }
 
         break;
@@ -375,8 +378,11 @@ static AJ_Status Timer_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Messa
 
         status = Cdm_Timer_CallSetTargetTimeToStop(busAttachment, objPath, target_time_to_stop);
 
+        AJ_Message reply;
+        AJ_MarshalReplyMsg(msg, &reply);
+
         if (status == AJ_OK) {
-            status = AJ_DeliverMsg(replyMsg);
+            status = AJ_DeliverMsg(&reply);
         }
 
         break;
