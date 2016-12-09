@@ -85,7 +85,7 @@ static AJ_Status RegisterInterface(const char* intfName, CdmInterfaceTypes intfT
 }
 #endif
 
-AJ_Status Cdm_Init()
+AJ_Status Cdm_Init(void)
 {
     objInfoFirst = NULL;
     objInfoLast = NULL;
@@ -107,7 +107,7 @@ AJ_Status Cdm_Init()
     return status;
 }
 
-void Cdm_Deinit()
+void Cdm_Deinit(void)
 {
     CdmObjectInfo* objInfo = objInfoFirst;
     CdmObjectInfo* tempObjInfo = NULL;
@@ -354,7 +354,7 @@ static void CleanInterfaceDescs()
     }
 }
 
-AJ_Status Cdm_Start()
+AJ_Status Cdm_Start(void)
 {
     if (!objInfoFirst || !objInfoLast) {
         return AJ_ERR_UNEXPECTED;

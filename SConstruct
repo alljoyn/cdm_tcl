@@ -106,6 +106,7 @@ env.Append(CPPDEFINES = [ v for k, v in ARGLIST if k.lower() == 'define' ])
 # Install header files
 #######################################################
 env.Install('#dist/include/ajtcl/cdm', env.Glob('inc/*.h'))
+env.Install('#dist/include/ajtcl/cdm/utils', env.Glob('inc/utils/*.h'))
 env.Install('#dist/include/ajtcl/cdm/interfaces', env.Glob('inc/interfaces/*.h'))
 env.Install('#dist/include/ajtcl/cdm/interfaces/operation', env.Glob('inc/interfaces/operation/*.h'))
 env.Install('#dist/include/ajtcl/cdm/interfaces/environment', env.Glob('inc/interfaces/environment/*.h'))
@@ -122,7 +123,7 @@ env.Depends('#build/$VARIANT', '#dist/include')
 #######################################################
 if env['build']:
     env.SConscript('src/SConscript',       variant_dir='#build/$VARIANT/src',       duplicate = 0)
-    env.SConscript('samples/SConscript',   variant_dir='#build/$VARIANT/samples',   duplicate = 0)
+    env.SConscript('samples/SConscript', variant_dir='#build/$VARIANT/samples', duplicate = 0)
 
 #######################################################
 # Run the whitespace checker

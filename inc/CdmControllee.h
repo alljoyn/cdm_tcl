@@ -21,7 +21,7 @@
 #include <ajtcl/alljoyn.h>
 #include <stdbool.h>
 
-#define USE_DEPRECATED_INTERFACE_TYPES      // Remove this define once deprecation period is over.
+//#define USE_DEPRECATED_INTERFACE_TYPES      // Remove this define once deprecation period is over.
 
 #ifdef USE_DEPRECATED_INTERFACE_TYPES
 typedef enum {
@@ -133,19 +133,20 @@ typedef struct {
     AJ_Status (*OnMethodHandler)(AJ_Message* msg, const char* objPath, uint8_t memberIndex);
 } InterfaceHandler;
 
+#ifdef USE_DEPRECATED_INTERFACE_TYPES
 AJ_DEPRECATED_ON(typedef InterfaceHandler VendorDefinedInterfaceHandler, 16.10);
-
+#endif
 
 /**
  * Initialize CDM service framework.
  * @return AJ_OK on success.
  */
-AJ_Status Cdm_Init();
+AJ_Status Cdm_Init(void);
 
 /**
  * Deinitialize CDM service framework.
  */
-void Cdm_Deinit();
+void Cdm_Deinit(void);
 
 #ifdef USE_DEPRECATED_INTERFACE_TYPES
 /**
@@ -193,7 +194,7 @@ AJ_Status Cdm_AddInterface(const char* objPath, const char* intfName, const char
  * Objects with interfaces are registered.
  * @return AJ_OK on success
  */
-AJ_Status Cdm_Start();
+AJ_Status Cdm_Start(void);
 
 /**
  * Enable security.

@@ -34,7 +34,7 @@ typedef enum {
 typedef AJ_Status (*MarshalStructFunc)(AJ_Message*, void*, const char*);
 typedef AJ_Status (*MarshalArgHandler)(va_list*, AJ_Message*, const char*, const char*);
 
-PropSignatureType GetPropSignatureType(const char* signature)
+static PropSignatureType GetPropSignatureType(const char* signature)
 {
     PropSignatureType propSignatureType = SIGNATURE_UNSUPPORTED;
 
@@ -64,7 +64,7 @@ PropSignatureType GetPropSignatureType(const char* signature)
     return propSignatureType;
 }
 
-AJ_Status MarshalSignatureBasic(va_list* vaList, AJ_Message* msg, const char* propName, const char* signature)
+static AJ_Status MarshalSignatureBasic(va_list* vaList, AJ_Message* msg, const char* propName, const char* signature)
 {
     AJ_Status status = AJ_OK;
 
@@ -113,7 +113,7 @@ AJ_Status MarshalSignatureBasic(va_list* vaList, AJ_Message* msg, const char* pr
     return status;
 }
 
-AJ_Status MarshalSignatureArrayBasic(va_list* vaList, AJ_Message* msg, const char* propName, const char* signature)
+static AJ_Status MarshalSignatureArrayBasic(va_list* vaList, AJ_Message* msg, const char* propName, const char* signature)
 {
     AJ_Status status = AJ_OK;
 
@@ -156,7 +156,7 @@ AJ_Status MarshalSignatureArrayBasic(va_list* vaList, AJ_Message* msg, const cha
     return status;
 }
 
-AJ_Status MarshalSignatureStruct(va_list* vaList, AJ_Message* msg, const char* propName, const char* signature)
+static AJ_Status MarshalSignatureStruct(va_list* vaList, AJ_Message* msg, const char* propName, const char* signature)
 {
     AJ_Status status = AJ_OK;
     AJ_Arg argStruct;
@@ -196,7 +196,7 @@ AJ_Status MarshalSignatureStruct(va_list* vaList, AJ_Message* msg, const char* p
     return status;
 }
 
-AJ_Status MarshalSignatureArrayStruct(va_list* vaList, AJ_Message* msg, const char* propName, const char* signature)
+static AJ_Status MarshalSignatureArrayStruct(va_list* vaList, AJ_Message* msg, const char* propName, const char* signature)
 {
     AJ_Status status = AJ_OK;
     AJ_Arg argArray;

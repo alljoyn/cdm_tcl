@@ -94,8 +94,9 @@ typedef struct {
     AJ_Status (*GetChannelList) (void* context, const char* objPath, uint16_t startingRecord, uint16_t numRecords, ChannelInfoRecord* outListOfChannelInfoRecords, uint16_t* outNumReturnedRecords, ErrorCode* outErrorCode);
 } ChannelModel;
 
+#ifdef USE_DEPRECATED_INTERFACE_TYPES
 AJ_DEPRECATED_ON(typedef ChannelModel ChannelListener, 16.10);
-
+#endif
 
 /**
  * Manually emit a changed signal for a Channel interface property; useful for read-only properties

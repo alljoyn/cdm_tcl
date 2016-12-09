@@ -88,8 +88,9 @@ typedef struct {
     AJ_Status (*GetStepValue) (void* context, const char* objPath, double* outStepValue);
 } TargetTemperatureModel;
 
+#ifdef USE_DEPRECATED_INTERFACE_TYPES
 AJ_DEPRECATED_ON(typedef TargetTemperatureModel TargetTemperatureListener, 16.10);
-
+#endif
 
 /**
  * Manually emit a changed signal for a TargetTemperature interface property; useful for read-only properties
