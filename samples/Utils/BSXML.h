@@ -17,6 +17,9 @@
 #ifndef ALLJOYN_BSXML_H
 #define ALLJOYN_BSXML_H
 
+#include <stdint.h>
+#include <stdlib.h>
+
 //======================================================================
 
 /**
@@ -57,7 +60,7 @@ extern Element* BSXML_GetRoot(const char* xml);
  * @param parent   Parent element or NULL if this element is the root.
  * @param name     XML element name.
  */
-extern Element* BSXML_NewElement(Element* parent, const char* name);
+extern Element* BSXML_NewElement(const char* name, Element* parent);
 
 
 /** 

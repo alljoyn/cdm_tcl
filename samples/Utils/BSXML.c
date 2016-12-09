@@ -16,7 +16,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdbool.h>
 #include <assert.h>
 
 #include "BSXML.h"
@@ -71,7 +71,7 @@ static void Context_Init(Context* ctxt, const char* source)
     ctxt->source = source;
     ctxt->getter = source;
     ctxt->parseState = IN_ELEMENT;
-    ctxt->root = BSXML_NewElement(NULL, "");
+    ctxt->root = BSXML_NewElement("", NULL);
     ctxt->curElem = NULL;
     StrBuf_Init(&ctxt->rawContent);
     StrBuf_Init(&ctxt->elemName);
@@ -104,7 +104,7 @@ static void FreeContext(Context* ctxt)
 
 
 
-Element* BSXML_NewElement(Element* parent, const char* name)
+Element* BSXML_NewElement(const char* name, Element* parent)
 {
     Element* elem = calloc(1, sizeof(Element));
 
@@ -607,7 +607,7 @@ static Element* Parse(Context* ctxt)
                                 ctxt->curElem = ctxt->root;
                                 XferName(ctxt->curElem, StrBuf_FetchClear(&ctxt->elemName));
                             } else {
-                                ctxt->curElem = BSXML_NewElement(ctxt->curElem, ctxt->elemName.chars);
+                                ctxt->curElem = BSXML_NewElement(ctxt->elemName.chars, ctxt->curElem);
                                 StrBuf_Clear(&ctxt->elemName);
                             }
                         } else {
@@ -623,7 +623,7 @@ static Element* Parse(Context* ctxt)
                             ctxt->curElem = ctxt->root;
                             XferName(ctxt->curElem, StrBuf_FetchClear(&ctxt->elemName));
                         } else {
-                            ctxt->curElem = BSXML_NewElement(ctxt->curElem, ctxt->elemName.chars);
+                            ctxt->curElem = BSXML_NewElement(ctxt->elemName.chars, ctxt->curElem);
                             StrBuf_Clear(&ctxt->elemName);
                         }
                         ctxt->isEndTag = true;
