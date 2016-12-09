@@ -21,15 +21,15 @@ typedef int (*HAL_WriterFunc)(FILE *fp, void*);
 typedef int (*HAL_ReaderFunc)(FILE *fp, const char*, void*);
 
 void HAL_Init(const char *base_path, const char *ext);
-void HAL_DefaultInit();
+void HAL_DefaultInit(void);
 
 int HAL_WriteProperty(const char *objPath, const char *interface, const char *property, HAL_WriterFunc write, void *data);
 int HAL_ReadProperty(const char *objPath, const char *interface, const char *property, HAL_ReaderFunc read, void *out);
 
-int HAL_writeBool(FILE *fp, void* data);
-int HAL_writeInt(FILE *fp, void* data);
+int HAL_WriteBool(FILE *fp, void* data);
+int HAL_WriteInt(FILE *fp, void* data);
 
-int HAL_readBool(FILE *fp, const char *buf, void *data);
-int HAL_readInt(FILE *fp, const char *buf, void *data);
+int HAL_ReadBool(FILE *fp, const char *buf, void *data);
+int HAL_ReadInt(FILE *fp, const char *buf, void *data);
 
 #endif //ALLJOYN_HAL_H

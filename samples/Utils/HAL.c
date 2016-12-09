@@ -20,6 +20,8 @@
 #include <sys/stat.h>
 //#include <stdint.h>
 
+#include <stdbool.h>
+
 #include "HAL.h"
 
 static int PathExists(const char *path) {
@@ -64,7 +66,7 @@ void HAL_Init(const char *base_path, const char *ext)
     EXT = ext;
 }
 
-void HAL_DefaultInit()
+void HAL_DefaultInit(void)
 {
     static const char *root = "device_state";
     static const char *ext = ".state";
@@ -151,6 +153,8 @@ int HAL_ReadProperty(const char *objPath, const char *interface, const char *pro
     strcat(path, EXT);
 
     fp = fopen(path, "r");
+    if (!fp)
+        return 0;
 
     fseek(fp, 0L, SEEK_END);
     fSize = ftell(fp);
@@ -166,9 +170,10 @@ int HAL_ReadProperty(const char *objPath, const char *interface, const char *pro
 
     result = read(fp, buf, out);
 
-    CLEANUP:
+CLEANUP:
     free(buf);
-    ERROR:
+
+ERROR:
     fclose(fp);
 
     return result;
@@ -176,7 +181,7 @@ int HAL_ReadProperty(const char *objPath, const char *interface, const char *pro
 
 int HAL_WriteBool(FILE *fp, void* data)
 {
-    int *value = (int*)data;
+    bool *value = (bool*)data;
     int result = fprintf(fp, "%d", *value);
 
     return (result <= 0) ? 0 : 1;
@@ -192,11 +197,11 @@ int HAL_WriteInt(FILE *fp, void* data)
 
 int HAL_ReadBool(FILE *fp, const char *buf, void *data)
 {
-    int *value = (int*)data;
+    bool *value = (bool*)data;
     if (strlen(buf)!= 1)
         return 0;
 
-    *value = (buf[0] == '0') ? 0 : 1;
+    *value = (buf[0] == '0') ? false : true;
     return 1;
 }
 
