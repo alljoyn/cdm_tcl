@@ -342,3 +342,9 @@ DEM_Config *DEM_CreateConfig(const char *deviceXmlPath)
     free(xmlBuf);
     return configBuilder.config;
 }
+
+void DEM_FreeConfig(DEM_Config *config)
+{
+    if (config != NULL)
+        free(config);
+}

@@ -14,30 +14,33 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
-#ifndef ALLJOYN_DEVICECONFIG_H
-#define ALLJOYN_DEVICECONFIG_H
+#ifndef ALLJOYN_CDM_SECURITY_H
+#define ALLJOYN_CDM_SECURITY_H
 
-typedef struct
-{
-    char *name;
-} DEM_Interface;
+#include <stdlib.h>
+#include <stdint.h>
 
-typedef struct
-{
-    char *objectPath;
-    DEM_Interface *interfaces;
-    int numInterfaces;
-} DEM_Object;
+#include <ajtcl/aj_status.h>
+#include <ajtcl/aj_bus.h>
 
-typedef struct
-{
-    char *deviceName;
-    char *aboutData;
-    DEM_Object *objects;
-    int numObjects;
-} DEM_Config;
+void Cdm_SetSuites(const uint32_t *suites, int numSuites);
 
-DEM_Config *DEM_CreateConfig(const char *deviceXmlPath);
-void DEM_FreeConfig(DEM_Config *config);
+void Cdm_EnableSPEKE(const char *password);
+void Cdm_DisableSPEKE(void);
 
-#endif //ALLJOYN_DEVICECONFIG_H
+void Cdm_EnableECDSA(const char *privateKey, const char *certificate);
+void Cdm_DisableECDSA(void);
+
+//AJ_Status Cdm_EnableFromFile(const char* pathPrefix);
+
+/**
+ * Enable security.
+ * @param[in] busAttachment bus attachment
+ * @param[in] suites the authentication suites to enable
+ * @param[in] numOfSuites the number of authentication suites
+ * @param[in] authListenerCallback the auth listener callback function
+ * @return AJ_OK on success
+ */
+AJ_Status Cdm_EnableSecurity(AJ_BusAttachment *busAttachment, AJ_AuthListenerFunc authListenerCallback);
+
+#endif //ALLJOYN_CDM_SECURITY_H

@@ -14,30 +14,15 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
-#ifndef ALLJOYN_DEVICECONFIG_H
-#define ALLJOYN_DEVICECONFIG_H
+#ifndef ALLJOYN_CDM_ABOUTDATA_H
+#define ALLJOYN_CDM_ABOUTDATA_H
 
-typedef struct
-{
-    char *name;
-} DEM_Interface;
+#include <ajtcl/aj_status.h>
 
-typedef struct
-{
-    char *objectPath;
-    DEM_Interface *interfaces;
-    int numInterfaces;
-} DEM_Object;
 
-typedef struct
-{
-    char *deviceName;
-    char *aboutData;
-    DEM_Object *objects;
-    int numObjects;
-} DEM_Config;
+typedef char* CDM_AboutDataBuf;
 
-DEM_Config *DEM_CreateConfig(const char *deviceXmlPath);
-void DEM_FreeConfig(DEM_Config *config);
+const CDM_AboutDataBuf CDM_CreateAboutDataFromXml(const char *aboutData);
+void CDM_DestroyAboutData(CDM_AboutDataBuf aboutData);
 
-#endif //ALLJOYN_DEVICECONFIG_H
+#endif //ALLJOYN_CDM_ABOUTDATA_H

@@ -411,22 +411,8 @@ AJ_Status Cdm_Start(void)
     }
 
     AJ_PrintXML(ajObjects);
-    AJ_RegisterObjectList(ajObjects, CDM_OBJECT_LIST_INDEX);
 
-    return AJ_OK;
-}
-
-AJ_Status Cdm_EnableSecurity(AJ_BusAttachment* busAttachment, const uint32_t* suites, const size_t numOfSuites,
-                             AJ_AuthListenerFunc authListenerCallback)
-{
-    AJ_Status status = AJ_OK;
-
-    status = AJ_BusEnableSecurity(busAttachment, suites, numOfSuites);
-    if (status == AJ_OK) {
-        AJ_BusSetAuthListenerCallback(busAttachment, authListenerCallback);
-    }
-
-    return status;
+    return AJ_RegisterObjectList(ajObjects, CDM_OBJECT_LIST_INDEX);
 }
 
 static bool IsCdmMsg(uint32_t msgId)

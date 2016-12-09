@@ -10,6 +10,7 @@ src_env['srcs'] = []
 
 src_env['srcs'] += Glob('*.c')
 src_env['srcs'] += Glob('CdmControllee/*.c')
+src_env['srcs'] += Glob('utils/*.c')
 src_env['srcs'] += Glob('interfaces/*.c')
 src_env['srcs'] += Glob('interfaces/operation/*.c')
 src_env['srcs'] += Glob('interfaces/environment/*.c')

@@ -14,30 +14,43 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
-#ifndef ALLJOYN_DEVICECONFIG_H
-#define ALLJOYN_DEVICECONFIG_H
+#ifndef ALLJOYN_CDM_SYSTEM_H
+#define ALLJOYN_CDM_SYSTEM_H
 
-typedef struct
-{
-    char *name;
-} DEM_Interface;
+#include <stdlib.h>
+#include <stdint.h>
 
-typedef struct
-{
-    char *objectPath;
-    DEM_Interface *interfaces;
-    int numInterfaces;
-} DEM_Object;
+#include <ajtcl/aj_status.h>
+#include <ajtcl/aj_bus.h>
 
-typedef struct
-{
-    char *deviceName;
-    char *aboutData;
-    DEM_Object *objects;
-    int numObjects;
-} DEM_Config;
+typedef struct {
+    const char* mimeType;
+    const uint8_t* content;
+    size_t contentSize;
+    const char* url;
+} CDM_AboutIconParams;
 
-DEM_Config *DEM_CreateConfig(const char *deviceXmlPath);
-void DEM_FreeConfig(DEM_Config *config);
+typedef struct {
+    const char* name;
+    uint32_t busLinkTimeout;
+    uint32_t connectTimeout;
+    uint32_t connectPause;
+    uint32_t preDisconnectPause;
+    uint32_t postDisconnectPause;
+} CDM_RoutingNodeParams;
 
-#endif //ALLJOYN_DEVICECONFIG_H
+typedef struct {
+    AJ_BusAttachment bus;
+    uint8_t isConnected;
+} CDM_BusAttachment;
+
+void CDM_SetDefaultAboutIconParams(CDM_AboutIconParams *params);
+void CDM_SetDefaultRoutingNodeParams(CDM_RoutingNodeParams *params);
+
+AJ_Status CDM_SystemInit(CDM_AboutIconParams *iconParams);
+AJ_Status CDM_SystemConnect(CDM_RoutingNodeParams *routingNodeParams, CDM_BusAttachment *busAttachment);
+
+void CDM_SystemStop(void);
+
+
+#endif //ALLJOYN_CDM_SYSTEM_H

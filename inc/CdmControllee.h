@@ -197,17 +197,6 @@ AJ_Status Cdm_AddInterface(const char* objPath, const char* intfName, const char
 AJ_Status Cdm_Start(void);
 
 /**
- * Enable security.
- * @param[in] busAttachment bus attachment
- * @param[in] suites the authentication suites to enable
- * @param[in] numOfSuites the number of authentication suites
- * @param[in] authListenerCallback the auth listener callback function
- * @return AJ_OK on success
- */
-AJ_Status Cdm_EnableSecurity(AJ_BusAttachment* busAttachment, const uint32_t* suites, const size_t numOfSuites,
-                             AJ_AuthListenerFunc authListenerCallback);
-
-/**
  * Function used to process CDM messages.
  * @param[in] busAttachment bus attachment
  * @param[in] msg message

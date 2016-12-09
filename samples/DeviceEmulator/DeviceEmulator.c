@@ -17,26 +17,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <ajtcl/aj_status.h>
 #include <ajtcl/cdm/utils/CDM_System.h>
+#include <ajtcl/cdm/utils/CDM_AboutData.h>
 
 #include "DeviceConfig.h"
 
 int main(int argc, char *argv[])
 {
+    int retVal = 0;
+    AJ_Status status;
+
+    CDM_AboutIconParams iconParams;
+    CDM_RoutingNodeParams routingNodeParams;
+    CDM_BusAttachment bus;
+
     if (argc < 2)
     {
         fprintf(stderr, "Usage: DeviceEmulator xml-file\n");
         return 1;
     }
 
-    DEM_Config* config = DEM_CreateConfig(argv[1]);
+    DEM_Config *config = DEM_CreateConfig(argv[1]);
+    const CDM_AboutDataBuf aboutData = CDM_CreateAboutDataFromXml(config->aboutData);
 
-    CDM_AboutIconParams iconParams;
-    CDM_SystemStart(&iconParams);
+    CDM_SetDefaultAboutIconParams(&iconParams);
+    status = CDM_SystemInit(&iconParams);
+    if (status != AJ_OK)
+    {
+        fprintf(stderr, "SystemInit failed: %d\n", status);
+        retVal = 1;
+        goto CLEANUP;
+    }
 
-    if (config != NULL)
-        free(config);
+    CDM_SetDefaultRoutingNodeParams(&routingNodeParams);
+    status = CDM_SystemConnect(&routingNodeParams, &bus);
 
-    return 0;
+
+    CDM_SystemStop();
+
+CLEANUP:
+    CDM_DestroyAboutData(aboutData);
+    DEM_FreeConfig(config);
+
+    return retVal;
 }
 
