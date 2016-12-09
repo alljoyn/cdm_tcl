@@ -27,8 +27,10 @@
 #include <ajtcl/cdm/interfaces/operation/OnOffStatusInterface.h>
 
 #include "DeviceConfig.h"
+#include "../Utils/HAL.h"
 
 #include "Models/operation/OnOffStatusModelImpl.h"
+
 
 /**
  * Security authentication suites.
@@ -59,12 +61,13 @@ static const uint32_t suites[4] = { AUTH_SUITE_ECDHE_ECDSA, AUTH_SUITE_ECDHE_SPE
 //};
 
 static const char ecspeke_password[] = "1234";
+static const char psk_password[] = "faaa0af3dd3f1e0379da046a3ab6ca44";
 
 static AJ_Status CreateInterfaces()
 {
     AJ_Status status = AJ_OK;
 
-    status = Cdm_AddInterface("/cdm/lamp", ON_OFF_STATUS, intfDescOperationOnOffStatus, &intfHandlerOperationOnOffStatus, GetOnOffStatusModel());
+    status = Cdm_AddInterface("/cdm/emulated", ON_OFF_STATUS, intfDescOperationOnOffStatus, &intfHandlerOperationOnOffStatus, GetOnOffStatusModel());
 
     return status;
 }
@@ -73,6 +76,8 @@ int main(int argc, char *argv[])
 {
     int retVal = 0;
     AJ_Status status;
+
+    HAL_DefaultInit();
 
     CDM_AboutIconParams iconParams;
     CDM_RoutingNodeParams routingNodeParams;
@@ -86,6 +91,7 @@ int main(int argc, char *argv[])
 
     Cdm_SetSuites(suites, 4);
     Cdm_EnableSPEKE(ecspeke_password);
+    Cdm_EnablePSK(psk_password);
 
     DEM_Config *config = DEM_CreateConfig(argv[1]);
     const CDM_AboutDataBuf aboutData = CDM_CreateAboutDataFromXml(config->aboutData);
@@ -101,9 +107,10 @@ int main(int argc, char *argv[])
 
     CreateInterfaces();
 
+    bus.isConnected = 0;
     CDM_SetDefaultRoutingNodeParams(&routingNodeParams);
     status = CDM_SystemConnect(&routingNodeParams, &bus);
-    if (status != AJ_OK)
+    if (status != AJ_OK || bus.isConnected == 0)
     {
         fprintf(stderr, "SystemConnect failed: %s\n", AJ_StatusText(status));
         retVal = 1;
@@ -117,6 +124,8 @@ int main(int argc, char *argv[])
         retVal = 1;
         goto SHUTDOWN;
     }
+
+    status = Cdm_MessageLoop(&bus);
 
 
 SHUTDOWN:
