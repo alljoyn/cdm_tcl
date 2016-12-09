@@ -18,8 +18,8 @@ Import('env')
 #env.Install('$CDM_DISTDIR/bin/device_emulator_certs', certs)
 
 srcs = env.Glob('*.c')
-#srcs += env.Glob('Models/operation/*.cc')
-#srcs += env.Glob('../Utils/*.cc')
+srcs += env.Glob('../Utils/*.c')
+srcs += env.Glob('Models/operation/*.c')
 
 objs = env.Object(srcs)
 
