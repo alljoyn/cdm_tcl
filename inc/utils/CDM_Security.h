@@ -25,6 +25,9 @@
 
 void Cdm_SetSuites(const uint32_t *suites, int numSuites);
 
+void Cdm_EnablePSK(const char *password);
+void Cdm_DisablePSK(void);
+
 void Cdm_EnableSPEKE(const char *password);
 void Cdm_DisableSPEKE(void);
 

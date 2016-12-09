@@ -347,6 +347,8 @@ static int WriteDeviceTypesDescriptions(const ABOUT_ANALYSIS *analysis, void *de
         desc[i].objectpath = curPos;
     }
 
+    //void *nullDesc = &desc[i];
+    //memcpy(&propertyStoreDefaultValues[17], &desc, sizeof(void*));
     return 1;
 }
 

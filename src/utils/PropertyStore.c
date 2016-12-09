@@ -24,7 +24,7 @@
 
 #include <ajtcl/alljoyn.h>
 #include <errno.h>
-#include "../inc/PropertyStoreOEMProvisioning.h"
+#include "../../inc/utils/PropertyStoreOEMProvisioning.h"
 #include <ajtcl/services/PropertyStore.h>
 #include <ajtcl/services/ServicesCommon.h>
 #ifdef ONBOARDING_SERVICE
@@ -285,7 +285,7 @@ static void InitMandatoryPropertiesInRAM()
 #endif
                 machineIdLen = strlen(machineIdValue);
 #ifdef _WIN32
-                _snprintf(deviceName, DEVICE_NAME_VALUE_LENGTH + 1, "%s %s %s", deviceManufactureName, deviceProductName, &machineIdValue[machineIdLen - min(serialIdLen, machineIdLen)]);
+                _snprintf(deviceName, DEVICE_NAME_VALUE_LENGTH + 1, "%s %s %s", 2deviceManufactureName, deviceProductName, &machineIdValue[machineIdLen - min(serialIdLen, machineIdLen)]);
 #else
                 snprintf(deviceName, DEVICE_NAME_VALUE_LENGTH + 1, "%s %s %s", deviceManufactureName, deviceProductName, &machineIdValue[machineIdLen - min(serialIdLen, machineIdLen)]);
 #endif

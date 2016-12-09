@@ -21,6 +21,7 @@
 
 #include <ajtcl/cdm/utils/CDM_Security.h>
 
+static const char *pskPassword = NULL;
 static const char *spekePassword = NULL;
 static const char *ecdsaPEMPrivateKey = NULL;
 static const char *ecdsaPEMCertificate = NULL;
@@ -38,6 +39,16 @@ void Cdm_SetSuites(const uint32_t *suites, int numSuites)
 {
     securitySuites = suites;
     numSecuritySuites = numSuites;
+}
+
+void Cdm_EnablePSK(const char *password)
+{
+    pskPassword = password;
+}
+
+void Cdm_DisablePSK(void)
+{
+    pskPassword = NULL;
 }
 
 void Cdm_EnableSPEKE(const char *password)
@@ -81,6 +92,20 @@ static AJ_Status retreiveSPEKE(AJ_Credential* cred)
     return status;
 }
 
+static AJ_Status retreivePSK(AJ_Credential* cred)
+{
+    AJ_Status status = AJ_ERR_INVALID;
+    if (pskPassword != NULL)
+    {
+        cred->data = (uint8_t*)pskPassword;
+        cred->len = strlen(pskPassword);
+        cred->expiration = keyExpiration;
+        status = AJ_OK;
+    }
+
+    return status;
+}
+
 static AJ_Status DefaultAuthListenerCallback(uint32_t authmechanism, uint32_t command, AJ_Credential* cred)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -101,23 +126,17 @@ static AJ_Status DefaultAuthListenerCallback(uint32_t authmechanism, uint32_t co
             }
             break;
 
-            // The ECDHE_PSK auth mechanism is deprecated as of 16.04 and ECDHE_SPEKE should be used instead.
-//        case AUTH_SUITE_ECDHE_PSK:
-//            switch (command) {
-//                case AJ_CRED_PUB_KEY:
-//                    cred->data = (uint8_t*) cdmMainParams->securityParams.defaultCallbackParams.pskPublicKey;
-//                    cred->len = strlen(cdmMainParams->securityParams.defaultCallbackParams.pskPublicKey);
-//                    cred->expiration = cdmMainParams->securityParams.defaultCallbackParams.keyExpiration;
-//                    status = AJ_OK;
-//                    break;
-//                case AJ_CRED_PRV_KEY:
-//                    cred->data = (uint8_t*) cdmMainParams->securityParams.defaultCallbackParams.pskPrivateKey;
-//                    cred->len = strlen(cdmMainParams->securityParams.defaultCallbackParams.pskPrivateKey);
-//                    cred->expiration = cdmMainParams->securityParams.defaultCallbackParams.keyExpiration;
-//                    status = AJ_OK;
-//                    break;
-//            }
-//            break;
+        //The ECDHE_PSK auth mechanism is deprecated as of 16.04 and ECDHE_SPEKE should be used instead.
+        case AUTH_SUITE_ECDHE_PSK:
+            switch (command) {
+                case AJ_CRED_PUB_KEY:
+                    status = retreivePSK(cred);
+                    break;
+                case AJ_CRED_PRV_KEY:
+                    status = retreivePSK(cred);
+                    break;
+            }
+            break;
         case AUTH_SUITE_ECDHE_ECDSA:
             switch (command) {
                 case AJ_CRED_PRV_KEY:

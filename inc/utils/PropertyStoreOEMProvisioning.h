@@ -144,7 +144,7 @@ typedef struct _DeviceTypeDescription {
     const char* objectpath;
 } DeviceTypeDescription;
 
-extern DeviceTypeDescription deviceTypeDescription[];
+extern DeviceTypeDescription *deviceTypeDescription;
 
 
 

@@ -22,6 +22,7 @@
 
 #include <ajtcl/aj_status.h>
 #include <ajtcl/aj_bus.h>
+#include <ajtcl/services/ServicesHandlers.h>
 
 typedef struct {
     const char* mimeType;
@@ -44,11 +45,17 @@ typedef struct {
     uint8_t isConnected;
 } CDM_BusAttachment;
 
+typedef AJ_Status (*AppUpdateHandler)(AJ_BusAttachment* busAttachment);
+typedef AJSVC_ServiceStatus (*MessageProcessor)(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Status* status);
+typedef AJ_Status (*SessionAcceptedHandler) (uint16_t port, uint32_t sessionId, const char* joiner);
+
 void CDM_SetDefaultAboutIconParams(CDM_AboutIconParams *params);
 void CDM_SetDefaultRoutingNodeParams(CDM_RoutingNodeParams *params);
 
 AJ_Status CDM_SystemInit(CDM_AboutIconParams *iconParams);
 AJ_Status CDM_SystemConnect(CDM_RoutingNodeParams *routingNodeParams, CDM_BusAttachment *busAttachment);
+
+AJ_Status Cdm_MessageLoop(CDM_BusAttachment *busAttachment);
 
 void CDM_SystemStop(void);
 
