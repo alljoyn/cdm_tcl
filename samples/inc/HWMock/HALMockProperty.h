@@ -1,0 +1,33 @@
+/******************************************************************************
+ * Copyright AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for any
+ *    purpose with or without fee is hereby granted, provided that the above
+ *    copyright notice and this permission notice appear in all copies.
+ *
+ *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ ******************************************************************************/
+
+#ifndef _HAL_MOCK_PROPERTY_H
+#define _HAL_MOCK_PROPERTY_H
+
+#include <ajtcl/aj_bus.h>
+#include <ajtcl/aj_status.h>
+#include <stdbool.h>
+
+typedef AJ_Status (*PropertyChangedCallback)(AJ_BusAttachment* busAttachment, const char* objPath, const char* valueString);
+
+typedef struct {
+	char* line;
+	PropertyChangedCallback propertyChangedCallback;
+} HALMockProperty;
+
+bool HALMockProperty_MatchesKey(HALMockProperty* halMockProperty, const char* objPath, const char* intfName, const char* propName);
+
+#endif /* _HAL_MOCK_PROPERTY_H */
