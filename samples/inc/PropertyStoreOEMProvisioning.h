@@ -68,14 +68,24 @@ typedef struct _PropertyStoreEntry {
 } PropertyStoreEntry;
 
 /**
+ * Extension to the AJSVC_PropertyStoreFieldIndices enum to cater for the new CDM properties.
+ */
+#define AJSVC_PROPERTY_STORE_COUNTRY_OF_PRODUCTION (AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS)
+#define AJSVC_PROPERTY_STORE_CORPORATE_BRAND (AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS + 1)
+#define AJSVC_PROPERTY_STORE_PRODUCT_BRAND (AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS + 2)
+#define AJSVC_PROPERTY_STORE_LOCATION (AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS + 3)
+#define AJSVC_PROPERTY_STORE_DEVICE_TYPE_DESCRIPTION (AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS + 4)
+#define CDM_PROPERTY_STORE_NUMBER_OF_KEYS (AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS + 5)
+
+/**
  * properties array variable with property definitions
  */
-extern const PropertyStoreEntry propertyStoreProperties[AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS+5];
+extern const PropertyStoreEntry propertyStoreProperties[CDM_PROPERTY_STORE_NUMBER_OF_KEYS];
 
 /**
  * properties array variable with default values
  */
-extern const char** propertyStoreDefaultValues[AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS+5]; // Array of Array of size 1 or AJSVC_PROPERTY_STORE_NUMBER_OF_LANGUAGES constant buffers depending on whether the property is multilingual
+extern const char** propertyStoreDefaultValues[CDM_PROPERTY_STORE_NUMBER_OF_KEYS]; // Array of Array of size 1 or AJSVC_PROPERTY_STORE_NUMBER_OF_LANGUAGES constant buffers depending on whether the property is multilingual
 
 /**
  * properties container for runtime values
@@ -131,7 +141,7 @@ typedef enum {
  */
 typedef struct _DeviceTypeDescription {
     DeviceType type;
-    char* objectpath;
+    const char* objectpath;
 } DeviceTypeDescription;
 
 extern DeviceTypeDescription deviceTypeDescription[];

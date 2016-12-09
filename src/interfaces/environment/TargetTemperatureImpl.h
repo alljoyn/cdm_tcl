@@ -19,12 +19,7 @@
 
 #include <ajtcl/alljoyn.h>
 
-const char* const intfDescEnvironmentTargetTemperature[7];
-
-AJ_Status CreateTargetTemperatureInterface(void** properties);
-void DestroyTargetTemperatureInterface(void* properties);
-AJ_Status TargetTemperatureInterfaceOnGetProperty(AJ_Message* replyMsg, const char* objPath, void* properties, uint8_t memberIndex, void* listener);
-AJ_Status TargetTemperatureInterfaceOnSetProperty(AJ_Message* replyMsg, const char* objPath, void* properties, uint8_t memberIndex, void* listener, bool* propChanged);
-AJ_Status TargetTemperatureInterfaceEmitPropertiesChanged(AJ_BusAttachment* busAttachment, const char* objPath, void* properties, uint8_t memberIndex);
+AJ_Status TargetTemperatureInterfaceOnGetProperty(AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex);
+AJ_Status TargetTemperatureInterfaceOnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex);
 
 #endif // TARGETTEMPERATUREIMPL_H_

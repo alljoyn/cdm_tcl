@@ -14,15 +14,16 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
-#include <string.h>
+#include <stdlib.h>
+#include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/operation/Channel.h>
-#include "../../CdmControllee/CdmControlleeImpl.h"
 #include "ChannelImpl.h"
 
 #define INTERFACE_VERSION 1
+#define INTERFACE_NAME CHANNEL_INTERFACE_NAME
 
 const char* const intfDescOperationChannel[] = {
-    "$org.alljoyn.SmartSpaces.Operation.Channel",
+    "$" INTERFACE_NAME,
     "@Version>q",
     "@ChannelId=s",
     "@TotalNumberOfChannels>q",
@@ -31,377 +32,363 @@ const char* const intfDescOperationChannel[] = {
     NULL
 };
 
-typedef struct {
-    uint16_t version;
-    char* channelId;
-    uint16_t totalNumberOfChannels;
-} ChannelProperties;
+const InterfaceHandler intfHandlerOperationChannel = {
+#ifdef USE_DEPRECATED_INTERFACE_TYPES
+    NULL,   // InterfaceRegistered
+#endif
+    ChannelInterfaceOnGetProperty,
+    ChannelInterfaceOnSetProperty,
+    ChannelInterfaceOnMethodHandler
+};
 
-AJ_Status CreateChannelInterface(void** properties)
+
+AJ_Status ChannelInterfaceOnGetProperty(AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
-    *properties = malloc(sizeof(ChannelProperties));
-    if (!(*properties)) {
-        return AJ_ERR_RESOURCES;
+    AJ_Status status = AJ_OK;
+
+    switch (memberIndex) {
+    case CHANNEL_PROP_VERSION:
+        status = AJ_MarshalArgs(replyMsg, "q", INTERFACE_VERSION);
+        break;
+    case CHANNEL_PROP_CHANNEL_ID: {
+        char* channelId;
+        uint32_t channelIdLen;
+        status = Cdm_ChannelInterfaceGetChannelId(objPath, NULL, &channelIdLen);
+        
+        if (status == AJ_OK) {
+            channelId = malloc(channelIdLen + 1);
+            if (channelId) {
+                status = Cdm_ChannelInterfaceGetChannelId(objPath, channelId, NULL);
+                if (status == AJ_OK) {
+                    status = AJ_MarshalArgs(replyMsg, "s", channelId);
+                }
+
+                free(channelId);
+            } else {
+                status = AJ_ERR_RESOURCES;
+            }
+        }
+        
+        break;
     }
-    memset(*properties, 0, sizeof(ChannelProperties));
+    case CHANNEL_PROP_TOTAL_NUMBER_OF_CHANNELS: {
+        uint16_t totalNumberOfChannels;
+        status = Cdm_ChannelInterfaceGetTotalNumberOfChannels(objPath, &totalNumberOfChannels);
+        if (status == AJ_OK) {
+            status = AJ_MarshalArgs(replyMsg, "q", totalNumberOfChannels);
+        }
+        break;
+    }
+    case CHANNEL_METHOD_GET_CHANNEL_LIST:
+        status = AJ_ERR_INVALID;
+        break;
+    case CHANNEL_SIGNAL_CHANNEL_LIST_CHANGED:
+        status = AJ_ERR_INVALID;
+        break;
+    default:
+        status = AJ_ERR_INVALID;
+    }
 
-    ((ChannelProperties*) *properties)->version = (uint16_t) INTERFACE_VERSION;
+    return status;
+}
 
+AJ_Status ChannelInterfaceOnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
+{
+    AJ_Status status = AJ_OK;
+
+    switch (memberIndex) {
+    case CHANNEL_PROP_VERSION:
+        status = AJ_ERR_DISALLOWED;
+        break;
+    case CHANNEL_PROP_CHANNEL_ID: {
+        char* channelId;
+        status = AJ_UnmarshalArgs(replyMsg, "s", &channelId);
+        if (status == AJ_OK) {
+            status = Cdm_ChannelInterfaceSetChannelId(busAttachment, objPath, channelId);
+        }
+        break;
+    }
+    case CHANNEL_PROP_TOTAL_NUMBER_OF_CHANNELS:
+        status = AJ_ERR_DISALLOWED;
+        break;
+    case CHANNEL_METHOD_GET_CHANNEL_LIST:
+        status = AJ_ERR_INVALID;
+        break;
+    case CHANNEL_SIGNAL_CHANNEL_LIST_CHANGED:
+        status = AJ_ERR_INVALID;
+        break;
+    default:
+        status = AJ_ERR_INVALID;
+    }
+
+    return status;
+}
+
+AJ_Status ChannelInterfaceOnMethodHandler(AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+{
+    AJ_Status status = AJ_OK;
+
+    switch (memberIndex) {
+    case CHANNEL_PROP_VERSION:
+        status = AJ_ERR_INVALID;
+        break;
+    case CHANNEL_PROP_CHANNEL_ID:
+        status = AJ_ERR_INVALID;
+        break;
+    case CHANNEL_PROP_TOTAL_NUMBER_OF_CHANNELS:
+        status = AJ_ERR_INVALID;
+        break;
+    case CHANNEL_METHOD_GET_CHANNEL_LIST: {
+        uint16_t startingRecord;
+        uint16_t numRecords;
+        ChannelInfoRecord* listOfChannelInfoRecords;
+        uint16_t numReturnedRecords;
+        ErrorCode errorCode;
+
+        status = AJ_UnmarshalArgs(msg, "qq", &startingRecord, &numRecords);
+        if (status == AJ_OK) {
+            listOfChannelInfoRecords = malloc(numRecords * sizeof(ChannelInfoRecord));
+
+            if (listOfChannelInfoRecords) {
+                // Query channel list size to ensure there are enough elements.
+                status = Cdm_ChannelInterfaceGetChannelList(msg, objPath, startingRecord, numRecords, NULL, &numReturnedRecords, &errorCode);
+                
+                if (status == AJ_OK) {
+                    // Get channel list from model and send a reply message.
+                    status = Cdm_ChannelInterfaceGetChannelList(msg, objPath, startingRecord, numRecords, listOfChannelInfoRecords, &numReturnedRecords, &errorCode);
+                }
+
+                for (uint16_t i = 0; i < numRecords; i++) {
+                    ChannelInfoRecord* record = &listOfChannelInfoRecords[i];
+
+                    if (record->channelID) {
+                        free(record->channelID);
+                    }
+                    if (record->channelNumber) {
+                        free(record->channelNumber);
+                    }
+                    if (record->channelName) {
+                        free(record->channelName);
+                    }
+                }
+                
+                free(listOfChannelInfoRecords);
+            } else {
+                status = AJ_ERR_RESOURCES;
+            }
+        }
+        break;
+    }
+    case CHANNEL_SIGNAL_CHANNEL_LIST_CHANGED:
+        status = AJ_ERR_INVALID;
+        break;
+    default:
+        status = AJ_ERR_INVALID;
+    }
+
+    return status;
+}
+
+
+AJ_Status Cdm_ChannelEmitPropertyChanged(AJ_BusAttachment* busAttachment, const char* objPath, ChannelMembers member, const void* value, size_t numValues)
+{
+    AJ_Status status = AJ_OK;
+
+    switch (member) {
+    case CHANNEL_PROP_VERSION:
+        status = AJ_ERR_DISALLOWED;
+        break;
+    case CHANNEL_PROP_CHANNEL_ID: {
+        char* channelId;
+        if (value) {
+            channelId = (char*)value;
+        } else {
+            uint32_t channelIdLen;
+            status = Cdm_ChannelInterfaceGetChannelId(objPath, NULL, &channelIdLen);
+            
+            channelId = malloc(channelIdLen + 1);
+            if (channelId) {
+                status = Cdm_ChannelInterfaceGetChannelId(objPath, channelId, NULL);
+            } else {
+                status = AJ_ERR_RESOURCES;
+            }
+        }
+
+        if (status == AJ_OK) {
+            status = EmitPropertyChanged(busAttachment, objPath, INTERFACE_NAME, "ChannelId", "s", channelId);
+        }
+        
+        if (!value) {
+            free(channelId);
+        }
+
+        break;
+    }
+    case CHANNEL_PROP_TOTAL_NUMBER_OF_CHANNELS: {
+        uint16_t totalNumberOfChannels;
+        if (value) {
+            totalNumberOfChannels = *(uint16_t*)value;
+        } else {
+            status = Cdm_ChannelInterfaceGetTotalNumberOfChannels(objPath, &totalNumberOfChannels);
+        }
+
+        if (status == AJ_OK) {
+            status = EmitPropertyChanged(busAttachment, objPath, INTERFACE_NAME, "TotalNumberOfChannels", "q", totalNumberOfChannels);
+        }
+        break;
+    }
+    case CHANNEL_METHOD_GET_CHANNEL_LIST:
+        status = AJ_ERR_INVALID;
+        break;
+    case CHANNEL_SIGNAL_CHANNEL_LIST_CHANGED:
+        status = AJ_ERR_INVALID;
+        break;
+    default:
+        status = AJ_ERR_INVALID;
+    }
+
+    return status;
+}
+
+AJ_Status Cdm_ChannelInterfaceGetVersion(uint16_t* outVersion)
+{
+    *outVersion = INTERFACE_VERSION;
     return AJ_OK;
 }
 
-void DestroyChannelInterface(void* properties)
+AJ_Status Cdm_ChannelInterfaceGetChannelId(const char* objPath, char* outChannelId, uint32_t* outChannelIdLen)
 {
-    if (properties) {
-        ChannelProperties* props = (ChannelProperties*) properties;
-        if (props->channelId) {
-            free(props->channelId);
-        }
-
-        free(props);
-    }
-}
-
-static AJ_Status EmitPropChanged(AJ_BusAttachment* busAttachment, const char* objPath, const char* propName, const char* signature, void* val)
-{
-    AJ_Status status = AJ_OK;
-    uint32_t msgId = 0;
-    AJ_Message msg;
-    AJ_Arg array, strc;
-
-    if (!busAttachment) {
+    if (!objPath || (!outChannelId && !outChannelIdLen)) {
         return AJ_ERR_INVALID;
     }
 
-    status = MakePropChangedId(objPath, &msgId);
-    if (status == AJ_OK) {
-        AJ_MarshalSignal(busAttachment, &msg, msgId, NULL, 0, AJ_FLAG_GLOBAL_BROADCAST, 0);
-        AJ_MarshalArgs(&msg, "s", intfDescOperationChannel[0] + 1);  //To remove '$'
-        AJ_MarshalContainer(&msg, &array, AJ_ARG_ARRAY);
-        AJ_MarshalContainer(&msg, &strc, AJ_ARG_DICT_ENTRY);
-        if (!strcmp(signature, "s")) {
-            AJ_MarshalArgs(&msg, "sv", propName, signature, (char*) val);
-        } else if (!strcmp(signature, "q")) {
-            AJ_MarshalArgs(&msg, "sv", propName, signature, *(uint16_t*) val);
-        } else {
-            return AJ_ERR_SIGNATURE;
-        }
-        AJ_MarshalCloseContainer(&msg, &strc);
-        AJ_MarshalCloseContainer(&msg, &array);
-        AJ_MarshalContainer(&msg, &array, AJ_ARG_ARRAY);
-        AJ_MarshalCloseContainer(&msg, &array);
-        status = AJ_DeliverMsg(&msg);
+    ChannelModel* model = (ChannelModel*)GetInterfaceModel(objPath, INTERFACE_NAME);
+    if (!model) {
+        return AJ_ERR_NO_MATCH;
     }
-
-    return status;
-}
-
-AJ_Status ChannelInterfaceEmitPropertiesChanged(AJ_BusAttachment* busAttachment, const char* objPath, void* properties, uint8_t memberIndex)
-{
-    AJ_Status status = AJ_OK;
-    ChannelProperties* props = NULL;
-
-    if (!properties) {
-        return AJ_ERR_INVALID;
+    if (!model->GetTotalNumberOfChannels) {
+        return AJ_ERR_NULL;
     }
-
-    props = (ChannelProperties*) properties;
-
-    switch (memberIndex) {
-    case 1:
-        status = EmitPropChanged(busAttachment, objPath, "ChannelId", "s", props->channelId);
-        break;
-    default:
-        status = AJ_ERR_INVALID;
-    }
-
-    return status;
-}
-
-AJ_Status ChannelInterfaceOnGetProperty(AJ_Message* replyMsg, const char* objPath, void* properties, uint8_t memberIndex, void* listener)
-{
-    AJ_Status status = AJ_OK;
-    ChannelProperties* props = NULL;
-    ChannelListener* lt = NULL;
-
-    if (!properties) {
-        return AJ_ERR_INVALID;
-    }
-
-    if (listener) {
-        lt = (ChannelListener*) listener;
-    }
-    props = (ChannelProperties*) properties;
-
-    switch (memberIndex) {
-    case 0:
-        status = AJ_MarshalArgs(replyMsg, "q", props->version);
-        break;
-    case 1: {
-        char channelId[128];  //?? how estimate proper buffer size when the listener is exist
-        if (lt && lt->OnGetChannelId) {
-            status = lt->OnGetChannelId(objPath, channelId);
-            if (status == AJ_OK) {
-                if (props->channelId) {
-                    free(props->channelId);
-                }
-                props->channelId = (char*) malloc(strlen(channelId) + 1);
-                if (!props->channelId) {
-                    return AJ_ERR_RESOURCES;
-                }
-                strncpy(props->channelId, channelId, strlen(channelId));
-                props->channelId[strlen(channelId)] = '\0';
-            }
-        }
-        if (!props->channelId) {
-            return AJ_ERR_NULL;
-        }
-        status = AJ_MarshalArgs(replyMsg, "s", props->channelId);
-    }
-        break;
-    case 2: {
-        uint16_t totalNumberOfChannels;
-        if (lt && lt->OnGetTotalNumberOfChannels) {
-            status = lt->OnGetTotalNumberOfChannels(objPath, &totalNumberOfChannels);
-            if (status == AJ_OK) {
-                props->totalNumberOfChannels = totalNumberOfChannels;
-            }
-        }
-        status = AJ_MarshalArgs(replyMsg, "q", props->totalNumberOfChannels);
-    }
-        break;
-    default:
-        status = AJ_ERR_INVALID;
-    }
-
-    return status;
-}
-
-AJ_Status ChannelInterfaceOnSetProperty(AJ_Message* replyMsg, const char* objPath, void* properties, uint8_t memberIndex, void* listener, bool* propChanged)
-{
-    AJ_Status status = AJ_OK;
-
-    if (!properties) {
-        return AJ_ERR_INVALID;
-    }
-
-    if (!listener) {
-        return AJ_ERR_INVALID;
-    }
-
-    ChannelProperties* props = (ChannelProperties*) properties;
-    ChannelListener* lt = (ChannelListener*) listener;
-
-    switch (memberIndex) {
-    case 0:
-        status = AJ_ERR_DISALLOWED;
-        break;
-    case 1:
-        if (!lt->OnSetChannelId) {
-            status = AJ_ERR_NULL;
-        } else {
-            char* channelId;
-            status = AJ_UnmarshalArgs(replyMsg, "s", &channelId);
-
-            if (status == AJ_OK) {
-                status = lt->OnSetChannelId(objPath, channelId);
-
-                if (status == AJ_OK) {
-                    if (strcmp(props->channelId, channelId)) {
-                        if (props->channelId) {
-                            free(props->channelId);
-                        }
-                        props->channelId = (char*) malloc(strlen(channelId) + 1);
-                        if (!props->channelId) {
-                            status = AJ_ERR_RESOURCES;
-                        } else {
-                            strncpy(props->channelId, channelId, strlen(channelId));
-                            props->channelId[strlen(channelId)] = '\0';
-                            *propChanged = true;
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    case 2:
-        status = AJ_ERR_DISALLOWED;
-        break;
-    default:
-        status = AJ_ERR_INVALID;
-    }
-
-    return status;
-}
-
-AJ_Status ChannelInterfaceOnMethodHandler(AJ_Message* msg, const char* objPath, uint8_t memberIndex, void* listener, CdmPropertiesChangedByMethod* propChangedByMethod)
-{
-    AJ_Status status = AJ_OK;
-
-    if (!listener) {
-        return AJ_ERR_INVALID;
-    }
-
-    if (!propChangedByMethod) {
-        return AJ_ERR_INVALID;
-    }
-
-    ChannelListener* lt = (ChannelListener*)listener;
-
-    switch (memberIndex) {
-    case 3:
-        if (!lt->OnGetChannelList) {
-            status = AJ_ERR_NULL;
-        } else {
-            uint16_t startingRecord, numOfRecords;
-            ChannelInfoRecord* records = NULL;
-            uint16_t numReturnedRecords = 0;
-
-            status = AJ_UnmarshalArgs(msg, "qq", &startingRecord, &numOfRecords);
-
-            if (status == AJ_OK) {
-                ErrorCode errorCode = NOT_ERROR;
-                status = lt->OnGetChannelList(objPath, startingRecord, numOfRecords, &records, &numReturnedRecords, &errorCode);
-                if (status == AJ_OK) {
-                    AJ_Message reply;
-                    AJ_Arg array, strc;
-                    int i = 0;
-
-                    AJ_MarshalReplyMsg(msg, &reply);
-                    AJ_MarshalContainer(&reply, &array, AJ_ARG_ARRAY);
-                    for (i = 0; i < numReturnedRecords; i++) {
-                        AJ_MarshalContainer(&reply, &strc, AJ_ARG_STRUCT);
-                        AJ_MarshalArgs(&reply, "sss", ((records + i)->channelId), ((records + i)->channelNumber), ((records + i)->channelName));
-                        AJ_MarshalCloseContainer(&reply, &strc);
-                    }
-                    AJ_MarshalCloseContainer(&reply, &array);
-
-                    status = AJ_DeliverMsg(&reply);
-                } else {
-                    AJ_Message reply;
-                    AJ_MarshalReplyMsg(msg, &reply);
-                    AJ_MarshalErrorMsgWithInfo(msg, &reply, GetInterfaceErrorName(errorCode), GetInterfaceErrorMessage(errorCode));
-                    status = AJ_DeliverMsg(&reply);
-                }
-            }
-        }
-        break;
-    default:
-        status = AJ_ERR_INVALID;
-    }
-
-    return status;
-}
-
-AJ_Status Cdm_ChannelInterfaceGetChannelId(const char* objPath, char* channelId)
-{
-    AJ_Status status = AJ_OK;
-    ChannelProperties* props = NULL;
-
-    if (!channelId) {
-        return AJ_ERR_INVALID;
-    }
-
-    props = (ChannelProperties*) GetProperties(objPath, CHANNEL_INTERFACE);
-    if (props) {
-        if (!props->channelId) {
-            return AJ_ERR_NULL;
-        }
-        strncpy(channelId, props->channelId, strlen(props->channelId));
-        channelId[strlen(props->channelId)] = '\0';
-    } else {
-        status = AJ_ERR_NO_MATCH;
-    }
-
-    return status;
+    
+    return model->GetChannelId(model, objPath, outChannelId, outChannelIdLen);
 }
 
 AJ_Status Cdm_ChannelInterfaceSetChannelId(AJ_BusAttachment* busAttachment, const char* objPath, const char* channelId)
 {
-    AJ_Status status = AJ_OK;
-    ChannelProperties* props = NULL;
-
-    if (!busAttachment) {
+    if (!busAttachment || !objPath || !channelId) {
         return AJ_ERR_INVALID;
     }
 
-    if (!channelId) {
-        return AJ_ERR_INVALID;
+    ChannelModel* model = (ChannelModel*)GetInterfaceModel(objPath, INTERFACE_NAME);
+    if (!model) {
+        return AJ_ERR_NO_MATCH;
+    }
+    if (!model->GetChannelId || !model->SetChannelId) {
+        return AJ_ERR_NULL;
     }
 
-    props = (ChannelProperties*) GetProperties(objPath, CHANNEL_INTERFACE);
-    if (props) {
-        if (props->channelId) {
-            free(props->channelId);
+    char* oldChannelId;
+    uint32_t oldChannelIdLen;
+    AJ_Status status = Cdm_ChannelInterfaceGetChannelId(objPath, NULL, &oldChannelIdLen);
+    if (status != AJ_OK) {
+        return status;
+    }
+
+    oldChannelId = malloc(oldChannelIdLen + 1);
+    if (oldChannelId) {
+        status = Cdm_ChannelInterfaceGetChannelId(objPath, oldChannelId, NULL);
+    } else {
+        status = AJ_ERR_RESOURCES;
+    }
+
+    if (strcmp(oldChannelId, channelId) != 0) {
+        status = model->SetChannelId(model, objPath, channelId);
+
+        if (status == AJ_OK) {
+            status = Cdm_ChannelEmitPropertyChanged(busAttachment, objPath, CHANNEL_PROP_CHANNEL_ID, channelId, 0);
         }
-        props->channelId = (char*) malloc(strlen(channelId) + 1);
-        if (!props->channelId) {
-            status = AJ_ERR_RESOURCES;
+    }
+
+    free(oldChannelId);
+
+    return status;
+}
+
+AJ_Status Cdm_ChannelInterfaceGetTotalNumberOfChannels(const char* objPath, uint16_t* outTotalNumberOfChannels)
+{
+    if (!objPath || !outTotalNumberOfChannels) {
+        return AJ_ERR_INVALID;
+    }
+
+    ChannelModel* model = (ChannelModel*)GetInterfaceModel(objPath, INTERFACE_NAME);
+    if (!model) {
+        return AJ_ERR_NO_MATCH;
+    }
+    if (!model->GetTotalNumberOfChannels) {
+        return AJ_ERR_NULL;
+    }
+    
+    return model->GetTotalNumberOfChannels(model, objPath, outTotalNumberOfChannels);
+}
+
+AJ_Status Cdm_ChannelInterfaceGetChannelList(AJ_Message* msg, const char* objPath, uint16_t startingRecord, uint16_t numRecords, ChannelInfoRecord* outListOfChannelInfoRecords, uint16_t* outNumReturnedRecords, ErrorCode* outErrorCode)
+{
+    if (!objPath || (!outListOfChannelInfoRecords && !outNumReturnedRecords)) {
+        return AJ_ERR_INVALID;
+    }
+
+    ChannelModel* model = (ChannelModel*)GetInterfaceModel(objPath, INTERFACE_NAME);
+    if (!model) {
+        return AJ_ERR_NO_MATCH;
+    }
+    if (!model->GetChannelList) {
+        return AJ_ERR_NULL;
+    }
+    
+    AJ_Status status = model->GetChannelList(model, objPath, startingRecord, numRecords, outListOfChannelInfoRecords, outNumReturnedRecords, outErrorCode);
+    
+    if (outListOfChannelInfoRecords && outNumReturnedRecords) {
+        if (status == AJ_OK) {
+            AJ_Message reply;
+            AJ_Arg array, strc;
+
+            AJ_MarshalReplyMsg(msg, &reply);
+            AJ_MarshalContainer(&reply, &array, AJ_ARG_ARRAY);
+            for (uint16_t i = 0; i < *outNumReturnedRecords; i++) {
+                AJ_MarshalContainer(&reply, &strc, AJ_ARG_STRUCT);
+                ChannelInfoRecord* record = &outListOfChannelInfoRecords[i];
+                AJ_MarshalArgs(&reply, "sss", record->channelID, record->channelNumber, record->channelName);
+                AJ_MarshalCloseContainer(&reply, &strc);
+            }
+            AJ_MarshalCloseContainer(&reply, &array);
+
+            status = AJ_DeliverMsg(&reply);
         } else {
-            strncpy(props->channelId, channelId, strlen(channelId));
-            props->channelId[strlen(channelId)] = '\0';
-
-            status = EmitPropChanged(busAttachment, objPath, "ChannelId", "s", props->channelId);
+            AJ_Message reply;
+            AJ_MarshalReplyMsg(msg, &reply);
+            AJ_MarshalErrorMsgWithInfo(msg, &reply, GetInterfaceErrorName(*outErrorCode), GetInterfaceErrorMessage(*outErrorCode));
+            status = AJ_DeliverMsg(&reply);
         }
-    } else {
-        status = AJ_ERR_NO_MATCH;
     }
 
     return status;
+
+    //return SendMethodReply((status == AJ_OK), objPath, startingRecord, numRecords, outListOfChannelInfoRecords, *outNumReturnedRecords, *outErrorCode);
 }
 
-AJ_Status Cdm_ChannelInterfaceGetTotalNumberOfChannels(const char* objPath, uint16_t* totalNumberOfChannels)
-{
-    AJ_Status status = AJ_OK;
-    ChannelProperties* props = NULL;
-
-    if (!totalNumberOfChannels) {
-        return AJ_ERR_INVALID;
-    }
-
-    props = (ChannelProperties*) GetProperties(objPath, CHANNEL_INTERFACE);
-    if (props) {
-        *totalNumberOfChannels = props->totalNumberOfChannels;
-    } else {
-        status = AJ_ERR_NO_MATCH;
-    }
-
-    return status;
-}
-
-AJ_Status Cdm_ChannelInterfaceSetTotalNumberOfChannels(AJ_BusAttachment* busAttachment, const char* objPath, const uint16_t totalNumberOfChannels)
-{
-    AJ_Status status = AJ_OK;
-    ChannelProperties* props = NULL;
-
-    if (!busAttachment) {
-        return AJ_ERR_INVALID;
-    }
-
-    props = (ChannelProperties*) GetProperties(objPath, CHANNEL_INTERFACE);
-    if (props) {
-        props->totalNumberOfChannels = totalNumberOfChannels;
-
-        status = EmitPropChanged(busAttachment, objPath, "TotalNumberOfChannels", "q", &(props->totalNumberOfChannels));
-    } else {
-        status = AJ_ERR_NO_MATCH;
-    }
-
-    return status;
-}
-
-AJ_Status Cdm_ChannelInterfaceEmitChannelListChanged(AJ_BusAttachment* busAttachment, const char* objPath, const uint32_t sessionId)
+AJ_Status Cdm_ChannelInterfaceEmitChannelListChanged(AJ_BusAttachment* busAttachment, const char* objPath, uint32_t sessionId)
 {
     AJ_Status status = AJ_OK;
     AJ_Message msg;
     uint32_t msgId = 0;
 
-    status = MakeMsgId(objPath, CHANNEL_INTERFACE, 4, &msgId);
+    status = MakeMessageId(objPath, CHANNEL_INTERFACE_NAME, CHANNEL_SIGNAL_CHANNEL_LIST_CHANGED, &msgId);
     if (status != AJ_OK) {
         return status;
     }
 
     AJ_MarshalSignal(busAttachment, &msg, msgId, NULL, sessionId, AJ_FLAG_GLOBAL_BROADCAST, 0);
-
     return AJ_DeliverMsg(&msg);
+
+    //return EmitSignal(busAttachment, objPath, CHANNEL_INTERFACE_NAME, CHANNEL_SIGNAL_CHANNEL_LIST_CHANGED, sessionId);
 }

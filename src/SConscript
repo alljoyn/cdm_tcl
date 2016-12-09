@@ -8,6 +8,7 @@ src_env.Append(LIBS = ['m'])
 
 src_env['srcs'] = []
 
+src_env['srcs'] += Glob('*.c')
 src_env['srcs'] += Glob('CdmControllee/*.c')
 src_env['srcs'] += Glob('interfaces/*.c')
 src_env['srcs'] += Glob('interfaces/operation/*.c')

@@ -21,40 +21,33 @@
 #include <ajtcl/cdm/CdmControllee.h>
 
 typedef struct cdmIntfInfo {
-    CdmInterfaceTypes intfType;
-    void* properties;
-    void* listener;
-    struct cdmIntfInfo* intfNext;
+#ifdef USE_DEPRECATED_INTERFACE_TYPES
+    CdmInterfaceTypes type;    // Deprecated, no dependency on this when using Cdm_AddInterface().
+#endif
+    const char* name;
+    AJ_InterfaceDescription desc;
+    const InterfaceHandler* handler;
+    void* model;
+    struct cdmIntfInfo* nextNode;
 } CdmInterfaceInfo;
 
 typedef struct cdmObjInfo {
     const char* path;
+    AJ_InterfaceDescription* descs;
     CdmInterfaceInfo* intfFirst;
     CdmInterfaceInfo* intfLast;
-    AJ_InterfaceDescription* ajIntfDesc;
-    struct cdmObjInfo* objNext;
+    struct cdmObjInfo* nextNode;
 } CdmObjectInfo;
 
-typedef struct {
-    CdmInterfaceTypes intfType;
-    void* properties;
-    uint8_t member_index;
-    bool changed;
-} CdmPropertiesChanged;
-
-typedef struct vendorDefinedIntfInfo {
-    const char* intfName;
-    CdmInterfaceTypes intfType;
-    const char* const* intfDesc;
-    VendorDefinedInterfaceHandler* handler;
-    struct vendorDefinedIntfInfo* intfNext;
-} VendorDefinedInterfaceInfo;
-
-typedef AJ_Status (*InterfaceCreator)(void** properties);
-typedef void (*InterfaceDestructor)(void* properties);
-typedef AJ_Status (*OnGetProperty)(AJ_Message* replyMsg, const char* objPath, void* properties, uint8_t memberIndex, void* listener);
-typedef AJ_Status (*OnSetProperty)(AJ_Message* replyMsg, const char* objPath, void* properties, uint8_t memberIndex, void* listener, bool* propChanged);
-typedef AJ_Status (*EmitPropertiesChanged)(AJ_BusAttachment* busAttachment, const char* objPath, void* properties, uint8_t memberIndex);
-typedef AJ_Status (*OnMethodHandler)(AJ_Message* msg, const char* objPath, uint8_t memberIndex, void* listener, CdmPropertiesChangedByMethod* propChangedByMethod);
+#ifdef USE_DEPRECATED_INTERFACE_TYPES
+// Deprecation transitional struct - used to maintain backwards compatibility.
+typedef struct cdmRegisteredIntfInfo {
+    CdmInterfaceTypes type;
+    const char* name;
+    AJ_InterfaceDescription desc;
+    const InterfaceHandler* handler;
+    struct cdmRegisteredIntfInfo* nextNode;
+} CdmRegisteredInterfaceInfo;
+#endif
 
 #endif /* CDMCONTROLLEEIMPL_H_ */

@@ -39,41 +39,41 @@
 extern AJ_EXPORT uint8_t dbgAJSVCAPP;
 #endif
 
-const PropertyStoreEntry propertyStoreProperties[AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS+5] =
+const PropertyStoreEntry propertyStoreProperties[CDM_PROPERTY_STORE_NUMBER_OF_KEYS] =
 {
-//  { "Key Name            ", W, A, M, I .. . . ., P },
-    { "DeviceId",             0, 1, 0, 1, 0, 0, 0, 1 },
-    { "AppId",                0, 1, 0, 1, 0, 0, 0, 1 },
+//  { "Key Name              ", W, A, M, I .. . . ., P },
+    { "DeviceId",               0, 1, 0, 1, 0, 0, 0, 1 },
+    { "AppId",                  0, 1, 0, 1, 0, 0, 0, 1 },
 #ifndef CONFIG_SERVICE
-    { "DeviceName",           0, 1, 1, 1, 0, 0, 0, 1 },
+    { "DeviceName",             0, 1, 1, 1, 0, 0, 0, 1 },
 // Add other runtime keys above this line
-    { "DefaultLanguage",      0, 1, 0, 0, 0, 0, 0, 1 },
+    { "DefaultLanguage",        0, 1, 0, 0, 0, 0, 0, 1 },
 #else
-    { "DeviceName",           1, 1, 1, 1, 0, 0, 0, 1 },
-    { "DefaultLanguage",      1, 1, 0, 0, 0, 0, 0, 1 },
-    { "Passcode",             1, 0, 0, 0, 0, 0, 0, 0 },
-    { "RealmName",            1, 0, 0, 0, 0, 0, 0, 0 },
+    { "DeviceName",             1, 1, 1, 1, 0, 0, 0, 1 },
+    { "DefaultLanguage",        1, 1, 0, 0, 0, 0, 0, 1 },
+    { "Passcode",               1, 0, 0, 0, 0, 0, 0, 0 },
+    { "RealmName",              1, 0, 0, 0, 0, 0, 0, 0 },
 // Add other runtime keys above this line
 #endif
-    { "AppName",              0, 1, 0, 0, 0, 0, 0, 1 },
-    { "Description",          0, 0, 1, 0, 0, 0, 0, 1 },
-    { "Manufacturer",         0, 1, 1, 0, 0, 0, 0, 1 },
-    { "ModelNumber",          0, 1, 0, 0, 0, 0, 0, 1 },
-    { "DateOfManufacture",    0, 0, 0, 0, 0, 0, 0, 1 },
-    { "SoftwareVersion",      0, 0, 0, 0, 0, 0, 0, 1 },
-    { "AJSoftwareVersion",    0, 0, 0, 0, 0, 0, 0, 1 },
+    { "AppName",                0, 1, 0, 0, 0, 0, 0, 1 },
+    { "Description",            0, 0, 1, 0, 0, 0, 0, 1 },
+    { "Manufacturer",           0, 1, 1, 0, 0, 0, 0, 1 },
+    { "ModelNumber",            0, 1, 0, 0, 0, 0, 0, 1 },
+    { "DateOfManufacture",      0, 0, 0, 0, 0, 0, 0, 1 },
+    { "SoftwareVersion",        0, 0, 0, 0, 0, 0, 0, 1 },
+    { "AJSoftwareVersion",      0, 0, 0, 0, 0, 0, 0, 1 },
 #ifdef CONFIG_SERVICE
-    { "MaxLength",            0, 1, 0, 0, 0, 0, 0, 1 },
+    { "MaxLength",              0, 1, 0, 0, 0, 0, 0, 1 },
 #endif
 // Add other mandatory about keys above this line
-    { "HardwareVersion",      0, 0, 0, 0, 0, 0, 0, 1 },
-    { "SupportUrl",           0, 0, 1, 0, 0, 0, 0, 1 },
+    { "HardwareVersion",        0, 0, 0, 0, 0, 0, 0, 1 },
+    { "SupportUrl",             0, 0, 1, 0, 0, 0, 0, 1 },
 // Add other optional about keys above this line
-    { "CountryOfProduction",         0, 1, 1, 0, 0, 0, 0, 1 },
+    { "CountryOfProduction",    0, 1, 1, 0, 0, 0, 0, 1 },
     { "CorporateBrand",         0, 1, 1, 0, 0, 0, 0, 1 },
-    { "ProductBrand",         0, 1, 1, 0, 0, 0, 0, 1 },
-    { "Location",         0, 1, 1, 0, 0, 0, 0, 1 },
-    { "DeviceTypeDescription",         0, 1, 0, 0, 0, 0, 0, 1 },
+    { "ProductBrand",           0, 1, 1, 0, 0, 0, 0, 1 },
+    { "Location",               0, 1, 1, 0, 0, 0, 0, 1 },
+    { "DeviceTypeDescription",  0, 1, 0, 0, 0, 0, 0, 1 },
 };
 
 
@@ -107,7 +107,7 @@ uint8_t AJSVC_PropertyStore_GetMaxValueLength(int8_t fieldIndex)
 
 const char* AJSVC_PropertyStore_GetFieldName(int8_t fieldIndex)
 {
-    if (fieldIndex <= AJSVC_PROPERTY_STORE_ERROR_FIELD_INDEX || fieldIndex >= AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS+5) {
+    if (fieldIndex <= AJSVC_PROPERTY_STORE_ERROR_FIELD_INDEX || fieldIndex >= CDM_PROPERTY_STORE_NUMBER_OF_KEYS) {
         return "N/A";
     }
     return propertyStoreProperties[fieldIndex].keyName;
@@ -117,7 +117,7 @@ int8_t AJSVC_PropertyStore_GetFieldIndex(const char* fieldName)
 {
     int8_t fieldIndex;
 
-    for (fieldIndex = 0; fieldIndex < AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS+5; fieldIndex++) {
+    for (fieldIndex = 0; fieldIndex < CDM_PROPERTY_STORE_NUMBER_OF_KEYS; fieldIndex++) {
         if (!strcmp(propertyStoreProperties[fieldIndex].keyName, fieldName)) {
             return fieldIndex;
         }
@@ -135,7 +135,7 @@ static int8_t GetLanguageIndexForProperty(int8_t langIndex, int8_t fieldIndex)
 
 const char* AJSVC_PropertyStore_GetValueForLang(int8_t fieldIndex, int8_t langIndex)
 {
-    if (fieldIndex <= AJSVC_PROPERTY_STORE_ERROR_FIELD_INDEX || fieldIndex >= AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS+5) {
+    if (fieldIndex <= AJSVC_PROPERTY_STORE_ERROR_FIELD_INDEX || fieldIndex >= CDM_PROPERTY_STORE_NUMBER_OF_KEYS) {
         return NULL;
     }
     langIndex = GetLanguageIndexForProperty(langIndex, fieldIndex);
@@ -470,7 +470,7 @@ AJ_Status AJSVC_PropertyStore_ReadAll(AJ_Message* msg, AJSVC_PropertyStoreCatego
         return status;
     }
 
-    for (fieldIndex = 0; fieldIndex < AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS+5; fieldIndex++) {
+    for (fieldIndex = 0; fieldIndex < CDM_PROPERTY_STORE_NUMBER_OF_KEYS; fieldIndex++) {
 #ifdef CONFIG_SERVICE
         if (propertyStoreProperties[fieldIndex].mode7Public && (filter.bit0About || (filter.bit1Config && propertyStoreProperties[fieldIndex].mode0Write) || (filter.bit2Announce && propertyStoreProperties[fieldIndex].mode1Announce))) {
 #else
@@ -521,7 +521,7 @@ AJ_Status AJSVC_PropertyStore_ReadAll(AJ_Message* msg, AJSVC_PropertyStoreCatego
                         return status;
                     }
                     AJ_InfoPrintf(("Has key [%s] runtime Value [%s]\n", propertyStoreProperties[AJSVC_PROPERTY_STORE_AJ_SOFTWARE_VERSION].keyName, ajVersion));
-                } else if (fieldIndex == AJSVC_PROPERTY_STORE_NUMBER_OF_KEYS+4 ) {
+                } else if (fieldIndex == AJSVC_PROPERTY_STORE_DEVICE_TYPE_DESCRIPTION ) {
                     // DeviceTypeDescription
                     AJ_Arg arr;
                     AJ_Arg structure;
