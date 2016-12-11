@@ -50,6 +50,8 @@ static bool CheckInterfaceAlreadyRegistered(const char* intfName)
     return (regIntfInfo != NULL);
 }
 
+
+
 // Helper function to maintain backwards compatibility of old create / register vendor-defined
 // interface functions, but also allow the old HAE interfaces to undergo a similar registration
 // process as the vendor defined interfaces (so the one list of interfaces can be used).
@@ -85,6 +87,8 @@ static AJ_Status RegisterInterface(const char* intfName, CdmInterfaceTypes intfT
 }
 #endif
 
+
+
 AJ_Status Cdm_Init(void)
 {
     objInfoFirst = NULL;
@@ -106,6 +110,8 @@ AJ_Status Cdm_Init(void)
 
     return status;
 }
+
+
 
 void Cdm_Deinit(void)
 {
@@ -150,6 +156,8 @@ void Cdm_Deinit(void)
 #endif
 }
 
+
+
 static CdmObjectInfo* GetObjectInfoByPath(const char* objPath)
 {
     CdmObjectInfo* objInfo = objInfoFirst;
@@ -168,6 +176,8 @@ static CdmObjectInfo* GetObjectInfoByPath(const char* objPath)
 
     return objInfo;
 }
+
+
 
 #ifdef USE_DEPRECATED_INTERFACE_TYPES
 AJ_Status Cdm_RegisterVendorDefinedInterface(const char* intfName, const char* const* intfDesc, VendorDefinedInterfaceHandler* handler, CdmInterfaceTypes* intfType)
@@ -192,6 +202,8 @@ AJ_Status Cdm_RegisterVendorDefinedInterface(const char* intfName, const char* c
     return status;
 }
 
+
+
 static CdmRegisteredInterfaceInfo* GetRegisteredInterfaceInfo(CdmInterfaceTypes intfType)
 {
     CdmRegisteredInterfaceInfo* regIntfInfo = regIntfInfoFirst;
@@ -205,6 +217,8 @@ static CdmRegisteredInterfaceInfo* GetRegisteredInterfaceInfo(CdmInterfaceTypes 
 
     return regIntfInfo;
 }
+
+
 
 AJ_Status Cdm_CreateInterface(CdmInterfaceTypes intfType, const char* objPath, void* listener)
 {
@@ -264,6 +278,8 @@ AJ_Status Cdm_CreateInterface(CdmInterfaceTypes intfType, const char* objPath, v
 }
 #endif
 
+
+
 static bool CheckInterfaceAlreadyAdded(CdmObjectInfo* objInfo, const char* intfName)
 {
     if (!objInfo) {
@@ -280,6 +296,8 @@ static bool CheckInterfaceAlreadyAdded(CdmObjectInfo* objInfo, const char* intfN
 
     return (intfInfo != NULL);
 }
+
+
 
 AJ_Status Cdm_AddInterface(const char* objPath, const char* intfName, const char* const* intfDesc, const InterfaceHandler* intfHandler, void* intfModel)
 {
@@ -341,6 +359,8 @@ AJ_Status Cdm_AddInterface(const char* objPath, const char* intfName, const char
     return AJ_OK;
 }
 
+
+
 static void CleanInterfaceDescs()
 {
     CdmObjectInfo* objInfo = objInfoFirst;
@@ -353,6 +373,8 @@ static void CleanInterfaceDescs()
         objInfo = objInfo->nextNode;
     }
 }
+
+
 
 AJ_Status Cdm_Start(void)
 {
@@ -435,6 +457,8 @@ static uint8_t GetMemberIndex(uint32_t msgId)
     return (uint8_t)(msgId & 0x0000FF);
 }
 
+
+
 static CdmObjectInfo* GetObjectInfoByIndex(uint8_t objIndex)
 {
     CdmObjectInfo* objInfo = objInfoFirst;
@@ -449,6 +473,8 @@ static CdmObjectInfo* GetObjectInfoByIndex(uint8_t objIndex)
 
     return objInfo;
 }
+
+
 
 static CdmInterfaceInfo* GetInterfaceInfo(CdmObjectInfo* objInfo, uint8_t intfIndex)
 {
@@ -471,7 +497,9 @@ static CdmInterfaceInfo* GetInterfaceInfo(CdmObjectInfo* objInfo, uint8_t intfIn
     return intfInfo;
 }
 
-static AJ_Status PropGetHandler(AJ_Message* msg)
+
+
+static AJ_Status PropGetHandler(AJ_Message* msg, AJ_BusAttachment* busAttachment)
 {
     uint32_t propId;
     const char* sig;
@@ -487,9 +515,14 @@ static AJ_Status PropGetHandler(AJ_Message* msg)
         CdmObjectInfo* objInfo = GetObjectInfoByIndex(objIndex);
         CdmInterfaceInfo* intfInfo = GetInterfaceInfo(objInfo, intfIndex);
             
+        /**
+         * OnGetProperty must attempt to deliver the message for memory management reasons.
+         * If it returns an error it may have attempted to deliver the message
+         * but failed.
+         */
         if (objInfo && intfInfo && intfInfo->handler && intfInfo->handler->OnGetProperty) {
             uint8_t memberIndex = GetMemberIndex(propId);
-            status = intfInfo->handler->OnGetProperty(&reply, objInfo->path, memberIndex);
+            status = intfInfo->handler->OnGetProperty(busAttachment, &reply, objInfo->path, memberIndex);
         } else {
             status = AJ_ERR_NULL;
         }
@@ -497,10 +530,13 @@ static AJ_Status PropGetHandler(AJ_Message* msg)
 
     if (status != AJ_OK) {
         AJ_MarshalStatusMsg(msg, &reply, status);
+        status = AJ_DeliverMsg(&reply);
     }
 
-    return AJ_DeliverMsg(&reply);
+    return status;
 }
+
+
 
 static AJ_Status PropSetHandler(AJ_Message* msg, AJ_BusAttachment* busAttachment)
 {
@@ -538,6 +574,8 @@ static AJ_Status PropSetHandler(AJ_Message* msg, AJ_BusAttachment* busAttachment
     return AJ_DeliverMsg(&reply);
 }
 
+
+
 AJSVC_ServiceStatus Cdm_MessageProcessor(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Status* status)
 {
     if (!IsCdmMsg(msg->msgId)) {
@@ -550,7 +588,7 @@ AJSVC_ServiceStatus Cdm_MessageProcessor(AJ_BusAttachment* busAttachment, AJ_Mes
 
     if (intfIndex == (uint8_t)0) { //org.freedesktop.DBus.Properties handling
         if (memberIndex == AJ_PROP_GET) {
-            *status = PropGetHandler(msg);
+            *status = PropGetHandler(msg, busAttachment);
         } else if (memberIndex == AJ_PROP_SET) {
             *status = PropSetHandler(msg, busAttachment);
         } else {
@@ -560,19 +598,25 @@ AJSVC_ServiceStatus Cdm_MessageProcessor(AJ_BusAttachment* busAttachment, AJ_Mes
         CdmObjectInfo* objInfo = GetObjectInfoByIndex(objIndex);
         CdmInterfaceInfo* intfInfo = GetInterfaceInfo(objInfo, intfIndex);
 
-        if (objInfo && intfInfo && intfInfo->handler && intfInfo->handler->OnMethodHandler) {
-            AJ_Message replyMsg;
-            *status = AJ_MarshalReplyMsg(msg, &replyMsg);
-            if (*status == AJ_OK) {
-                *status = intfInfo->handler->OnMethodHandler(msg, &replyMsg, objInfo->path, memberIndex);
+        // Prepare a reply message to be filled in and delivered by OnMethodHandler
+        AJ_Message replyMsg;
+        *status = AJ_MarshalReplyMsg(msg, &replyMsg);
+
+        if (*status == AJ_OK) {
+            if (objInfo && intfInfo && intfInfo->handler && intfInfo->handler->OnMethodHandler) {
+                if (*status == AJ_OK) {
+                    *status = intfInfo->handler->OnMethodHandler(busAttachment, msg, &replyMsg, objInfo->path, memberIndex);
+                }
+            } else {
+                *status = AJ_ERR_NULL;
             }
-        } else {
-            *status = AJ_ERR_NULL;
         }
     }
 
     return AJSVC_SERVICE_STATUS_HANDLED;
 }
+
+
 
 #ifdef USE_DEPRECATED_INTERFACE_TYPES
 AJ_Status MakeMsgId(const char* objPath, CdmInterfaceTypes intfType, uint8_t memberIndex, uint32_t* msgId)
@@ -626,6 +670,8 @@ AJ_Status MakeMsgId(const char* objPath, CdmInterfaceTypes intfType, uint8_t mem
 }
 #endif
 
+
+
 void* GetInterfaceModel(const char* objPath, const char* intfName)
 {
     CdmObjectInfo* objInfo = NULL;
@@ -652,6 +698,8 @@ void* GetInterfaceModel(const char* objPath, const char* intfName)
 
     return NULL;
 }
+
+
 
 AJ_Status MakeMessageId(const char* objPath, const char* intfName, uint8_t memberIndex, uint32_t* msgId)
 {
@@ -702,6 +750,8 @@ AJ_Status MakeMessageId(const char* objPath, const char* intfName, uint8_t membe
 
     return AJ_OK;
 }
+
+
 
 AJ_Status MakePropChangedId(const char* objPath, uint32_t* msgId)
 {

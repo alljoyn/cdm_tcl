@@ -15,30 +15,53 @@
  ******************************************************************************/
 
 #include <stdio.h>
+#include <stdint.h>
 #include <stdbool.h>
 
 #include "OnOffStatusModelImpl.h"
-
 #include "../../../Utils/HAL.h"
 
 
-static AJ_Status GetIsOn(void *context, const char *objPath, bool *out) {
 
-    int result = HAL_ReadProperty("/cdm/emulated", "OnOffStatus", "IsOn", &HAL_ReadBool, out);
-    if (!result) {
-        bool defaultValue = false;
-        result = HAL_WriteProperty("/cdm/emulated", "OnOffStatus", "IsOn", &HAL_WriteBool, &defaultValue);
-        if (!result)
+
+
+
+static AJ_Status GetIsOn(void *context, const char *objPath, bool *out)
+{
+    AJ_Status result = AJ_OK;
+    int64_t value = {0};
+
+    FILE* fp = HAL_ReadProperty("/cdm/emulated", "OnOffStatus", "IsOn");
+
+    if (!fp) {
+        fp = HAL_WriteProperty("/cdm/emulated", "OnOffStatus", "IsOn");
+
+        if (!fp) {
             return AJ_ERR_FAILURE;
+        }
 
-        result = HAL_ReadProperty("/cdm/emulated", "OnOffStatus", "IsOn", &HAL_ReadBool, out);
+        HAL_Encode_Int(fp, value);
+        fclose(fp);
     }
 
-    return (result) ? AJ_OK : AJ_ERR_FAILURE;
+    fp = HAL_ReadProperty("/cdm/emulated", "OnOffStatus", "IsOn");
+
+    if (!fp) {
+        return AJ_ERR_FAILURE;
+    }
+
+    value = HAL_Decode_Int(fp);
+    *out = value;
+    fclose(fp);
+    return result;
 }
+
+
+
 
 static OnOffStatusModel model = {
     GetIsOn
+
 };
 
 

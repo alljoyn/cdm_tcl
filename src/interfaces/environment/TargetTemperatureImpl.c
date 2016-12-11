@@ -14,16 +14,20 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
-#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ajtcl/alljoyn.h>
+#include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/interfaces/environment/TargetTemperature.h>
-#include "TargetTemperatureImpl.h"
+#include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/environment/TargetTemperatureInterface.h>
+#include <ajtcl/cdm/interfaces/environment/TargetTemperatureModel.h>
 
 #define INTERFACE_VERSION 1
-#define INTERFACE_NAME TARGET_TEMPERATURE_INTERFACE_NAME
+#define INTERFACE_NAME TARGET_TEMPERATURE
 
-const char* const intfDescEnvironmentTargetTemperature[] = {
-    "$" INTERFACE_NAME,
+const char* const intfDescOperationTargetTemperature[] = {
+    "$org.alljoyn.SmartSpaces.Environment.TargetTemperature",
     "@Version>q",
     "@TargetValue=d",
     "@MinValue>d",
@@ -32,208 +36,12 @@ const char* const intfDescEnvironmentTargetTemperature[] = {
     NULL
 };
 
-const InterfaceHandler intfHandlerEnvironmentTargetTemperature = {
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-    NULL,   // InterfaceRegistered
-#endif
-    TargetTemperatureInterfaceOnGetProperty,
-    TargetTemperatureInterfaceOnSetProperty,
-    NULL
-};
 
 
-static AJ_Status AdjustTargetValue(TargetTemperatureModel* model, const char* objPath, double* outTargetValue)
+
+static AJ_Status TargetTemperature_GetTargetValue(AJ_BusAttachment* busAttachment, const char* objPath, double* out)
 {
-    double stepValue;
-    double minValue;
-    double maxValue;
-
-    if (!model || !objPath || !outTargetValue) {
-        return AJ_ERR_INVALID;
-    }
-    
-    AJ_Status status = model->GetStepValue(model, objPath, &stepValue);
-    if (status != AJ_OK) {
-        return status;
-    }
-    if (stepValue == 0.0) {
-        return AJ_OK;
-    }
-
-    status = model->GetMinValue(model, objPath, &minValue);
-    if (status != AJ_OK) {
-        return status;
-    }
-
-    status = model->GetMaxValue(model, objPath, &maxValue);
-    if (status != AJ_OK) {
-        return status;
-    }
-
-    double div = *outTargetValue / stepValue;
-    double value = floor(div + 0.5) * stepValue;
-    *outTargetValue = (value < minValue) ? minValue : (value > maxValue ? maxValue : value);
-
-    return status;
-}
-
-AJ_Status TargetTemperatureInterfaceOnGetProperty(AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
-{
-    AJ_Status status = AJ_OK;
-
-    switch (memberIndex) {
-    case TARGET_TEMPERATURE_PROP_VERSION:
-        status = AJ_MarshalArgs(replyMsg, "q", INTERFACE_VERSION);
-        break;
-    case TARGET_TEMPERATURE_PROP_TARGET_VALUE: {
-        double targetValue;
-        status = Cdm_TargetTemperatureInterfaceGetTargetValue(objPath, &targetValue);
-        if (status == AJ_OK) {
-            status = AJ_MarshalArgs(replyMsg, "d", targetValue);
-        }
-        break;
-    }
-    case TARGET_TEMPERATURE_PROP_MIN_VALUE: {
-        double minValue;
-        status = Cdm_TargetTemperatureInterfaceGetMinValue(objPath, &minValue);
-        if (status == AJ_OK) {
-            status = AJ_MarshalArgs(replyMsg, "d", minValue);
-        }
-        break;
-    }
-    case TARGET_TEMPERATURE_PROP_MAX_VALUE: {
-        double maxValue;
-        status = Cdm_TargetTemperatureInterfaceGetMaxValue(objPath, &maxValue);
-        if (status == AJ_OK) {
-            status = AJ_MarshalArgs(replyMsg, "d", maxValue);
-        }
-        break;
-    }
-    case TARGET_TEMPERATURE_PROP_STEP_VALUE: {
-        double stepValue;
-        status = Cdm_TargetTemperatureInterfaceGetStepValue(objPath, &stepValue);
-        if (status == AJ_OK) {
-            status = AJ_MarshalArgs(replyMsg, "d", stepValue);
-        }
-        break;
-    }
-    default:
-        status = AJ_ERR_INVALID;
-    }
-
-    return status;
-}
-
-AJ_Status TargetTemperatureInterfaceOnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
-{
-    AJ_Status status = AJ_OK;
-
-    switch (memberIndex) {
-    case TARGET_TEMPERATURE_PROP_VERSION:
-        status = AJ_ERR_DISALLOWED;
-        break;
-    case TARGET_TEMPERATURE_PROP_TARGET_VALUE: {
-        double targetValue;
-        status = AJ_UnmarshalArgs(replyMsg, "d", &targetValue);
-
-        if (status == AJ_OK) {
-            status = Cdm_TargetTemperatureInterfaceSetTargetValue(busAttachment, objPath, targetValue);
-        }
-        break;
-    }
-    case TARGET_TEMPERATURE_PROP_MIN_VALUE:
-        status = AJ_ERR_DISALLOWED;
-        break;
-    case TARGET_TEMPERATURE_PROP_MAX_VALUE:
-        status = AJ_ERR_DISALLOWED;
-        break;
-    case TARGET_TEMPERATURE_PROP_STEP_VALUE:
-        status = AJ_ERR_DISALLOWED;
-        break;
-    default:
-        status = AJ_ERR_INVALID;
-    }
-
-    return status;
-}
-
-
-AJ_Status Cdm_TargetTemperatureEmitPropertyChanged(AJ_BusAttachment* busAttachment, const char* objPath, TargetTemperatureMembers member, const void* value, size_t numValues)
-{
-    AJ_Status status = AJ_OK;
-    
-    switch (member) {
-    case TARGET_TEMPERATURE_PROP_VERSION:
-        status = AJ_ERR_DISALLOWED;
-        break;
-    case TARGET_TEMPERATURE_PROP_TARGET_VALUE: {
-        double targetValue;
-        if (value) {
-            targetValue = *(double*)value;
-        } else {
-            status = Cdm_TargetTemperatureInterfaceGetTargetValue(objPath, &targetValue);
-        }
-
-        if (status == AJ_OK) {
-            status = EmitPropertyChanged(busAttachment, objPath, INTERFACE_NAME, "TargetValue", "d", targetValue);
-        }
-        break;
-    }
-    case TARGET_TEMPERATURE_PROP_MIN_VALUE: {
-        double minValue;
-        if (value) {
-            minValue = *(double*)value;
-        } else {
-            status = Cdm_TargetTemperatureInterfaceGetMinValue(objPath, &minValue);
-        }
-
-        if (status == AJ_OK) {
-            status = EmitPropertyChanged(busAttachment, objPath, INTERFACE_NAME, "MinValue", "d", minValue);
-        }
-        break;
-    }
-    case TARGET_TEMPERATURE_PROP_MAX_VALUE: {
-        double maxValue;
-        if (value) {
-            maxValue = *(double*)value;
-        } else {
-            status = Cdm_TargetTemperatureInterfaceGetMaxValue(objPath, &maxValue);
-        }
-
-        if (status == AJ_OK) {
-            status = EmitPropertyChanged(busAttachment, objPath, INTERFACE_NAME, "MaxValue", "d", maxValue);
-        }
-        break;
-    }
-    case TARGET_TEMPERATURE_PROP_STEP_VALUE: {
-        double stepValue;
-        if (value) {
-            stepValue = *(double*)value;
-        } else {
-            status = Cdm_TargetTemperatureInterfaceGetStepValue(objPath, &stepValue);
-        }
-
-        if (status == AJ_OK) {
-            status = EmitPropertyChanged(busAttachment, objPath, INTERFACE_NAME, "StepValue", "d", stepValue);
-        }
-        break;
-    }
-    default:
-        status = AJ_ERR_INVALID;
-    }
-
-    return status;
-}
-
-AJ_Status Cdm_TargetTemperatureInterfaceGetVersion(uint16_t* outVersion)
-{
-    *outVersion = INTERFACE_VERSION;
-    return AJ_OK;
-}
-
-AJ_Status Cdm_TargetTemperatureInterfaceGetTargetValue(const char* objPath, double* outTargetValue)
-{
-    if (!objPath || !outTargetValue) {
+    if (!objPath || !out) {
         return AJ_ERR_INVALID;
     }
 
@@ -244,13 +52,16 @@ AJ_Status Cdm_TargetTemperatureInterfaceGetTargetValue(const char* objPath, doub
     if (!model->GetTargetValue) {
         return AJ_ERR_NULL;
     }
-    
-    return model->GetTargetValue(model, objPath, outTargetValue);
+
+    model->busAttachment = busAttachment;
+    return model->GetTargetValue(model, objPath, out);
 }
 
-AJ_Status Cdm_TargetTemperatureInterfaceSetTargetValue(AJ_BusAttachment* busAttachment, const char* objPath, const double targetValue)
+
+
+static AJ_Status TargetTemperature_SetTargetValue(AJ_BusAttachment* busAttachment, const char* objPath, double value)
 {
-    if (!busAttachment || !objPath) {
+    if (!objPath) {
         return AJ_ERR_INVALID;
     }
 
@@ -258,36 +69,26 @@ AJ_Status Cdm_TargetTemperatureInterfaceSetTargetValue(AJ_BusAttachment* busAtta
     if (!model) {
         return AJ_ERR_NO_MATCH;
     }
-    if (!model->GetTargetValue || !model->SetTargetValue) {
+    if (!model->SetTargetValue) {
         return AJ_ERR_NULL;
     }
 
-    double newTargetValue = targetValue;
-    AJ_Status status = AdjustTargetValue(model, objPath, &newTargetValue);
-    if (status != AJ_OK) {
-        return status;
-    }
-
-    double oldTargetValue;
-    status = Cdm_TargetTemperatureInterfaceGetTargetValue(objPath, &oldTargetValue);
-    if (status != AJ_OK) {
-        return status;
-    }
-
-    if (fabs(oldTargetValue - newTargetValue) > 0.0001) {
-        status = model->SetTargetValue(model, objPath, newTargetValue);
-
-        if (status == AJ_OK) {
-            status = Cdm_TargetTemperatureEmitPropertyChanged(busAttachment, objPath, TARGET_TEMPERATURE_PROP_TARGET_VALUE, &newTargetValue, 0);
-        }
-    }
-
-    return status;
+    model->busAttachment = busAttachment;
+    return model->SetTargetValue(model, objPath, value);
 }
 
-AJ_Status Cdm_TargetTemperatureInterfaceGetMinValue(const char* objPath, double* outMinValue)
+
+
+AJ_Status Cdm_TargetTemperature_EmitTargetValueChanged(AJ_BusAttachment *bus, const char *objPath, double newValue)
 {
-    if (!objPath || !outMinValue) {
+    return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "TargetValue", "d", newValue);
+}
+
+
+
+static AJ_Status TargetTemperature_GetMinValue(AJ_BusAttachment* busAttachment, const char* objPath, double* out)
+{
+    if (!objPath || !out) {
         return AJ_ERR_INVALID;
     }
 
@@ -299,12 +100,22 @@ AJ_Status Cdm_TargetTemperatureInterfaceGetMinValue(const char* objPath, double*
         return AJ_ERR_NULL;
     }
 
-    return model->GetMinValue(model, objPath, outMinValue);
+    model->busAttachment = busAttachment;
+    return model->GetMinValue(model, objPath, out);
 }
 
-AJ_Status Cdm_TargetTemperatureInterfaceGetMaxValue(const char* objPath, double* outMaxValue)
+
+
+AJ_Status Cdm_TargetTemperature_EmitMinValueChanged(AJ_BusAttachment *bus, const char *objPath, double newValue)
 {
-    if (!objPath || !outMaxValue) {
+    return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "MinValue", "d", newValue);
+}
+
+
+
+static AJ_Status TargetTemperature_GetMaxValue(AJ_BusAttachment* busAttachment, const char* objPath, double* out)
+{
+    if (!objPath || !out) {
         return AJ_ERR_INVALID;
     }
 
@@ -316,12 +127,22 @@ AJ_Status Cdm_TargetTemperatureInterfaceGetMaxValue(const char* objPath, double*
         return AJ_ERR_NULL;
     }
 
-    return model->GetMaxValue(model, objPath, outMaxValue);
+    model->busAttachment = busAttachment;
+    return model->GetMaxValue(model, objPath, out);
 }
 
-AJ_Status Cdm_TargetTemperatureInterfaceGetStepValue(const char* objPath, double* outStepValue)
+
+
+AJ_Status Cdm_TargetTemperature_EmitMaxValueChanged(AJ_BusAttachment *bus, const char *objPath, double newValue)
 {
-    if (!objPath || !outStepValue) {
+    return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "MaxValue", "d", newValue);
+}
+
+
+
+static AJ_Status TargetTemperature_GetStepValue(AJ_BusAttachment* busAttachment, const char* objPath, double* out)
+{
+    if (!objPath || !out) {
         return AJ_ERR_INVALID;
     }
 
@@ -332,6 +153,134 @@ AJ_Status Cdm_TargetTemperatureInterfaceGetStepValue(const char* objPath, double
     if (!model->GetStepValue) {
         return AJ_ERR_NULL;
     }
-    
-    return model->GetStepValue(model, objPath, outStepValue);
+
+    model->busAttachment = busAttachment;
+    return model->GetStepValue(model, objPath, out);
 }
+
+
+
+AJ_Status Cdm_TargetTemperature_EmitStepValueChanged(AJ_BusAttachment *bus, const char *objPath, double newValue)
+{
+    return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "StepValue", "d", newValue);
+}
+
+
+
+
+//
+// Handler functions
+//
+static AJ_Status TargetTemperature_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
+{
+    AJ_Status status = AJ_ERR_INVALID;
+
+    switch (memberIndex) {
+        case TARGETTEMPERATURE_PROP_VERSION:
+            status = AJ_MarshalArgs(replyMsg, "q", INTERFACE_VERSION);
+            break;
+
+        case TARGETTEMPERATURE_PROP_TARGET_VALUE:
+        {
+            double target_value;
+            status = TargetTemperature_GetTargetValue(busAttachment, objPath, &target_value);
+            if (status == AJ_OK) {
+                status = AJ_MarshalArgs(replyMsg, "d", target_value);
+                if (status == AJ_OK) {
+                    status = AJ_DeliverMsg(replyMsg);
+                }
+                
+            }
+            break;
+        }
+
+        case TARGETTEMPERATURE_PROP_MIN_VALUE:
+        {
+            double min_value;
+            status = TargetTemperature_GetMinValue(busAttachment, objPath, &min_value);
+            if (status == AJ_OK) {
+                status = AJ_MarshalArgs(replyMsg, "d", min_value);
+                if (status == AJ_OK) {
+                    status = AJ_DeliverMsg(replyMsg);
+                }
+                
+            }
+            break;
+        }
+
+        case TARGETTEMPERATURE_PROP_MAX_VALUE:
+        {
+            double max_value;
+            status = TargetTemperature_GetMaxValue(busAttachment, objPath, &max_value);
+            if (status == AJ_OK) {
+                status = AJ_MarshalArgs(replyMsg, "d", max_value);
+                if (status == AJ_OK) {
+                    status = AJ_DeliverMsg(replyMsg);
+                }
+                
+            }
+            break;
+        }
+
+        case TARGETTEMPERATURE_PROP_STEP_VALUE:
+        {
+            double step_value;
+            status = TargetTemperature_GetStepValue(busAttachment, objPath, &step_value);
+            if (status == AJ_OK) {
+                status = AJ_MarshalArgs(replyMsg, "d", step_value);
+                if (status == AJ_OK) {
+                    status = AJ_DeliverMsg(replyMsg);
+                }
+                
+            }
+            break;
+        }
+    }
+
+    return status;
+}
+
+
+
+static AJ_Status TargetTemperature_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+{
+    AJ_Status status = AJ_ERR_INVALID;
+
+    switch (memberIndex) {
+        case TARGETTEMPERATURE_PROP_VERSION:
+            status = AJ_ERR_DISALLOWED;
+        break;
+
+        case TARGETTEMPERATURE_PROP_TARGET_VALUE:
+        {
+            double target_value;
+            status = AJ_UnmarshalArgs(msg, "d", &target_value);
+            if (status == AJ_OK) {
+                status = TargetTemperature_SetTargetValue(busAttachment, objPath, target_value);
+                if (status == AJ_OK) {
+                    status= Cdm_TargetTemperature_EmitTargetValueChanged(busAttachment, objPath, target_value);
+                }
+            }
+            break;
+        }
+    }
+
+    return status;
+}
+
+
+
+static AJ_Status TargetTemperature_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
+{
+    AJ_Status status = AJ_ERR_INVALID;
+
+    return status;
+}
+
+
+
+const InterfaceHandler intfHandlerOperationTargetTemperature = {
+    TargetTemperature_OnGetProperty,
+    TargetTemperature_OnSetProperty,
+    TargetTemperature_OnMethodHandler
+};

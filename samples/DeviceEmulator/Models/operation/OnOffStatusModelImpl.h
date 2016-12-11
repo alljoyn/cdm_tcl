@@ -14,12 +14,16 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
+#ifndef ALLJOYN_ONOFFSTATUS_MODELIMPL_H
+#define ALLJOYN_ONOFFSTATUS_MODELIMPL_H
 
-#ifndef ALLJOYN_ONOFFSTATUSMODELIMPL_H
-#define ALLJOYN_ONOFFSTATUSMODELIMPL_H
+#include <stdio.h>
 
 #include <ajtcl/cdm/interfaces/operation/OnOffStatusModel.h>
+#include <ajtcl/cdm/interfaces/operation/OnOffStatusInterface.h>
 
 OnOffStatusModel *GetOnOffStatusModel(void);
 
-#endif //ALLJOYN_ONOFFSTATUSMODELIMPL_H
+// REVISIT delete this
+
+#endif // ALLJOYN_ONOFFSTATUS_MODELIMPL_H
