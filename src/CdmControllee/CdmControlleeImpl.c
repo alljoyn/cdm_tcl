@@ -432,8 +432,6 @@ AJ_Status Cdm_Start(void)
         i++;
     }
 
-    AJ_PrintXML(ajObjects);
-
     return AJ_RegisterObjectList(ajObjects, CDM_OBJECT_LIST_INDEX);
 }
 

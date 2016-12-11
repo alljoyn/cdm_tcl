@@ -28,6 +28,8 @@ const char *deviceManufactureName;
 const char *deviceProductName;
 const char* const* propertyStoreDefaultLanguages; // = SUPPORTED_LANGUAGES;
 
+static const char* DEFAULT_DEVICETYPEDESC[] = { "" };
+
 const char **propertyStoreDefaultValues[CDM_PROPERTY_STORE_NUMBER_OF_KEYS] =
 {
 // "Default Values per language",   "Key Name"
@@ -55,7 +57,7 @@ const char **propertyStoreDefaultValues[CDM_PROPERTY_STORE_NUMBER_OF_KEYS] =
     NULL,                           /*CorporateBrand*/
     NULL,                           /*ProductBrand*/
     NULL,                           /*Location*/
-    NULL,                           /*DeviceTypeDescription*/
+    DEFAULT_DEVICETYPEDESC,         /*DeviceTypeDescription*/
 };
 
 static char machineIdVar[MACHINE_ID_LENGTH + 1] = { 0 };

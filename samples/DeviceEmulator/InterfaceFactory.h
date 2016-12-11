@@ -17,6 +17,8 @@
 #ifndef CDM_INTERFACE_FACTORY_H_
 #define CDM_INTERFACE_FACTORY_H_
 
-void createInterface(const char* objPath, const char* ifaceName);
+#include <ajtcl/aj_status.h>
+
+AJ_Status createInterface(const char* objPath, const char* ifaceName);
 
 #endif /* CDM_INTERFACE_FACTORY_H_ */
