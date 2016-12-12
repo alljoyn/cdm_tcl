@@ -70,6 +70,7 @@ static void CreateInterfaces(DEM_Config* config)
         DEM_Object* obj = &config->objects[i];
 
         for (int j = 0; j < obj->numInterfaces; ++j) {
+            fprintf(stdout, "Creating interface %s\n", obj->interfaces[j].name);
             createInterface("/cdm/emulated", obj->interfaces[j].name);
         }
     }
@@ -99,6 +100,12 @@ int main(int argc, char *argv[])
     Cdm_EnablePSK(psk_password);
 
     DEM_Config *config = DEM_CreateConfig(argv[1]);
+
+    if (!config) {
+        fprintf(stderr, "Invalid XML file\n");
+        return 1;
+    }
+
     const CDM_AboutDataBuf aboutData = CDM_CreateAboutDataFromXml(config->aboutData);
 
     CDM_SetDefaultAboutIconParams(&iconParams);

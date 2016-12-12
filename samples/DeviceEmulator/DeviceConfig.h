@@ -17,25 +17,44 @@
 #ifndef ALLJOYN_DEVICECONFIG_H
 #define ALLJOYN_DEVICECONFIG_H
 
-typedef struct
-{
-    char *name;
-} DEM_Interface;
+#include <stdbool.h>
 
 typedef struct
 {
-    char *objectPath;
+    const char *name;
+    const char *initialState;
+    bool defaultOnly;
+} DEM_Property;
+
+
+
+typedef struct
+{
+    const char *name;
+    DEM_Property *properties;
+    int numProperties;
+} DEM_Interface;
+
+
+
+typedef struct
+{
+    const char *objectPath;
     DEM_Interface *interfaces;
     int numInterfaces;
 } DEM_Object;
 
+
+
 typedef struct
 {
-    char *deviceName;
-    char *aboutData;
+    const char *deviceName;
+    const char *aboutData;
     DEM_Object *objects;
     int numObjects;
 } DEM_Config;
+
+
 
 DEM_Config *DEM_CreateConfig(const char *deviceXmlPath);
 void DEM_FreeConfig(DEM_Config *config);
