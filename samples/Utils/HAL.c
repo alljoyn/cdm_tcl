@@ -28,6 +28,7 @@
 #include <ajtcl/cdm/utils/CDM_Array.h>
 
 #include "HAL.h"
+#include "StrBuf.h"
 
 //======================================================================
 
@@ -362,72 +363,6 @@ void HAL_Encode_Array_int64(FILE *fp, Array_int64 value)
 
 //======================================================================
 
-typedef struct {
-    char* chars;
-    size_t numChars;
-    size_t capacity;
-    } Buf;
-
-
-
-static void need(Buf* buf, size_t amount)
-{
-    // Allow for the NUL
-    int need = (buf->numChars + amount + 1) - buf->capacity;
-
-    if (need > 0)
-    {
-        size_t newCap = buf->capacity;
-
-        if (need < 32)
-        {
-            need = 32;
-        }
-
-        newCap += need;
-        buf->chars = (char*)realloc(buf->chars, newCap);
-        buf->capacity = newCap;
-    }
-}
-
-
-
-static void initBuf(Buf* buf)
-{
-    buf->chars = NULL;
-    buf->numChars = 0;
-    buf->capacity = 0;
-    need(buf, 32);
-}
-
-
-
-static void freeBuf(Buf* buf)
-{
-    free(buf->chars);
-}
-
-
-
-static void append(Buf* buf, char c)
-{
-    need(buf, buf->numChars + 1);
-    buf->chars[buf->numChars] = c;
-    ++buf->numChars;
-}
-
-
-
-static void clear(Buf* buf)
-{
-    if (buf->chars)
-    {
-        buf->chars[0] = 0;
-        buf->numChars = 0;
-    }
-}
-
-
 
 static void skipWS(FILE* fp)
 {
@@ -451,10 +386,10 @@ static void skipWS(FILE* fp)
 
 
 
-static void readToWS(FILE* fp, Buf* buf)
+static void readToWS(FILE* fp, StrBuf* buf)
 {
     // This leaves the file on the first WS found.
-    clear(buf);
+    StrBuf_Clear(buf);
 
     for (;;)
     {
@@ -470,7 +405,7 @@ static void readToWS(FILE* fp, Buf* buf)
             break;
         }
 
-        append(buf, c);
+        StrBuf_AppendChar(buf, c);
     }
 }
 
@@ -519,7 +454,7 @@ static int lookahead(FILE* fp, const char* token)
 
 
 
-static bool decode_Int(Buf* buf, int64_t* out)
+static bool decode_Int(StrBuf* buf, int64_t* out)
 {
     char* endptr = NULL;
     *out = strtoll(buf->chars, &endptr, 10);
@@ -528,7 +463,7 @@ static bool decode_Int(Buf* buf, int64_t* out)
 
 
 
-static bool decode_UInt(Buf* buf, uint64_t* out)
+static bool decode_UInt(StrBuf* buf, uint64_t* out)
 {
     char* endptr = NULL;
     *out = strtoull(buf->chars, &endptr, 10);
@@ -537,7 +472,7 @@ static bool decode_UInt(Buf* buf, uint64_t* out)
 
 
 
-static bool decode_Double(Buf* buf, double* out)
+static bool decode_Double(StrBuf* buf, double* out)
 {
     char* endptr = NULL;
     *out = strtod(buf->chars, &endptr);
@@ -550,13 +485,13 @@ static int decode_String(FILE* fp, char** out)
 {
     // We don't free the buffer but return its chars directly to the caller
     // The return code is -1 if eof, -2 if a string was read or the code of rejected character.
-    Buf buf;
+    StrBuf buf;
     bool inStr = false;
     bool done  = false;
     int  result = -2;
 
     skipWS(fp);
-    initBuf(&buf);
+    StrBuf_Init(&buf);
 
     while (!done)
     {
@@ -600,13 +535,13 @@ static int decode_String(FILE* fp, char** out)
                         hex[1] = h2;
                         hex[2] = 0;
                         sscanf(hex, "%hhx", &x);
-                        append(&buf, (char)x);
+                        StrBuf_AppendChar(&buf, (char)x);
                     }
                 }
                 else
                 {
                     // For simplicity, allow anything to be quoted
-                    append(&buf, c2);
+                    StrBuf_AppendChar(&buf, c2);
                 }
             }
             else
@@ -618,7 +553,7 @@ static int decode_String(FILE* fp, char** out)
             }
             else
             {
-                append(&buf, c);
+                StrBuf_AppendChar(&buf, c);
             }
         }
     }
@@ -630,10 +565,10 @@ static int decode_String(FILE* fp, char** out)
 
 int64_t HAL_Decode_Int(FILE *fp)
 {
-    Buf buf;
+    StrBuf buf;
     int64_t value = 0;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     skipWS(fp);
     readToWS(fp, &buf);
 
@@ -642,7 +577,7 @@ int64_t HAL_Decode_Int(FILE *fp)
         fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
     }
 
-    freeBuf(&buf);
+    StrBuf_Free(&buf);
     return value;
 }
 
@@ -650,10 +585,10 @@ int64_t HAL_Decode_Int(FILE *fp)
 
 uint64_t HAL_Decode_UInt(FILE *fp)
 {
-    Buf buf;
+    StrBuf buf;
     uint64_t value = 0;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     skipWS(fp);
     readToWS(fp, &buf);
 
@@ -662,7 +597,7 @@ uint64_t HAL_Decode_UInt(FILE *fp)
         fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
     }
 
-    freeBuf(&buf);
+    StrBuf_Free(&buf);
     return value;
 }
 
@@ -689,10 +624,10 @@ const char* HAL_Decode_String(FILE *fp)
 
 double HAL_Decode_Double(FILE *fp)
 {
-    Buf buf;
+    StrBuf buf;
     double value = 0;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     skipWS(fp);
     readToWS(fp, &buf);
 
@@ -701,7 +636,7 @@ double HAL_Decode_Double(FILE *fp)
         fprintf(stderr, "Invalid HAL double %s\n", buf.chars);
     }
 
-    freeBuf(&buf);
+    StrBuf_Free(&buf);
     return value;
 }
 
@@ -709,9 +644,9 @@ double HAL_Decode_Double(FILE *fp)
 
 void HAL_Decode_OpenStruct(FILE *fp)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     skipWS(fp);
     readToWS(fp, &buf);
 
@@ -720,16 +655,16 @@ void HAL_Decode_OpenStruct(FILE *fp)
         fprintf(stderr, "Missing opening brace");
     }
 
-    freeBuf(&buf);
+    StrBuf_Free(&buf);
 }
 
 
 
 void HAL_Decode_CloseStruct(FILE *fp)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     skipWS(fp);
     readToWS(fp, &buf);
 
@@ -737,16 +672,16 @@ void HAL_Decode_CloseStruct(FILE *fp)
     {
         fprintf(stderr, "Missing closing brace");
     }
-    freeBuf(&buf);
+    StrBuf_Free(&buf);
 }
 
 
 
 void HAL_Decode_OpenArray(FILE *fp)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     skipWS(fp);
     readToWS(fp, &buf);
 
@@ -754,7 +689,7 @@ void HAL_Decode_OpenArray(FILE *fp)
     {
         fprintf(stderr, "Missing array opening");
     }
-    freeBuf(&buf);
+    StrBuf_Free(&buf);
 }
 
 
@@ -779,9 +714,9 @@ void HAL_Decode_CloseArray(FILE *fp)
 
 void HAL_Decode_Array_Bool(FILE *fp, Array_Bool *value)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     InitArray_Bool(value, 0);
     HAL_Decode_OpenArray(fp);
 
@@ -852,9 +787,9 @@ void HAL_Decode_Array_string(FILE *fp, Array_string *value)
 
 void HAL_Decode_Array_double(FILE *fp, Array_double *value)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     InitArray_double(value, 0);
     HAL_Decode_OpenArray(fp);
 
@@ -886,9 +821,9 @@ void HAL_Decode_Array_double(FILE *fp, Array_double *value)
 
 void HAL_Decode_Array_uint8(FILE *fp, Array_uint8 *value)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     InitArray_uint8(value, 0);
     HAL_Decode_OpenArray(fp);
 
@@ -920,9 +855,9 @@ void HAL_Decode_Array_uint8(FILE *fp, Array_uint8 *value)
 
 void HAL_Decode_Array_uint16(FILE *fp, Array_uint16 *value)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     InitArray_uint16(value, 0);
     HAL_Decode_OpenArray(fp);
 
@@ -954,9 +889,9 @@ void HAL_Decode_Array_uint16(FILE *fp, Array_uint16 *value)
 
 void HAL_Decode_Array_uint32(FILE *fp, Array_uint32 *value)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     InitArray_uint32(value, 0);
     HAL_Decode_OpenArray(fp);
 
@@ -988,9 +923,9 @@ void HAL_Decode_Array_uint32(FILE *fp, Array_uint32 *value)
 
 void HAL_Decode_Array_uint64(FILE *fp, Array_uint64 *value)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     InitArray_uint64(value, 0);
     HAL_Decode_OpenArray(fp);
 
@@ -1022,9 +957,9 @@ void HAL_Decode_Array_uint64(FILE *fp, Array_uint64 *value)
 
 void HAL_Decode_Array_int16(FILE *fp, Array_int16 *value)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     InitArray_int16(value, 0);
     HAL_Decode_OpenArray(fp);
 
@@ -1056,9 +991,9 @@ void HAL_Decode_Array_int16(FILE *fp, Array_int16 *value)
 
 void HAL_Decode_Array_int32(FILE *fp, Array_int32 *value)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     InitArray_int32(value, 0);
     HAL_Decode_OpenArray(fp);
 
@@ -1090,9 +1025,9 @@ void HAL_Decode_Array_int32(FILE *fp, Array_int32 *value)
 
 void HAL_Decode_Array_int64(FILE *fp, Array_int64 *value)
 {
-    Buf buf;
+    StrBuf buf;
 
-    initBuf(&buf);
+    StrBuf_Init(&buf);
     InitArray_int64(value, 0);
     HAL_Decode_OpenArray(fp);
 
