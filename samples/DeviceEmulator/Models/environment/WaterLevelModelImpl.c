@@ -80,7 +80,6 @@ static int HAL_Decode_Array_WaterLevel_SupplySource(FILE* fp, Array_WaterLevel_S
 static AJ_Status GetSupplySource(void *context, const char *objPath, WaterLevel_SupplySource *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "SupplySource");
 
@@ -91,6 +90,7 @@ static AJ_Status GetSupplySource(void *context, const char *objPath, WaterLevel_
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -101,6 +101,7 @@ static AJ_Status GetSupplySource(void *context, const char *objPath, WaterLevel_
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (WaterLevel_SupplySource)(int)value;
     fclose(fp);
@@ -111,7 +112,6 @@ static AJ_Status GetSupplySource(void *context, const char *objPath, WaterLevel_
 static AJ_Status GetCurrentLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "CurrentLevel");
 
@@ -122,6 +122,7 @@ static AJ_Status GetCurrentLevel(void *context, const char *objPath, uint8_t *ou
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -132,6 +133,7 @@ static AJ_Status GetCurrentLevel(void *context, const char *objPath, uint8_t *ou
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -142,7 +144,6 @@ static AJ_Status GetCurrentLevel(void *context, const char *objPath, uint8_t *ou
 static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "MaxLevel");
 
@@ -153,6 +154,7 @@ static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -163,6 +165,7 @@ static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);

@@ -29,7 +29,6 @@
 static AJ_Status GetReferenceTimer(void *context, const char *objPath, int32_t *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "ReferenceTimer");
 
@@ -40,6 +39,7 @@ static AJ_Status GetReferenceTimer(void *context, const char *objPath, int32_t *
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetReferenceTimer(void *context, const char *objPath, int32_t *
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);
@@ -60,7 +61,6 @@ static AJ_Status GetReferenceTimer(void *context, const char *objPath, int32_t *
 static AJ_Status GetTargetTimeToStart(void *context, const char *objPath, int32_t *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetTimeToStart");
 
@@ -71,6 +71,7 @@ static AJ_Status GetTargetTimeToStart(void *context, const char *objPath, int32_
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -81,6 +82,7 @@ static AJ_Status GetTargetTimeToStart(void *context, const char *objPath, int32_
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);
@@ -91,7 +93,6 @@ static AJ_Status GetTargetTimeToStart(void *context, const char *objPath, int32_
 static AJ_Status GetTargetTimeToStop(void *context, const char *objPath, int32_t *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetTimeToStop");
 
@@ -102,6 +103,7 @@ static AJ_Status GetTargetTimeToStop(void *context, const char *objPath, int32_t
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -112,6 +114,7 @@ static AJ_Status GetTargetTimeToStop(void *context, const char *objPath, int32_t
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);
@@ -122,7 +125,6 @@ static AJ_Status GetTargetTimeToStop(void *context, const char *objPath, int32_t
 static AJ_Status GetEstimatedTimeToEnd(void *context, const char *objPath, int32_t *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "EstimatedTimeToEnd");
 
@@ -133,6 +135,7 @@ static AJ_Status GetEstimatedTimeToEnd(void *context, const char *objPath, int32
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -143,6 +146,7 @@ static AJ_Status GetEstimatedTimeToEnd(void *context, const char *objPath, int32
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);
@@ -153,7 +157,6 @@ static AJ_Status GetEstimatedTimeToEnd(void *context, const char *objPath, int32
 static AJ_Status GetRunningTime(void *context, const char *objPath, int32_t *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "RunningTime");
 
@@ -164,6 +167,7 @@ static AJ_Status GetRunningTime(void *context, const char *objPath, int32_t *out
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -174,6 +178,7 @@ static AJ_Status GetRunningTime(void *context, const char *objPath, int32_t *out
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);
@@ -184,7 +189,6 @@ static AJ_Status GetRunningTime(void *context, const char *objPath, int32_t *out
 static AJ_Status GetTargetDuration(void *context, const char *objPath, int32_t *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetDuration");
 
@@ -195,6 +199,7 @@ static AJ_Status GetTargetDuration(void *context, const char *objPath, int32_t *
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -205,6 +210,7 @@ static AJ_Status GetTargetDuration(void *context, const char *objPath, int32_t *
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);

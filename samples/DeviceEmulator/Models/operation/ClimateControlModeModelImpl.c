@@ -131,7 +131,6 @@ static int HAL_Decode_Array_ClimateControlMode_OperationalState(FILE* fp, Array_
 static AJ_Status GetMode(void *context, const char *objPath, ClimateControlMode_Mode *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "Mode");
 
@@ -142,6 +141,7 @@ static AJ_Status GetMode(void *context, const char *objPath, ClimateControlMode_
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -152,6 +152,7 @@ static AJ_Status GetMode(void *context, const char *objPath, ClimateControlMode_
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (ClimateControlMode_Mode)(int)value;
     fclose(fp);
@@ -175,7 +176,6 @@ static AJ_Status SetMode(void *context, const char *objPath, ClimateControlMode_
 static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_ClimateControlMode_Mode *out)
 {
     AJ_Status result = AJ_OK;
-    Array_ClimateControlMode_Mode value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "SupportedModes");
 
@@ -186,6 +186,7 @@ static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_Cli
             return AJ_ERR_FAILURE;
         }
 
+        Array_ClimateControlMode_Mode const value = {0};
         HAL_Encode_Array_ClimateControlMode_Mode(fp, value);
         fclose(fp);
     }
@@ -196,6 +197,7 @@ static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_Cli
         return AJ_ERR_FAILURE;
     }
 
+    Array_ClimateControlMode_Mode value;
     HAL_Decode_Array_ClimateControlMode_Mode(fp, &value);
 
     *out = value;
@@ -207,7 +209,6 @@ static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_Cli
 static AJ_Status GetOperationalState(void *context, const char *objPath, ClimateControlMode_OperationalState *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "OperationalState");
 
@@ -218,6 +219,7 @@ static AJ_Status GetOperationalState(void *context, const char *objPath, Climate
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -228,6 +230,7 @@ static AJ_Status GetOperationalState(void *context, const char *objPath, Climate
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (ClimateControlMode_OperationalState)(int)value;
     fclose(fp);

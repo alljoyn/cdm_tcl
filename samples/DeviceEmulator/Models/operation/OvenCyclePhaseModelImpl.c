@@ -89,7 +89,6 @@ static int HAL_Decode_Array_OvenCyclePhase_CyclePhaseDescriptor(FILE* fp, Array_
 static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "OvenCyclePhase", "CyclePhase");
 
@@ -100,6 +99,7 @@ static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -110,6 +110,7 @@ static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -120,7 +121,6 @@ static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
 static AJ_Status GetSupportedCyclePhases(void *context, const char *objPath, Array_uint8 *out)
 {
     AJ_Status result = AJ_OK;
-    Array_uint8 value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "OvenCyclePhase", "SupportedCyclePhases");
 
@@ -131,6 +131,7 @@ static AJ_Status GetSupportedCyclePhases(void *context, const char *objPath, Arr
             return AJ_ERR_FAILURE;
         }
 
+        Array_uint8 const value = {0};
         HAL_Encode_Array_uint8(fp, value);
         fclose(fp);
     }
@@ -141,6 +142,7 @@ static AJ_Status GetSupportedCyclePhases(void *context, const char *objPath, Arr
         return AJ_ERR_FAILURE;
     }
 
+    Array_uint8 value;
     HAL_Decode_Array_uint8(fp, &value);
 
     *out = value;

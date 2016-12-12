@@ -29,7 +29,6 @@
 static AJ_Status GetIsRecirculating(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "AirRecirculationMode", "IsRecirculating");
 
@@ -40,6 +39,7 @@ static AJ_Status GetIsRecirculating(void *context, const char *objPath, bool *ou
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetIsRecirculating(void *context, const char *objPath, bool *ou
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);

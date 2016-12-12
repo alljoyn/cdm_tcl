@@ -29,7 +29,6 @@
 static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperatureLevel", "MaxLevel");
 
@@ -40,6 +39,7 @@ static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -60,7 +61,6 @@ static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
 static AJ_Status GetTargetLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperatureLevel", "TargetLevel");
 
@@ -71,6 +71,7 @@ static AJ_Status GetTargetLevel(void *context, const char *objPath, uint8_t *out
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -81,6 +82,7 @@ static AJ_Status GetTargetLevel(void *context, const char *objPath, uint8_t *out
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -104,7 +106,6 @@ static AJ_Status SetTargetLevel(void *context, const char *objPath, uint8_t inpu
 static AJ_Status GetSelectableTemperatureLevels(void *context, const char *objPath, Array_uint8 *out)
 {
     AJ_Status result = AJ_OK;
-    Array_uint8 value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperatureLevel", "SelectableTemperatureLevels");
 
@@ -115,6 +116,7 @@ static AJ_Status GetSelectableTemperatureLevels(void *context, const char *objPa
             return AJ_ERR_FAILURE;
         }
 
+        Array_uint8 const value = {0};
         HAL_Encode_Array_uint8(fp, value);
         fclose(fp);
     }
@@ -125,6 +127,7 @@ static AJ_Status GetSelectableTemperatureLevels(void *context, const char *objPa
         return AJ_ERR_FAILURE;
     }
 
+    Array_uint8 value;
     HAL_Decode_Array_uint8(fp, &value);
 
     *out = value;

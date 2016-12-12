@@ -345,7 +345,7 @@ static int WriteDeviceTypesDescriptions(const ABOUT_ANALYSIS *analysis, void *de
         memcpy(curPos, analysis->devicePaths.values[i].element, analysis->devicePaths.values[i].elemSize);
         aboutDataBuf->itr += analysis->devicePaths.values[i].elemSize + 1;
 
-        desc[i].type = (DeviceType)atoi(analysis->deviceTypes.values[i].element);
+        desc[i].type = (DeviceType)(int)atoi(analysis->deviceTypes.values[i].element);
         desc[i].objectpath = curPos;
     }
 

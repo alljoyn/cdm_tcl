@@ -29,7 +29,6 @@
 static AJ_Status GetBrightness(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Brightness", "Brightness");
 
@@ -40,6 +39,7 @@ static AJ_Status GetBrightness(void *context, const char *objPath, double *out)
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetBrightness(void *context, const char *objPath, double *out)
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);

@@ -232,7 +232,6 @@ static void CopyAlerts_AlertCodesDescriptor(Alerts_AlertCodesDescriptor* value, 
 static AJ_Status GetAlerts(void *context, const char *objPath, Array_Alerts_AlertRecord *out)
 {
     AJ_Status result = AJ_OK;
-    Array_Alerts_AlertRecord value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Alerts", "Alerts");
 
@@ -243,6 +242,7 @@ static AJ_Status GetAlerts(void *context, const char *objPath, Array_Alerts_Aler
             return AJ_ERR_FAILURE;
         }
 
+        Array_Alerts_AlertRecord const value = {0};
         HAL_Encode_Array_Alerts_AlertRecord(fp, value);
         fclose(fp);
     }
@@ -253,6 +253,7 @@ static AJ_Status GetAlerts(void *context, const char *objPath, Array_Alerts_Aler
         return AJ_ERR_FAILURE;
     }
 
+    Array_Alerts_AlertRecord value;
     HAL_Decode_Array_Alerts_AlertRecord(fp, &value);
 
     *out = value;

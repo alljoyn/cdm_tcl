@@ -89,7 +89,6 @@ static int HAL_Decode_Array_PlugInUnits_PlugInInfo(FILE* fp, Array_PlugInUnits_P
 static AJ_Status GetPlugInUnits(void *context, const char *objPath, Array_PlugInUnits_PlugInInfo *out)
 {
     AJ_Status result = AJ_OK;
-    Array_PlugInUnits_PlugInInfo value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "PlugInUnits", "PlugInUnits");
 
@@ -100,6 +99,7 @@ static AJ_Status GetPlugInUnits(void *context, const char *objPath, Array_PlugIn
             return AJ_ERR_FAILURE;
         }
 
+        Array_PlugInUnits_PlugInInfo const value = {0};
         HAL_Encode_Array_PlugInUnits_PlugInInfo(fp, value);
         fclose(fp);
     }
@@ -110,6 +110,7 @@ static AJ_Status GetPlugInUnits(void *context, const char *objPath, Array_PlugIn
         return AJ_ERR_FAILURE;
     }
 
+    Array_PlugInUnits_PlugInInfo value;
     HAL_Decode_Array_PlugInUnits_PlugInInfo(fp, &value);
 
     *out = value;

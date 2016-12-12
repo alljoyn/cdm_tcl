@@ -195,7 +195,6 @@ static int HAL_Decode_Array_AudioVideoInput_SignalPresence(FILE* fp, Array_Audio
 static AJ_Status GetInputSourceId(void *context, const char *objPath, AudioVideoInput_SourceType *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "InputSourceId");
 
@@ -206,6 +205,7 @@ static AJ_Status GetInputSourceId(void *context, const char *objPath, AudioVideo
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -216,6 +216,7 @@ static AJ_Status GetInputSourceId(void *context, const char *objPath, AudioVideo
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (AudioVideoInput_SourceType)(int)value;
     fclose(fp);
@@ -239,7 +240,6 @@ static AJ_Status SetInputSourceId(void *context, const char *objPath, AudioVideo
 static AJ_Status GetSupportedInputSources(void *context, const char *objPath, Array_AudioVideoInput_InputSource *out)
 {
     AJ_Status result = AJ_OK;
-    Array_AudioVideoInput_InputSource value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "SupportedInputSources");
 
@@ -250,6 +250,7 @@ static AJ_Status GetSupportedInputSources(void *context, const char *objPath, Ar
             return AJ_ERR_FAILURE;
         }
 
+        Array_AudioVideoInput_InputSource const value = {0};
         HAL_Encode_Array_AudioVideoInput_InputSource(fp, value);
         fclose(fp);
     }
@@ -260,6 +261,7 @@ static AJ_Status GetSupportedInputSources(void *context, const char *objPath, Ar
         return AJ_ERR_FAILURE;
     }
 
+    Array_AudioVideoInput_InputSource value;
     HAL_Decode_Array_AudioVideoInput_InputSource(fp, &value);
 
     *out = value;

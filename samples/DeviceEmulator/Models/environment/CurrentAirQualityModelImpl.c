@@ -80,7 +80,6 @@ static int HAL_Decode_Array_CurrentAirQuality_ContaminantType(FILE* fp, Array_Cu
 static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentAirQuality_ContaminantType *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "ContaminantType");
 
@@ -91,6 +90,7 @@ static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentA
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -101,6 +101,7 @@ static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentA
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (CurrentAirQuality_ContaminantType)(int)value;
     fclose(fp);
@@ -111,7 +112,6 @@ static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentA
 static AJ_Status GetCurrentValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "CurrentValue");
 
@@ -122,6 +122,7 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, double *out
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -132,6 +133,7 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, double *out
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);
@@ -142,7 +144,6 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, double *out
 static AJ_Status GetMinValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MinValue");
 
@@ -153,6 +154,7 @@ static AJ_Status GetMinValue(void *context, const char *objPath, double *out)
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -163,6 +165,7 @@ static AJ_Status GetMinValue(void *context, const char *objPath, double *out)
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);
@@ -173,7 +176,6 @@ static AJ_Status GetMinValue(void *context, const char *objPath, double *out)
 static AJ_Status GetMaxValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MaxValue");
 
@@ -184,6 +186,7 @@ static AJ_Status GetMaxValue(void *context, const char *objPath, double *out)
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -194,6 +197,7 @@ static AJ_Status GetMaxValue(void *context, const char *objPath, double *out)
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);
@@ -204,7 +208,6 @@ static AJ_Status GetMaxValue(void *context, const char *objPath, double *out)
 static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "Precision");
 
@@ -215,6 +218,7 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -225,6 +229,7 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);
@@ -235,7 +240,6 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "UpdateMinTime");
 
@@ -246,6 +250,7 @@ static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -256,6 +261,7 @@ static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);

@@ -29,7 +29,6 @@
 static AJ_Status GetCumulativeEnergy(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "CumulativeEnergy");
 
@@ -40,6 +39,7 @@ static AJ_Status GetCumulativeEnergy(void *context, const char *objPath, double 
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetCumulativeEnergy(void *context, const char *objPath, double 
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);
@@ -60,7 +61,6 @@ static AJ_Status GetCumulativeEnergy(void *context, const char *objPath, double 
 static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "Precision");
 
@@ -71,6 +71,7 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -81,6 +82,7 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);
@@ -91,7 +93,6 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "UpdateMinTime");
 
@@ -102,6 +103,7 @@ static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -112,6 +114,7 @@ static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -131,7 +134,7 @@ static AJ_Status MethodResetCumulativeEnergy(void *context, const char *objPath)
 
     HAL_Encode_Double(fp, 0);
     fclose(fp);
-
+    return AJ_OK;
 }
 
 

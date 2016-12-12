@@ -29,7 +29,6 @@
 static AJ_Status GetRapidModeMinutesRemaining(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "RapidModeMinutesRemaining");
 
@@ -40,6 +39,7 @@ static AJ_Status GetRapidModeMinutesRemaining(void *context, const char *objPath
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetRapidModeMinutesRemaining(void *context, const char *objPath
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -73,7 +74,6 @@ static AJ_Status SetRapidModeMinutesRemaining(void *context, const char *objPath
 static AJ_Status GetMaxSetMinutes(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "MaxSetMinutes");
 
@@ -84,6 +84,7 @@ static AJ_Status GetMaxSetMinutes(void *context, const char *objPath, uint16_t *
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -94,6 +95,7 @@ static AJ_Status GetMaxSetMinutes(void *context, const char *objPath, uint16_t *
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);

@@ -131,7 +131,6 @@ static int HAL_Decode_Array_CycleControl_OperationalCommands(FILE* fp, Array_Cyc
 static AJ_Status GetOperationalState(void *context, const char *objPath, CycleControl_OperationalState *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "CycleControl", "OperationalState");
 
@@ -142,6 +141,7 @@ static AJ_Status GetOperationalState(void *context, const char *objPath, CycleCo
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -152,6 +152,7 @@ static AJ_Status GetOperationalState(void *context, const char *objPath, CycleCo
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (CycleControl_OperationalState)(int)value;
     fclose(fp);
@@ -162,7 +163,6 @@ static AJ_Status GetOperationalState(void *context, const char *objPath, CycleCo
 static AJ_Status GetSupportedOperationalStates(void *context, const char *objPath, Array_CycleControl_OperationalState *out)
 {
     AJ_Status result = AJ_OK;
-    Array_CycleControl_OperationalState value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalStates");
 
@@ -173,6 +173,7 @@ static AJ_Status GetSupportedOperationalStates(void *context, const char *objPat
             return AJ_ERR_FAILURE;
         }
 
+        Array_CycleControl_OperationalState const value = {0};
         HAL_Encode_Array_CycleControl_OperationalState(fp, value);
         fclose(fp);
     }
@@ -183,6 +184,7 @@ static AJ_Status GetSupportedOperationalStates(void *context, const char *objPat
         return AJ_ERR_FAILURE;
     }
 
+    Array_CycleControl_OperationalState value;
     HAL_Decode_Array_CycleControl_OperationalState(fp, &value);
 
     *out = value;
@@ -194,7 +196,6 @@ static AJ_Status GetSupportedOperationalStates(void *context, const char *objPat
 static AJ_Status GetSupportedOperationalCommands(void *context, const char *objPath, Array_CycleControl_OperationalCommands *out)
 {
     AJ_Status result = AJ_OK;
-    Array_CycleControl_OperationalCommands value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalCommands");
 
@@ -205,6 +206,7 @@ static AJ_Status GetSupportedOperationalCommands(void *context, const char *objP
             return AJ_ERR_FAILURE;
         }
 
+        Array_CycleControl_OperationalCommands const value = {0};
         HAL_Encode_Array_CycleControl_OperationalCommands(fp, value);
         fclose(fp);
     }
@@ -215,6 +217,7 @@ static AJ_Status GetSupportedOperationalCommands(void *context, const char *objP
         return AJ_ERR_FAILURE;
     }
 
+    Array_CycleControl_OperationalCommands value;
     HAL_Decode_Array_CycleControl_OperationalCommands(fp, &value);
 
     *out = value;

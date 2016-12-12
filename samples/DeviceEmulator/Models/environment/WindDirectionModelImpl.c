@@ -80,7 +80,6 @@ static int HAL_Decode_Array_WindDirection_AutoMode(FILE* fp, Array_WindDirection
 static AJ_Status GetHorizontalDirection(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalDirection");
 
@@ -91,6 +90,7 @@ static AJ_Status GetHorizontalDirection(void *context, const char *objPath, uint
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -101,6 +101,7 @@ static AJ_Status GetHorizontalDirection(void *context, const char *objPath, uint
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -124,7 +125,6 @@ static AJ_Status SetHorizontalDirection(void *context, const char *objPath, uint
 static AJ_Status GetHorizontalMax(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalMax");
 
@@ -135,6 +135,7 @@ static AJ_Status GetHorizontalMax(void *context, const char *objPath, uint16_t *
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -145,6 +146,7 @@ static AJ_Status GetHorizontalMax(void *context, const char *objPath, uint16_t *
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -155,7 +157,6 @@ static AJ_Status GetHorizontalMax(void *context, const char *objPath, uint16_t *
 static AJ_Status GetHorizontalAutoMode(void *context, const char *objPath, WindDirection_AutoMode *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalAutoMode");
 
@@ -166,6 +167,7 @@ static AJ_Status GetHorizontalAutoMode(void *context, const char *objPath, WindD
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -176,6 +178,7 @@ static AJ_Status GetHorizontalAutoMode(void *context, const char *objPath, WindD
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (WindDirection_AutoMode)(int)value;
     fclose(fp);
@@ -199,7 +202,6 @@ static AJ_Status SetHorizontalAutoMode(void *context, const char *objPath, WindD
 static AJ_Status GetVerticalDirection(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalDirection");
 
@@ -210,6 +212,7 @@ static AJ_Status GetVerticalDirection(void *context, const char *objPath, uint16
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -220,6 +223,7 @@ static AJ_Status GetVerticalDirection(void *context, const char *objPath, uint16
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -243,7 +247,6 @@ static AJ_Status SetVerticalDirection(void *context, const char *objPath, uint16
 static AJ_Status GetVerticalMax(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalMax");
 
@@ -254,6 +257,7 @@ static AJ_Status GetVerticalMax(void *context, const char *objPath, uint16_t *ou
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -264,6 +268,7 @@ static AJ_Status GetVerticalMax(void *context, const char *objPath, uint16_t *ou
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -274,7 +279,6 @@ static AJ_Status GetVerticalMax(void *context, const char *objPath, uint16_t *ou
 static AJ_Status GetVerticalAutoMode(void *context, const char *objPath, WindDirection_AutoMode *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalAutoMode");
 
@@ -285,6 +289,7 @@ static AJ_Status GetVerticalAutoMode(void *context, const char *objPath, WindDir
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -295,6 +300,7 @@ static AJ_Status GetVerticalAutoMode(void *context, const char *objPath, WindDir
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (WindDirection_AutoMode)(int)value;
     fclose(fp);

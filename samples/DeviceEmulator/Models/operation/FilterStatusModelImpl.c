@@ -29,7 +29,6 @@
 static AJ_Status GetExpectedLifeInDays(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "ExpectedLifeInDays");
 
@@ -40,6 +39,7 @@ static AJ_Status GetExpectedLifeInDays(void *context, const char *objPath, uint1
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetExpectedLifeInDays(void *context, const char *objPath, uint1
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -60,7 +61,6 @@ static AJ_Status GetExpectedLifeInDays(void *context, const char *objPath, uint1
 static AJ_Status GetIsCleanable(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "IsCleanable");
 
@@ -71,6 +71,7 @@ static AJ_Status GetIsCleanable(void *context, const char *objPath, bool *out)
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -81,6 +82,7 @@ static AJ_Status GetIsCleanable(void *context, const char *objPath, bool *out)
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);
@@ -91,7 +93,6 @@ static AJ_Status GetIsCleanable(void *context, const char *objPath, bool *out)
 static AJ_Status GetOrderPercentage(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "OrderPercentage");
 
@@ -102,6 +103,7 @@ static AJ_Status GetOrderPercentage(void *context, const char *objPath, uint8_t 
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -112,6 +114,7 @@ static AJ_Status GetOrderPercentage(void *context, const char *objPath, uint8_t 
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -122,7 +125,6 @@ static AJ_Status GetOrderPercentage(void *context, const char *objPath, uint8_t 
 static AJ_Status GetManufacturer(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
-    char const* value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "Manufacturer");
 
@@ -133,6 +135,7 @@ static AJ_Status GetManufacturer(void *context, const char *objPath, char const*
             return AJ_ERR_FAILURE;
         }
 
+        char const* const value = "";
         HAL_Encode_String(fp, value);
         fclose(fp);
     }
@@ -143,6 +146,7 @@ static AJ_Status GetManufacturer(void *context, const char *objPath, char const*
         return AJ_ERR_FAILURE;
     }
 
+    char const* value;
     value = HAL_Decode_String(fp);
     *out = value;
     fclose(fp);
@@ -153,7 +157,6 @@ static AJ_Status GetManufacturer(void *context, const char *objPath, char const*
 static AJ_Status GetPartNumber(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
-    char const* value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "PartNumber");
 
@@ -164,6 +167,7 @@ static AJ_Status GetPartNumber(void *context, const char *objPath, char const* *
             return AJ_ERR_FAILURE;
         }
 
+        char const* const value = "";
         HAL_Encode_String(fp, value);
         fclose(fp);
     }
@@ -174,6 +178,7 @@ static AJ_Status GetPartNumber(void *context, const char *objPath, char const* *
         return AJ_ERR_FAILURE;
     }
 
+    char const* value;
     value = HAL_Decode_String(fp);
     *out = value;
     fclose(fp);
@@ -184,7 +189,6 @@ static AJ_Status GetPartNumber(void *context, const char *objPath, char const* *
 static AJ_Status GetUrl(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
-    char const* value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "Url");
 
@@ -195,6 +199,7 @@ static AJ_Status GetUrl(void *context, const char *objPath, char const* *out)
             return AJ_ERR_FAILURE;
         }
 
+        char const* const value = "";
         HAL_Encode_String(fp, value);
         fclose(fp);
     }
@@ -205,6 +210,7 @@ static AJ_Status GetUrl(void *context, const char *objPath, char const* *out)
         return AJ_ERR_FAILURE;
     }
 
+    char const* value;
     value = HAL_Decode_String(fp);
     *out = value;
     fclose(fp);
@@ -215,7 +221,6 @@ static AJ_Status GetUrl(void *context, const char *objPath, char const* *out)
 static AJ_Status GetLifeRemaining(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "LifeRemaining");
 
@@ -226,6 +231,7 @@ static AJ_Status GetLifeRemaining(void *context, const char *objPath, uint8_t *o
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -236,6 +242,7 @@ static AJ_Status GetLifeRemaining(void *context, const char *objPath, uint8_t *o
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);

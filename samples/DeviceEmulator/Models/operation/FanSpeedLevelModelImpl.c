@@ -80,7 +80,6 @@ static int HAL_Decode_Array_FanSpeedLevel_AutoMode(FILE* fp, Array_FanSpeedLevel
 static AJ_Status GetFanSpeedLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FanSpeedLevel", "FanSpeedLevel");
 
@@ -91,6 +90,7 @@ static AJ_Status GetFanSpeedLevel(void *context, const char *objPath, uint8_t *o
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -101,6 +101,7 @@ static AJ_Status GetFanSpeedLevel(void *context, const char *objPath, uint8_t *o
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -124,7 +125,6 @@ static AJ_Status SetFanSpeedLevel(void *context, const char *objPath, uint8_t in
 static AJ_Status GetMaxFanSpeedLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FanSpeedLevel", "MaxFanSpeedLevel");
 
@@ -135,6 +135,7 @@ static AJ_Status GetMaxFanSpeedLevel(void *context, const char *objPath, uint8_t
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -145,6 +146,7 @@ static AJ_Status GetMaxFanSpeedLevel(void *context, const char *objPath, uint8_t
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -155,7 +157,6 @@ static AJ_Status GetMaxFanSpeedLevel(void *context, const char *objPath, uint8_t
 static AJ_Status GetAutoMode(void *context, const char *objPath, FanSpeedLevel_AutoMode *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "FanSpeedLevel", "AutoMode");
 
@@ -166,6 +167,7 @@ static AJ_Status GetAutoMode(void *context, const char *objPath, FanSpeedLevel_A
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -176,6 +178,7 @@ static AJ_Status GetAutoMode(void *context, const char *objPath, FanSpeedLevel_A
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (FanSpeedLevel_AutoMode)(int)value;
     fclose(fp);

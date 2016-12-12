@@ -194,6 +194,11 @@ void HAL_Encode_String(FILE *fp, const char* value)
 {
     // Apply basic quoting to control chars and double quote chars.
 
+    if (!value) 
+    {
+        value = "";             // this suits the code generator
+    }
+
     for (; *value; ++value)
     {
         if (*value < 32)
@@ -380,7 +385,7 @@ static void need(Buf* buf, size_t amount)
         }
 
         newCap += need;
-        realloc(buf->chars, newCap);
+        buf->chars = (char*)realloc(buf->chars, newCap);
         buf->capacity = newCap;
     }
 }
@@ -664,6 +669,11 @@ const char* HAL_Decode_String(FILE *fp)
         fprintf(stderr, "Invalid HAL string\n");
     }
 
+    if (!out)
+    {
+        out = strdup("");
+    }
+
     return out;
 }
 
@@ -800,12 +810,15 @@ void HAL_Decode_Array_string(FILE *fp, Array_string *value)
     while (!feof(fp))
     {
         char* out = 0;
-
         int code = decode_String(fp, &out);
 
         if (code == -2)
         {
             ExtendArray_string(value, 1);
+            if (!out)
+            {
+                out = strdup("");
+            }
             value->elems[value->numElems - 1] = out;
         }
         else

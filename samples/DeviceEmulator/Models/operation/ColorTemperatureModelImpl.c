@@ -29,7 +29,6 @@
 static AJ_Status GetTemperature(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "Temperature");
 
@@ -40,6 +39,7 @@ static AJ_Status GetTemperature(void *context, const char *objPath, double *out)
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetTemperature(void *context, const char *objPath, double *out)
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);
@@ -73,7 +74,6 @@ static AJ_Status SetTemperature(void *context, const char *objPath, double input
 static AJ_Status GetMinTemperature(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "MinTemperature");
 
@@ -84,6 +84,7 @@ static AJ_Status GetMinTemperature(void *context, const char *objPath, double *o
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -94,6 +95,7 @@ static AJ_Status GetMinTemperature(void *context, const char *objPath, double *o
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);
@@ -104,7 +106,6 @@ static AJ_Status GetMinTemperature(void *context, const char *objPath, double *o
 static AJ_Status GetMaxTemperature(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
-    double value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "MaxTemperature");
 
@@ -115,6 +116,7 @@ static AJ_Status GetMaxTemperature(void *context, const char *objPath, double *o
             return AJ_ERR_FAILURE;
         }
 
+        double const value = {0};
         HAL_Encode_Double(fp, value);
         fclose(fp);
     }
@@ -125,6 +127,7 @@ static AJ_Status GetMaxTemperature(void *context, const char *objPath, double *o
         return AJ_ERR_FAILURE;
     }
 
+    double value;
     value = HAL_Decode_Double(fp);
     *out = value;
     fclose(fp);

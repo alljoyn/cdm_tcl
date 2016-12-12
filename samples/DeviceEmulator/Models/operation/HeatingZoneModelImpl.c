@@ -29,7 +29,6 @@
 static AJ_Status GetNumberOfHeatingZones(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "NumberOfHeatingZones");
 
@@ -40,6 +39,7 @@ static AJ_Status GetNumberOfHeatingZones(void *context, const char *objPath, uin
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetNumberOfHeatingZones(void *context, const char *objPath, uin
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -60,7 +61,6 @@ static AJ_Status GetNumberOfHeatingZones(void *context, const char *objPath, uin
 static AJ_Status GetMaxHeatingLevels(void *context, const char *objPath, Array_uint8 *out)
 {
     AJ_Status result = AJ_OK;
-    Array_uint8 value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "MaxHeatingLevels");
 
@@ -71,6 +71,7 @@ static AJ_Status GetMaxHeatingLevels(void *context, const char *objPath, Array_u
             return AJ_ERR_FAILURE;
         }
 
+        Array_uint8 const value = {0};
         HAL_Encode_Array_uint8(fp, value);
         fclose(fp);
     }
@@ -81,6 +82,7 @@ static AJ_Status GetMaxHeatingLevels(void *context, const char *objPath, Array_u
         return AJ_ERR_FAILURE;
     }
 
+    Array_uint8 value;
     HAL_Decode_Array_uint8(fp, &value);
 
     *out = value;
@@ -92,7 +94,6 @@ static AJ_Status GetMaxHeatingLevels(void *context, const char *objPath, Array_u
 static AJ_Status GetHeatingLevels(void *context, const char *objPath, Array_uint8 *out)
 {
     AJ_Status result = AJ_OK;
-    Array_uint8 value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "HeatingLevels");
 
@@ -103,6 +104,7 @@ static AJ_Status GetHeatingLevels(void *context, const char *objPath, Array_uint
             return AJ_ERR_FAILURE;
         }
 
+        Array_uint8 const value = {0};
         HAL_Encode_Array_uint8(fp, value);
         fclose(fp);
     }
@@ -113,6 +115,7 @@ static AJ_Status GetHeatingLevels(void *context, const char *objPath, Array_uint
         return AJ_ERR_FAILURE;
     }
 
+    Array_uint8 value;
     HAL_Decode_Array_uint8(fp, &value);
 
     *out = value;

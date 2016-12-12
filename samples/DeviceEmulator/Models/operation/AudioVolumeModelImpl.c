@@ -29,7 +29,6 @@
 static AJ_Status GetVolume(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Volume");
 
@@ -40,6 +39,7 @@ static AJ_Status GetVolume(void *context, const char *objPath, uint8_t *out)
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetVolume(void *context, const char *objPath, uint8_t *out)
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -73,7 +74,6 @@ static AJ_Status SetVolume(void *context, const char *objPath, uint8_t input)
 static AJ_Status GetMaxVolume(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "MaxVolume");
 
@@ -84,6 +84,7 @@ static AJ_Status GetMaxVolume(void *context, const char *objPath, uint8_t *out)
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -94,6 +95,7 @@ static AJ_Status GetMaxVolume(void *context, const char *objPath, uint8_t *out)
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -104,7 +106,6 @@ static AJ_Status GetMaxVolume(void *context, const char *objPath, uint8_t *out)
 static AJ_Status GetMute(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Mute");
 
@@ -115,6 +116,7 @@ static AJ_Status GetMute(void *context, const char *objPath, bool *out)
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -125,6 +127,7 @@ static AJ_Status GetMute(void *context, const char *objPath, bool *out)
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);

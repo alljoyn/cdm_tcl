@@ -121,7 +121,6 @@ static void CopyChannel_ChannelInfoRecord(Channel_ChannelInfoRecord* value, Chan
 static AJ_Status GetChannelId(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
-    char const* value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Channel", "ChannelId");
 
@@ -132,6 +131,7 @@ static AJ_Status GetChannelId(void *context, const char *objPath, char const* *o
             return AJ_ERR_FAILURE;
         }
 
+        char const* const value = "";
         HAL_Encode_String(fp, value);
         fclose(fp);
     }
@@ -142,6 +142,7 @@ static AJ_Status GetChannelId(void *context, const char *objPath, char const* *o
         return AJ_ERR_FAILURE;
     }
 
+    char const* value;
     value = HAL_Decode_String(fp);
     *out = value;
     fclose(fp);
@@ -165,7 +166,6 @@ static AJ_Status SetChannelId(void *context, const char *objPath, char const* in
 static AJ_Status GetTotalNumberOfChannels(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "Channel", "TotalNumberOfChannels");
 
@@ -176,6 +176,7 @@ static AJ_Status GetTotalNumberOfChannels(void *context, const char *objPath, ui
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -186,6 +187,7 @@ static AJ_Status GetTotalNumberOfChannels(void *context, const char *objPath, ui
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);

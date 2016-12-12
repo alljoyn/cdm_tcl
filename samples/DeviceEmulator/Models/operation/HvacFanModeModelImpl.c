@@ -80,7 +80,6 @@ static int HAL_Decode_Array_HvacFanMode_Mode(FILE* fp, Array_HvacFanMode_Mode* v
 static AJ_Status GetMode(void *context, const char *objPath, HvacFanMode_Mode *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "Mode");
 
@@ -91,6 +90,7 @@ static AJ_Status GetMode(void *context, const char *objPath, HvacFanMode_Mode *o
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -101,6 +101,7 @@ static AJ_Status GetMode(void *context, const char *objPath, HvacFanMode_Mode *o
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (HvacFanMode_Mode)(int)value;
     fclose(fp);
@@ -124,7 +125,6 @@ static AJ_Status SetMode(void *context, const char *objPath, HvacFanMode_Mode in
 static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_HvacFanMode_Mode *out)
 {
     AJ_Status result = AJ_OK;
-    Array_HvacFanMode_Mode value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "SupportedModes");
 
@@ -135,6 +135,7 @@ static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_Hva
             return AJ_ERR_FAILURE;
         }
 
+        Array_HvacFanMode_Mode const value = {0};
         HAL_Encode_Array_HvacFanMode_Mode(fp, value);
         fclose(fp);
     }
@@ -145,6 +146,7 @@ static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_Hva
         return AJ_ERR_FAILURE;
     }
 
+    Array_HvacFanMode_Mode value;
     HAL_Decode_Array_HvacFanMode_Mode(fp, &value);
 
     *out = value;

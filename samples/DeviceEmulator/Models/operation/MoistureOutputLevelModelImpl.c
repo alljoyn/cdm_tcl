@@ -80,7 +80,6 @@ static int HAL_Decode_Array_MoistureOutputLevel_AutoMode(FILE* fp, Array_Moistur
 static AJ_Status GetMoistureOutputLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MoistureOutputLevel");
 
@@ -91,6 +90,7 @@ static AJ_Status GetMoistureOutputLevel(void *context, const char *objPath, uint
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -101,6 +101,7 @@ static AJ_Status GetMoistureOutputLevel(void *context, const char *objPath, uint
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -124,7 +125,6 @@ static AJ_Status SetMoistureOutputLevel(void *context, const char *objPath, uint
 static AJ_Status GetMaxMoistureOutputLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MaxMoistureOutputLevel");
 
@@ -135,6 +135,7 @@ static AJ_Status GetMaxMoistureOutputLevel(void *context, const char *objPath, u
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -145,6 +146,7 @@ static AJ_Status GetMaxMoistureOutputLevel(void *context, const char *objPath, u
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -155,7 +157,6 @@ static AJ_Status GetMaxMoistureOutputLevel(void *context, const char *objPath, u
 static AJ_Status GetAutoMode(void *context, const char *objPath, MoistureOutputLevel_AutoMode *out)
 {
     AJ_Status result = AJ_OK;
-    int value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "AutoMode");
 
@@ -166,6 +167,7 @@ static AJ_Status GetAutoMode(void *context, const char *objPath, MoistureOutputL
             return AJ_ERR_FAILURE;
         }
 
+        int const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -176,6 +178,7 @@ static AJ_Status GetAutoMode(void *context, const char *objPath, MoistureOutputL
         return AJ_ERR_FAILURE;
     }
 
+    int value;
     value = HAL_Decode_Int(fp);
     *out = (MoistureOutputLevel_AutoMode)(int)value;
     fclose(fp);

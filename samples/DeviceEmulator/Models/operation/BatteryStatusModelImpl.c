@@ -29,7 +29,6 @@
 static AJ_Status GetCurrentValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
-    uint64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "BatteryStatus", "CurrentValue");
 
@@ -40,6 +39,7 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, uint8_t *ou
             return AJ_ERR_FAILURE;
         }
 
+        uint64_t const value = {0};
         HAL_Encode_UInt(fp, value);
         fclose(fp);
     }
@@ -50,6 +50,7 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, uint8_t *ou
         return AJ_ERR_FAILURE;
     }
 
+    uint64_t value;
     value = HAL_Decode_UInt(fp);
     *out = value;
     fclose(fp);
@@ -60,7 +61,6 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, uint8_t *ou
 static AJ_Status GetIsCharging(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = {0};
 
     FILE* fp = HAL_ReadProperty("/cdm/emulated", "BatteryStatus", "IsCharging");
 
@@ -71,6 +71,7 @@ static AJ_Status GetIsCharging(void *context, const char *objPath, bool *out)
             return AJ_ERR_FAILURE;
         }
 
+        int64_t const value = {0};
         HAL_Encode_Int(fp, value);
         fclose(fp);
     }
@@ -81,6 +82,7 @@ static AJ_Status GetIsCharging(void *context, const char *objPath, bool *out)
         return AJ_ERR_FAILURE;
     }
 
+    int64_t value;
     value = HAL_Decode_Int(fp);
     *out = value;
     fclose(fp);
