@@ -202,8 +202,8 @@ const char* const* propertyStoreDefaultLanguages = SUPPORTED_LANGUAGES;
 /**
  * property array of structure with defaults
  */
-static const char DEFAULT_DEVICE_NAME_LANG1[] = { "Company A - \"Generic Board\"" };
-static const char DEFAULT_DEVICE_NAME_LANG2[] = { "Firma A - \"Generic Board\"" };
+static const char DEFAULT_DEVICE_NAME_LANG1[] = { "Tv" };
+static const char DEFAULT_DEVICE_NAME_LANG2[] = { "Fernseher" };
 static const char* DEFAULT_DEVICE_NAMES[] = { DEFAULT_DEVICE_NAME_LANG1, DEFAULT_DEVICE_NAME_LANG2 };
 static const char* DEFAULT_APP_NAMES[] = { "Controllee" };
 static const char DEFAULT_DESCRIPTION_LANG1[] = "My first IOE device";
@@ -471,6 +471,8 @@ AJ_Status OnTestMethod(const char* objPath, int32_t arg1)
 AJ_Status InitCdmProperties(AJ_BusAttachment* busAttachment)
 {
     AJ_Status status = AJ_OK;
+    uint8_t maxVol = 10;
+    uint8_t maxVolRead = 0;
     uint8_t vol = 8;
     uint8_t volRead = 0;
     char channelId[81] = "1-1";
@@ -478,6 +480,10 @@ AJ_Status InitCdmProperties(AJ_BusAttachment* busAttachment)
     uint16_t numOfChannels = 70;
     int32_t testProperty = 3;
     int32_t testPropertyRead = 0;
+
+    status = Cdm_AudioVolumeInterfaceSetMaxVolume(busAttachment, CDM_OBJECT_PATH_TV, maxVol);
+    status = Cdm_AudioVolumeInterfaceGetMaxVolume(CDM_OBJECT_PATH_TV, &maxVolRead);
+    printf("maxVolume : %u\n", maxVolRead);
 
     status = Cdm_AudioVolumeInterfaceSetVolume(busAttachment, CDM_OBJECT_PATH_TV, vol);
     status = Cdm_AudioVolumeInterfaceGetVolume(CDM_OBJECT_PATH_TV, &volRead);
