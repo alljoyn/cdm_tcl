@@ -15,6 +15,7 @@ src_env['srcs'] += Glob('interfaces/*.c')
 src_env['srcs'] += Glob('interfaces/operation/*.c')
 src_env['srcs'] += Glob('interfaces/environment/*.c')
 src_env['srcs'] += Glob('interfaces/input/*.c')
+src_env['srcs'] += Glob('interfaces/userinterfacesettings/*.c')
 
 # Compile sources and create libraries
 objs = src_env.StaticObject(src_env['srcs'])
