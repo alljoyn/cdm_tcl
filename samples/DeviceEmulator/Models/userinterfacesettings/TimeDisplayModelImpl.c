@@ -18,24 +18,24 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "ColorTemperatureModelImpl.h"
+#include "TimeDisplayModelImpl.h"
 #include "../../../Utils/HAL.h"
 
 
 
 
-static AJ_Status GetTemperature(void *context, const char *objPath, double *out)
+static AJ_Status GetDisplayTimeFormat(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "Temperature");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TimeDisplay", "DisplayTimeFormat");
 
     if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
+    uint64_t value;
+    value = HAL_Decode_UInt(elem);
     *out = value;
 
     BSXML_FreeElement(elem);
@@ -44,50 +44,32 @@ static AJ_Status GetTemperature(void *context, const char *objPath, double *out)
 
 
 
-static AJ_Status SetTemperature(void *context, const char *objPath, double input)
+static AJ_Status SetDisplayTimeFormat(void *context, const char *objPath, uint8_t input)
 {
     AJ_Status result = AJ_OK;
-    double value = input;
+    uint64_t value = input;
 
-    Element* elem = HAL_Encode_Double(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "ColorTemperature", "Temperature", elem);
+    Element* elem = HAL_Encode_UInt(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "TimeDisplay", "DisplayTimeFormat", elem);
     BSXML_FreeElement(elem);
 
     return result;
 }
 
 
-static AJ_Status GetMinTemperature(void *context, const char *objPath, double *out)
+static AJ_Status GetSupportedDisplayTimeFormats(void *context, const char *objPath, Array_uint8 *out)
 {
     AJ_Status result = AJ_OK;
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "MinTemperature");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TimeDisplay", "SupportedDisplayTimeFormats");
 
     if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
-    *out = value;
+    Array_uint8 value;
+    HAL_Decode_Array_uint8(elem, &value);
 
-    BSXML_FreeElement(elem);
-    return result;
-}
-
-
-static AJ_Status GetMaxTemperature(void *context, const char *objPath, double *out)
-{
-    AJ_Status result = AJ_OK;
-
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "MaxTemperature");
-
-    if (!elem) {
-        return AJ_ERR_FAILURE;
-    }
-
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
 
     BSXML_FreeElement(elem);
@@ -97,16 +79,15 @@ static AJ_Status GetMaxTemperature(void *context, const char *objPath, double *o
 
 
 
-static ColorTemperatureModel model = {
-    GetTemperature
-    , SetTemperature
-    , GetMinTemperature
-    , GetMaxTemperature
+static TimeDisplayModel model = {
+    GetDisplayTimeFormat
+    , SetDisplayTimeFormat
+    , GetSupportedDisplayTimeFormats
 
 };
 
 
-ColorTemperatureModel *GetColorTemperatureModel(void)
+TimeDisplayModel *GetTimeDisplayModel(void)
 {
     return &model;
 }

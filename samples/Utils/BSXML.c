@@ -713,19 +713,22 @@ error:
 
 
 
-static void GenerateInt(Element* element, StrBuf* outStr)
+static void GenerateInt(const Element* element, StrBuf* outStr)
 {
     StrBuf_AppendStr(outStr, "\n<");
     StrBuf_AppendStr(outStr, element->name);
 
     for (size_t i = 0; i < element->numAttributes; ++i) {
         ElementAttr* attr = &element->attributes[i];
+        const char* v = BSXML_EscapeXml(attr->value);
     
         StrBuf_AppendChar(outStr, ' ');
         StrBuf_AppendStr(outStr, attr->name);
         StrBuf_AppendStr(outStr, "=\"");
-        StrBuf_AppendStr(outStr, attr->value);
+        StrBuf_AppendStr(outStr, v);
         StrBuf_AppendChar(outStr, '"');
+
+        free((void*)v);
     }
 
     bool hasChildren = element->numChildren > 0;
@@ -760,7 +763,7 @@ static void GenerateInt(Element* element, StrBuf* outStr)
 
 
 
-const char* BSXML_Generate(Element* element)
+const char* BSXML_Generate(const Element* element)
 {
     StrBuf outStr;
     StrBuf_Init(&outStr);
@@ -770,7 +773,7 @@ const char* BSXML_Generate(Element* element)
 }
 
 
-const char* BSXML_ToString(Element* element)
+const char* BSXML_ToString(const Element* element)
 {
     return BSXML_Generate(element);
 }

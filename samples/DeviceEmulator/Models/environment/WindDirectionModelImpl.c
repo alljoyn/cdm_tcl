@@ -22,56 +22,48 @@
 #include "../../../Utils/HAL.h"
 
 
+static Element* HAL_Encode_WindDirection_AutoMode(WindDirection_AutoMode value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_WindDirection_AutoMode(FILE* fp, WindDirection_AutoMode value) UNUSED_OK;
-
-static int HAL_Encode_WindDirection_AutoMode(FILE* fp, WindDirection_AutoMode value)
+static Element* HAL_Encode_WindDirection_AutoMode(WindDirection_AutoMode value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Decode_WindDirection_AutoMode(FILE* fp, WindDirection_AutoMode* value) UNUSED_OK;
+static void HAL_Decode_WindDirection_AutoMode(Element* elem, WindDirection_AutoMode* value) UNUSED_OK;
 
-static int HAL_Decode_WindDirection_AutoMode(FILE* fp, WindDirection_AutoMode* value)
+static void HAL_Decode_WindDirection_AutoMode(Element* elem, WindDirection_AutoMode* value)
 {
-    *value = (WindDirection_AutoMode)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    *value = (WindDirection_AutoMode)(int)HAL_Decode_Int(elem);
 }
 
 
 
-static int HAL_Encode_Array_WindDirection_AutoMode(FILE* fp, Array_WindDirection_AutoMode value) UNUSED_OK;
+static Element* HAL_Encode_Array_WindDirection_AutoMode(Array_WindDirection_AutoMode value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Array_WindDirection_AutoMode(FILE* fp, Array_WindDirection_AutoMode value)
+static Element* HAL_Encode_Array_WindDirection_AutoMode(Array_WindDirection_AutoMode value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_WindDirection_AutoMode(FILE* fp, Array_WindDirection_AutoMode* value) UNUSED_OK;
+static void HAL_Decode_Array_WindDirection_AutoMode(Element* elem, Array_WindDirection_AutoMode* value) UNUSED_OK;
 
-static int HAL_Decode_Array_WindDirection_AutoMode(FILE* fp, Array_WindDirection_AutoMode* value)
+static void HAL_Decode_Array_WindDirection_AutoMode(Element* elem, Array_WindDirection_AutoMode* value)
 {
     InitArray_WindDirection_AutoMode(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_WindDirection_AutoMode(value, 1);
+            value->elems[j] = (WindDirection_AutoMode)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_WindDirection_AutoMode(value, 1);
-        value->elems[i] = (WindDirection_AutoMode)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
@@ -81,30 +73,17 @@ static AJ_Status GetHorizontalDirection(void *context, const char *objPath, uint
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalDirection");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalDirection");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "HorizontalDirection");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalDirection");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -115,9 +94,10 @@ static AJ_Status SetHorizontalDirection(void *context, const char *objPath, uint
     AJ_Status result = AJ_OK;
     uint64_t value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "HorizontalDirection");
-    HAL_Encode_UInt(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_UInt(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "WindDirection", "HorizontalDirection", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -126,30 +106,17 @@ static AJ_Status GetHorizontalMax(void *context, const char *objPath, uint16_t *
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalMax");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalMax");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "HorizontalMax");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalMax");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -158,30 +125,17 @@ static AJ_Status GetHorizontalAutoMode(void *context, const char *objPath, WindD
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalAutoMode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalAutoMode");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "HorizontalAutoMode");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalAutoMode");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (WindDirection_AutoMode)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -192,9 +146,10 @@ static AJ_Status SetHorizontalAutoMode(void *context, const char *objPath, WindD
     AJ_Status result = AJ_OK;
     int value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "HorizontalAutoMode");
-    HAL_Encode_Int(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Int(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "WindDirection", "HorizontalAutoMode", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -203,30 +158,17 @@ static AJ_Status GetVerticalDirection(void *context, const char *objPath, uint16
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalDirection");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalDirection");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "VerticalDirection");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalDirection");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -237,9 +179,10 @@ static AJ_Status SetVerticalDirection(void *context, const char *objPath, uint16
     AJ_Status result = AJ_OK;
     uint64_t value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "VerticalDirection");
-    HAL_Encode_UInt(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_UInt(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "WindDirection", "VerticalDirection", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -248,30 +191,17 @@ static AJ_Status GetVerticalMax(void *context, const char *objPath, uint16_t *ou
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalMax");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalMax");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "VerticalMax");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalMax");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -280,30 +210,17 @@ static AJ_Status GetVerticalAutoMode(void *context, const char *objPath, WindDir
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalAutoMode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalAutoMode");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "VerticalAutoMode");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalAutoMode");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (WindDirection_AutoMode)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -314,9 +231,10 @@ static AJ_Status SetVerticalAutoMode(void *context, const char *objPath, WindDir
     AJ_Status result = AJ_OK;
     int value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "WindDirection", "VerticalAutoMode");
-    HAL_Encode_Int(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Int(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "WindDirection", "VerticalAutoMode", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 

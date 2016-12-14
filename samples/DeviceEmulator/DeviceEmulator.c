@@ -63,6 +63,7 @@ static const uint32_t suites[4] = { AUTH_SUITE_ECDHE_ECDSA, AUTH_SUITE_ECDHE_SPE
 
 static const char ecspeke_password[] = "1234";
 static const char psk_password[] = "faaa0af3dd3f1e0379da046a3ab6ca44";
+static const char* objPath = "/cdm/emulated";
 
 static void CreateInterfaces(DEM_Config* config)
 {
@@ -70,8 +71,17 @@ static void CreateInterfaces(DEM_Config* config)
         DEM_Object* obj = &config->objects[i];
 
         for (int j = 0; j < obj->numInterfaces; ++j) {
-            fprintf(stdout, "Creating interface %s\n", obj->interfaces[j].name);
-            createInterface("/cdm/emulated", obj->interfaces[j].name);
+            DEM_Interface* iface = &obj->interfaces[j];
+            fprintf(stdout, "Creating interface %s\n", iface->name);
+            createInterface(objPath, iface->name);
+
+            // Set some initial property values.
+            for (int k = 0; k < iface->numProperties; ++k) {
+                DEM_Property* prop = &iface->properties[k];
+                if (prop->initialState) {
+                    HAL_WritePropertyXml(objPath, iface->name, prop->name, prop->initialState, !prop->defaultOnly);
+                }
+            }
         }
     }
 }

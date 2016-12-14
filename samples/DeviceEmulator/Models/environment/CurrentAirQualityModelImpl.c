@@ -22,56 +22,48 @@
 #include "../../../Utils/HAL.h"
 
 
+static Element* HAL_Encode_CurrentAirQuality_ContaminantType(CurrentAirQuality_ContaminantType value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_CurrentAirQuality_ContaminantType(FILE* fp, CurrentAirQuality_ContaminantType value) UNUSED_OK;
-
-static int HAL_Encode_CurrentAirQuality_ContaminantType(FILE* fp, CurrentAirQuality_ContaminantType value)
+static Element* HAL_Encode_CurrentAirQuality_ContaminantType(CurrentAirQuality_ContaminantType value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Decode_CurrentAirQuality_ContaminantType(FILE* fp, CurrentAirQuality_ContaminantType* value) UNUSED_OK;
+static void HAL_Decode_CurrentAirQuality_ContaminantType(Element* elem, CurrentAirQuality_ContaminantType* value) UNUSED_OK;
 
-static int HAL_Decode_CurrentAirQuality_ContaminantType(FILE* fp, CurrentAirQuality_ContaminantType* value)
+static void HAL_Decode_CurrentAirQuality_ContaminantType(Element* elem, CurrentAirQuality_ContaminantType* value)
 {
-    *value = (CurrentAirQuality_ContaminantType)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    *value = (CurrentAirQuality_ContaminantType)(int)HAL_Decode_Int(elem);
 }
 
 
 
-static int HAL_Encode_Array_CurrentAirQuality_ContaminantType(FILE* fp, Array_CurrentAirQuality_ContaminantType value) UNUSED_OK;
+static Element* HAL_Encode_Array_CurrentAirQuality_ContaminantType(Array_CurrentAirQuality_ContaminantType value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Array_CurrentAirQuality_ContaminantType(FILE* fp, Array_CurrentAirQuality_ContaminantType value)
+static Element* HAL_Encode_Array_CurrentAirQuality_ContaminantType(Array_CurrentAirQuality_ContaminantType value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_CurrentAirQuality_ContaminantType(FILE* fp, Array_CurrentAirQuality_ContaminantType* value) UNUSED_OK;
+static void HAL_Decode_Array_CurrentAirQuality_ContaminantType(Element* elem, Array_CurrentAirQuality_ContaminantType* value) UNUSED_OK;
 
-static int HAL_Decode_Array_CurrentAirQuality_ContaminantType(FILE* fp, Array_CurrentAirQuality_ContaminantType* value)
+static void HAL_Decode_Array_CurrentAirQuality_ContaminantType(Element* elem, Array_CurrentAirQuality_ContaminantType* value)
 {
     InitArray_CurrentAirQuality_ContaminantType(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_CurrentAirQuality_ContaminantType(value, 1);
+            value->elems[j] = (CurrentAirQuality_ContaminantType)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_CurrentAirQuality_ContaminantType(value, 1);
-        value->elems[i] = (CurrentAirQuality_ContaminantType)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
@@ -81,30 +73,17 @@ static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentA
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "ContaminantType");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "ContaminantType");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentAirQuality", "ContaminantType");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "ContaminantType");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (CurrentAirQuality_ContaminantType)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -113,30 +92,17 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, double *out
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "CurrentValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "CurrentValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentAirQuality", "CurrentValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "CurrentValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -145,30 +111,17 @@ static AJ_Status GetMinValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MinValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MinValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentAirQuality", "MinValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MinValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -177,30 +130,17 @@ static AJ_Status GetMaxValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MaxValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MaxValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentAirQuality", "MaxValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MaxValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -209,30 +149,17 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "Precision");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "Precision");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentAirQuality", "Precision");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "Precision");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -241,30 +168,17 @@ static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "UpdateMinTime");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "UpdateMinTime");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentAirQuality", "UpdateMinTime");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "UpdateMinTime");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

@@ -14,7 +14,6 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -22,37 +21,7 @@
 #include "DeviceConfig.h"
 #include "../Utils/BSXML.h"
 #include "../Utils/StrBuf.h"
-
-
-static bool ReadXMLFile(const char *filepath, StrBuf* xmlBuf)
-{
-    char buf[BUFSIZ];
-    bool ok = false;
-
-    FILE* fp = fopen(filepath, "r");
-
-    if (fp) {
-        for (;;) {
-            int n = fread(buf, 1, BUFSIZ, fp);
-
-            if (n > 0) {
-                StrBuf_AppendStrNum(xmlBuf, buf, n);
-            } else if (n == 0) {
-                ok = true;
-                break;
-            } else {
-                fprintf(stderr, "%s", filepath);
-                fprintf(stderr, ": %s\n", strerror(errno));
-                break;
-            }
-        }
-
-        fclose(fp);
-    }
-
-    return ok;
-}
-
+#include "../Utils/FileIO.h"
 
 
 DEM_Config *DEM_CreateConfig(const char *deviceXmlPath)
@@ -63,7 +32,7 @@ DEM_Config *DEM_CreateConfig(const char *deviceXmlPath)
     Element* root = NULL;
     DEM_Config* config = calloc(1, sizeof(DEM_Config));
 
-    if (!ReadXMLFile(deviceXmlPath, &buf)) {
+    if (!ReadFile(deviceXmlPath, &buf)) {
         goto error;
     }
 

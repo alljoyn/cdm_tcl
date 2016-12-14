@@ -23,64 +23,68 @@
 
 
 
+static Element* HAL_Encode_PlugInUnits_PlugInInfo(PlugInUnits_PlugInInfo value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_PlugInUnits_PlugInInfo(FILE* fp, PlugInUnits_PlugInInfo value) UNUSED_OK;
-
-static int HAL_Encode_PlugInUnits_PlugInInfo(FILE* fp, PlugInUnits_PlugInInfo value)
+static Element* HAL_Encode_PlugInUnits_PlugInInfo(PlugInUnits_PlugInInfo value, Element* parent)
 {
-    HAL_Encode_OpenStruct(fp);
-    HAL_Encode_String(fp, value.objectPath);
-    HAL_Encode_UInt(fp, value.deviceId);
-    HAL_Encode_Int(fp, value.pluggedIn);
-    HAL_Encode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_PlugInUnits_PlugInInfo(FILE* fp, PlugInUnits_PlugInInfo* value) UNUSED_OK;
-
-static int HAL_Decode_PlugInUnits_PlugInInfo(FILE* fp, PlugInUnits_PlugInInfo* value)
-{
-    HAL_Decode_OpenStruct(fp);
-    value->objectPath = HAL_Decode_String(fp);
-    value->deviceId = HAL_Decode_UInt(fp);
-    value->pluggedIn = HAL_Decode_Int(fp);
-    HAL_Decode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Encode_Array_PlugInUnits_PlugInInfo(FILE* fp, Array_PlugInUnits_PlugInInfo value) UNUSED_OK;
-
-static int HAL_Encode_Array_PlugInUnits_PlugInInfo(FILE* fp, Array_PlugInUnits_PlugInInfo value)
-{
-    HAL_Encode_OpenArray(fp);
-    for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_PlugInUnits_PlugInInfo(fp, value.elems[i]);
+    Element* struc = BSXML_NewElement("struct", parent);
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "objectPath");
+        BSXML_AddChild(field, HAL_Encode_String(value.objectPath, field));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "deviceId");
+        BSXML_AddChild(field, HAL_Encode_UInt(value.deviceId, field));
+    }
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "pluggedIn");
+        BSXML_AddChild(field, HAL_Encode_Int(value.pluggedIn, field));
+    }
+    return struc;
 }
 
 
-static int HAL_Decode_Array_PlugInUnits_PlugInInfo(FILE* fp, Array_PlugInUnits_PlugInInfo* value) UNUSED_OK;
 
-static int HAL_Decode_Array_PlugInUnits_PlugInInfo(FILE* fp, Array_PlugInUnits_PlugInInfo* value)
+static void HAL_Decode_PlugInUnits_PlugInInfo(Element* elem, PlugInUnits_PlugInInfo* value) UNUSED_OK;
+
+static void HAL_Decode_PlugInUnits_PlugInInfo(Element* elem, PlugInUnits_PlugInInfo* value)
+{
+    if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
+        value->objectPath = HAL_Decode_String(elem->children[0]);
+        value->deviceId = HAL_Decode_UInt(elem->children[1]);
+        value->pluggedIn = HAL_Decode_Int(elem->children[2]);
+    }
+}
+
+
+
+static Element* HAL_Encode_Array_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugInInfo value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugInInfo value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
+    for (size_t i = 0; i < value.numElems; ++i) {
+        BSXML_AddChild(array, HAL_Encode_PlugInUnits_PlugInInfo(value.elems[i], array));
+    }
+    return array;
+}
+
+
+static void HAL_Decode_Array_PlugInUnits_PlugInInfo(Element* elem, Array_PlugInUnits_PlugInInfo* value) UNUSED_OK;
+
+static void HAL_Decode_Array_PlugInUnits_PlugInInfo(Element* elem, Array_PlugInUnits_PlugInInfo* value)
 {
     InitArray_PlugInUnits_PlugInInfo(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_PlugInUnits_PlugInInfo(value, 1);
+            HAL_Decode_PlugInUnits_PlugInInfo(elem->children[i], &value->elems[j]);
         }
-        size_t i = ExtendArray_PlugInUnits_PlugInInfo(value, 1);
-        HAL_Decode_PlugInUnits_PlugInInfo(fp, &value->elems[i]);
     }
-    return AJ_OK;
 }
 
 
@@ -90,31 +94,18 @@ static AJ_Status GetPlugInUnits(void *context, const char *objPath, Array_PlugIn
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "PlugInUnits", "PlugInUnits");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "PlugInUnits", "PlugInUnits");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "PlugInUnits", "PlugInUnits");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_PlugInUnits_PlugInInfo const value = {0};
-        HAL_Encode_Array_PlugInUnits_PlugInInfo(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "PlugInUnits", "PlugInUnits");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_PlugInUnits_PlugInInfo value;
-    HAL_Decode_Array_PlugInUnits_PlugInInfo(fp, &value);
+    HAL_Decode_Array_PlugInUnits_PlugInInfo(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

@@ -22,56 +22,48 @@
 #include "../../../Utils/HAL.h"
 
 
+static Element* HAL_Encode_HvacFanMode_Mode(HvacFanMode_Mode value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_HvacFanMode_Mode(FILE* fp, HvacFanMode_Mode value) UNUSED_OK;
-
-static int HAL_Encode_HvacFanMode_Mode(FILE* fp, HvacFanMode_Mode value)
+static Element* HAL_Encode_HvacFanMode_Mode(HvacFanMode_Mode value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Decode_HvacFanMode_Mode(FILE* fp, HvacFanMode_Mode* value) UNUSED_OK;
+static void HAL_Decode_HvacFanMode_Mode(Element* elem, HvacFanMode_Mode* value) UNUSED_OK;
 
-static int HAL_Decode_HvacFanMode_Mode(FILE* fp, HvacFanMode_Mode* value)
+static void HAL_Decode_HvacFanMode_Mode(Element* elem, HvacFanMode_Mode* value)
 {
-    *value = (HvacFanMode_Mode)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    *value = (HvacFanMode_Mode)(int)HAL_Decode_Int(elem);
 }
 
 
 
-static int HAL_Encode_Array_HvacFanMode_Mode(FILE* fp, Array_HvacFanMode_Mode value) UNUSED_OK;
+static Element* HAL_Encode_Array_HvacFanMode_Mode(Array_HvacFanMode_Mode value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Array_HvacFanMode_Mode(FILE* fp, Array_HvacFanMode_Mode value)
+static Element* HAL_Encode_Array_HvacFanMode_Mode(Array_HvacFanMode_Mode value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_HvacFanMode_Mode(FILE* fp, Array_HvacFanMode_Mode* value) UNUSED_OK;
+static void HAL_Decode_Array_HvacFanMode_Mode(Element* elem, Array_HvacFanMode_Mode* value) UNUSED_OK;
 
-static int HAL_Decode_Array_HvacFanMode_Mode(FILE* fp, Array_HvacFanMode_Mode* value)
+static void HAL_Decode_Array_HvacFanMode_Mode(Element* elem, Array_HvacFanMode_Mode* value)
 {
     InitArray_HvacFanMode_Mode(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_HvacFanMode_Mode(value, 1);
+            value->elems[j] = (HvacFanMode_Mode)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_HvacFanMode_Mode(value, 1);
-        value->elems[i] = (HvacFanMode_Mode)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
@@ -81,30 +73,17 @@ static AJ_Status GetMode(void *context, const char *objPath, HvacFanMode_Mode *o
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "Mode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "Mode");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "HvacFanMode", "Mode");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "Mode");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (HvacFanMode_Mode)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -115,9 +94,10 @@ static AJ_Status SetMode(void *context, const char *objPath, HvacFanMode_Mode in
     AJ_Status result = AJ_OK;
     int value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "HvacFanMode", "Mode");
-    HAL_Encode_Int(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Int(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "HvacFanMode", "Mode", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -126,31 +106,18 @@ static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_Hva
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "SupportedModes");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "SupportedModes");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "HvacFanMode", "SupportedModes");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_HvacFanMode_Mode const value = {0};
-        HAL_Encode_Array_HvacFanMode_Mode(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "SupportedModes");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_HvacFanMode_Mode value;
-    HAL_Decode_Array_HvacFanMode_Mode(fp, &value);
+    HAL_Decode_Array_HvacFanMode_Mode(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

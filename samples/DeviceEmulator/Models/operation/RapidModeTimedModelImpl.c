@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetRapidModeMinutesRemaining(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "RapidModeMinutesRemaining");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "RapidModeMinutesRemaining");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "RapidModeTimed", "RapidModeMinutesRemaining");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "RapidModeMinutesRemaining");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -64,9 +49,10 @@ static AJ_Status SetRapidModeMinutesRemaining(void *context, const char *objPath
     AJ_Status result = AJ_OK;
     uint64_t value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "RapidModeTimed", "RapidModeMinutesRemaining");
-    HAL_Encode_UInt(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_UInt(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "RapidModeTimed", "RapidModeMinutesRemaining", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -75,30 +61,17 @@ static AJ_Status GetMaxSetMinutes(void *context, const char *objPath, uint16_t *
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "MaxSetMinutes");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "MaxSetMinutes");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "RapidModeTimed", "MaxSetMinutes");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "MaxSetMinutes");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

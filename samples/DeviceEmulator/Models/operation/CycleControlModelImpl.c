@@ -22,107 +22,93 @@
 #include "../../../Utils/HAL.h"
 
 
+static Element* HAL_Encode_CycleControl_OperationalState(CycleControl_OperationalState value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_CycleControl_OperationalState(FILE* fp, CycleControl_OperationalState value) UNUSED_OK;
-
-static int HAL_Encode_CycleControl_OperationalState(FILE* fp, CycleControl_OperationalState value)
+static Element* HAL_Encode_CycleControl_OperationalState(CycleControl_OperationalState value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Decode_CycleControl_OperationalState(FILE* fp, CycleControl_OperationalState* value) UNUSED_OK;
+static void HAL_Decode_CycleControl_OperationalState(Element* elem, CycleControl_OperationalState* value) UNUSED_OK;
 
-static int HAL_Decode_CycleControl_OperationalState(FILE* fp, CycleControl_OperationalState* value)
+static void HAL_Decode_CycleControl_OperationalState(Element* elem, CycleControl_OperationalState* value)
 {
-    *value = (CycleControl_OperationalState)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    *value = (CycleControl_OperationalState)(int)HAL_Decode_Int(elem);
 }
 
 
 
-static int HAL_Encode_Array_CycleControl_OperationalState(FILE* fp, Array_CycleControl_OperationalState value) UNUSED_OK;
+static Element* HAL_Encode_Array_CycleControl_OperationalState(Array_CycleControl_OperationalState value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Array_CycleControl_OperationalState(FILE* fp, Array_CycleControl_OperationalState value)
+static Element* HAL_Encode_Array_CycleControl_OperationalState(Array_CycleControl_OperationalState value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_CycleControl_OperationalState(FILE* fp, Array_CycleControl_OperationalState* value) UNUSED_OK;
+static void HAL_Decode_Array_CycleControl_OperationalState(Element* elem, Array_CycleControl_OperationalState* value) UNUSED_OK;
 
-static int HAL_Decode_Array_CycleControl_OperationalState(FILE* fp, Array_CycleControl_OperationalState* value)
+static void HAL_Decode_Array_CycleControl_OperationalState(Element* elem, Array_CycleControl_OperationalState* value)
 {
     InitArray_CycleControl_OperationalState(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_CycleControl_OperationalState(value, 1);
+            value->elems[j] = (CycleControl_OperationalState)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_CycleControl_OperationalState(value, 1);
-        value->elems[i] = (CycleControl_OperationalState)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
-static int HAL_Encode_CycleControl_OperationalCommands(FILE* fp, CycleControl_OperationalCommands value) UNUSED_OK;
+static Element* HAL_Encode_CycleControl_OperationalCommands(CycleControl_OperationalCommands value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_CycleControl_OperationalCommands(FILE* fp, CycleControl_OperationalCommands value)
+static Element* HAL_Encode_CycleControl_OperationalCommands(CycleControl_OperationalCommands value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_CycleControl_OperationalCommands(FILE* fp, CycleControl_OperationalCommands* value) UNUSED_OK;
-
-static int HAL_Decode_CycleControl_OperationalCommands(FILE* fp, CycleControl_OperationalCommands* value)
-{
-    *value = (CycleControl_OperationalCommands)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Encode_Array_CycleControl_OperationalCommands(FILE* fp, Array_CycleControl_OperationalCommands value) UNUSED_OK;
+static void HAL_Decode_CycleControl_OperationalCommands(Element* elem, CycleControl_OperationalCommands* value) UNUSED_OK;
 
-static int HAL_Encode_Array_CycleControl_OperationalCommands(FILE* fp, Array_CycleControl_OperationalCommands value)
+static void HAL_Decode_CycleControl_OperationalCommands(Element* elem, CycleControl_OperationalCommands* value)
 {
-    HAL_Encode_OpenArray(fp);
+    *value = (CycleControl_OperationalCommands)(int)HAL_Decode_Int(elem);
+}
+
+
+
+static Element* HAL_Encode_Array_CycleControl_OperationalCommands(Array_CycleControl_OperationalCommands value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_CycleControl_OperationalCommands(Array_CycleControl_OperationalCommands value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_CycleControl_OperationalCommands(FILE* fp, Array_CycleControl_OperationalCommands* value) UNUSED_OK;
+static void HAL_Decode_Array_CycleControl_OperationalCommands(Element* elem, Array_CycleControl_OperationalCommands* value) UNUSED_OK;
 
-static int HAL_Decode_Array_CycleControl_OperationalCommands(FILE* fp, Array_CycleControl_OperationalCommands* value)
+static void HAL_Decode_Array_CycleControl_OperationalCommands(Element* elem, Array_CycleControl_OperationalCommands* value)
 {
     InitArray_CycleControl_OperationalCommands(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_CycleControl_OperationalCommands(value, 1);
+            value->elems[j] = (CycleControl_OperationalCommands)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_CycleControl_OperationalCommands(value, 1);
-        value->elems[i] = (CycleControl_OperationalCommands)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
@@ -132,30 +118,17 @@ static AJ_Status GetOperationalState(void *context, const char *objPath, CycleCo
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CycleControl", "OperationalState");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CycleControl", "OperationalState");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CycleControl", "OperationalState");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CycleControl", "OperationalState");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (CycleControl_OperationalState)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -164,31 +137,18 @@ static AJ_Status GetSupportedOperationalStates(void *context, const char *objPat
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalStates");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalStates");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CycleControl", "SupportedOperationalStates");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_CycleControl_OperationalState const value = {0};
-        HAL_Encode_Array_CycleControl_OperationalState(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalStates");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_CycleControl_OperationalState value;
-    HAL_Decode_Array_CycleControl_OperationalState(fp, &value);
+    HAL_Decode_Array_CycleControl_OperationalState(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -197,31 +157,18 @@ static AJ_Status GetSupportedOperationalCommands(void *context, const char *objP
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalCommands");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalCommands");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CycleControl", "SupportedOperationalCommands");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_CycleControl_OperationalCommands const value = {0};
-        HAL_Encode_Array_CycleControl_OperationalCommands(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalCommands");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_CycleControl_OperationalCommands value;
-    HAL_Decode_Array_CycleControl_OperationalCommands(fp, &value);
+    HAL_Decode_Array_CycleControl_OperationalCommands(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

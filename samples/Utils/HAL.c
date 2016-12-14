@@ -29,6 +29,7 @@
 
 #include "HAL.h"
 #include "StrBuf.h"
+#include "FileIO.h"
 
 //======================================================================
 
@@ -96,7 +97,7 @@ void HAL_DefaultInit(void)
 //======================================================================
 
 
-FILE* HAL_WriteProperty(const char *objPath, const char *interface, const char *property)
+bool HAL_WritePropertyXml(const char *objPath, const char *interface, const char *property, const char* xml, bool force)
 {
     char path[MAX_PATH_LEN];
     size_t totalPathLen;
@@ -104,14 +105,14 @@ FILE* HAL_WriteProperty(const char *objPath, const char *interface, const char *
     if (ROOT == NULL || EXT == NULL)
     {
         fprintf(stderr, "HAL hasn't been initialised.\n");
-        return 0;
+        return false;
     }
 
     totalPathLen = strlen(ROOT) + strlen(objPath) + 1 + strlen(interface) + 1 + strlen(property) + strlen(EXT);
     if (totalPathLen >= MAX_PATH_LEN)
     {
         fprintf(stderr, "Path length too long %lu >= %d\n", totalPathLen, MAX_PATH_LEN);
-        return 0;
+        return false;
     }
 
     memset(path, 0, MAX_PATH_LEN);
@@ -123,19 +124,60 @@ FILE* HAL_WriteProperty(const char *objPath, const char *interface, const char *
     if (!PathExists(path))
     {
         if (!CreateDirectories((char*)path))
-            return 0;
+        {
+            return false;
+        }
     }
 
     strcat(path, "/");
     strcat(path, property);
     strcat(path, EXT);
 
-    return fopen(path, "w");
+    if (!force)
+    {
+        // See if it exists first.
+        FILE* fp = fopen(path, "r");
+
+        if (fp)
+        {
+            return false;
+        }
+
+        fclose(fp);
+    }
+
+    FILE* fp = fopen(path, "w");
+
+    if (fp)
+    {
+        fputs(xml, fp);
+
+        size_t l = strlen(xml);
+
+        if (l == 0 || xml[l - 1] != '\n')
+        {
+            fputs("\n", fp);
+        }
+
+        fclose(fp);
+    }
+
+    return true;
 }
 
 
 
-FILE* HAL_ReadProperty(const char *objPath, const char *interface, const char *property)
+bool HAL_WritePropertyElem(const char *objPath, const char *interface, const char *property, const Element* elem)
+{
+    const char* xml = BSXML_Generate(elem);
+    bool ok = HAL_WritePropertyXml(objPath, interface, property, xml, true);
+    free((void*)xml);
+    return ok;
+}
+
+
+
+Element* HAL_ReadProperty(const char *objPath, const char *interface, const char *property)
 {
     char path[MAX_PATH_LEN];
     size_t totalPathLen;
@@ -162,896 +204,431 @@ FILE* HAL_ReadProperty(const char *objPath, const char *interface, const char *p
     strcat(path, property);
     strcat(path, EXT);
 
-    return fopen(path, "r");
+    StrBuf buf;
+    StrBuf_Init(&buf);
+    Element* elem = NULL;
+
+    if (ReadFile(path, &buf))
+    {
+        elem = BSXML_GetRoot(buf.chars);
+    }
+
+    StrBuf_Free(&buf);
+    return elem;
 }
 
 
 //======================================================================
 
-// Always but a blank before each token. The decoder relies on it.
-
-void HAL_Encode_Int(FILE *fp, int64_t value)
+Element* HAL_Encode_Bool(bool value, Element* parent)
 {
-    fprintf(fp, " %lld", value);
+    Element* scalar = BSXML_NewElement("scalar", parent);
+    BSXML_AddAttribute(scalar, "type", "bool");
+    BSXML_AddAttribute(scalar, "value", value? "true" : "false");
+    return scalar;
 }
 
 
 
-void HAL_Encode_UInt(FILE *fp, uint64_t value)
+static Element* encodeScalar(const char* num, const char* type, Element* parent)
 {
-    fprintf(fp, " %llu", value);
+    Element* scalar = BSXML_NewElement("scalar", parent);
+    BSXML_AddAttribute(scalar, "type", type);
+    BSXML_AddAttribute(scalar, "value", num);
+    return scalar;
 }
 
 
 
-void HAL_Encode_Double(FILE *fp, double value)
+Element* HAL_Encode_Int(int64_t value, Element* parent)
 {
-    fprintf(fp, " %.16g", value);
+    char nbuf[60];
+    sprintf(nbuf, " %lld", value);
+    return encodeScalar(nbuf, "signed", parent);
 }
 
 
 
-void HAL_Encode_String(FILE *fp, const char* value)
+Element* HAL_Encode_UInt(uint64_t value, Element* parent)
 {
-    // Apply basic quoting to control chars and double quote chars.
-
-    if (!value) 
-    {
-        value = "";             // this suits the code generator
-    }
-
-    for (; *value; ++value)
-    {
-        if (*value < 32)
-        {
-            fprintf(fp, "\\x%02x", (uint8_t)*value);
-        }
-        else
-        if (*value == '\\')
-        {
-            fprintf(fp, "\\\\");
-        }
-        else
-        if (*value == '"')
-        {
-            fprintf(fp, "\\\"");
-        }
-        else
-        {
-            fprintf(fp, "%c", *value);
-        }
-    }
+    char nbuf[60];
+    sprintf(nbuf, " %llu", value);
+    return encodeScalar(nbuf, "unsigned", parent);
 }
 
 
 
-void HAL_Encode_OpenStruct(FILE *fp)
+Element* HAL_Encode_Double(double value, Element* parent)
 {
-    fprintf(fp, " {");
+    char nbuf[60];
+    sprintf(nbuf, " %.16g", value);
+    return encodeScalar(nbuf, "double", parent);
 }
 
 
 
-void HAL_Encode_CloseStruct(FILE *fp)
+Element* HAL_Encode_String(const char* value, Element* parent)
 {
-    fprintf(fp, " }");
+    return encodeScalar(value, "string", parent);
 }
 
 
 
-void HAL_Encode_OpenArray(FILE *fp)
+Element* HAL_Encode_Array_Bool(Array_Bool value, Element* parent)
 {
-    fprintf(fp, " [");
-}
-
-
-
-void HAL_Encode_CloseArray(FILE *fp)
-{
-    fprintf(fp, " ]");
-}
-
-
-
-void HAL_Encode_Array_Bool(FILE *fp, Array_Bool value)
-{
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i)
     {
-        HAL_Encode_Int(fp, value.elems[i]);
+        HAL_Encode_Bool(value.elems[i], array);
     }
-    HAL_Encode_CloseArray(fp);
+    return array;
 }
 
 
 
-void HAL_Encode_Array_string(FILE *fp, Array_string value)
+Element* HAL_Encode_Array_string(Array_string value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i)
     {
-        HAL_Encode_String(fp, value.elems[i]);
+        HAL_Encode_String(value.elems[i], array);
     }
-    HAL_Encode_CloseArray(fp);
+    return array;
 }
 
 
 
 
-void HAL_Encode_Array_uint8(FILE *fp, Array_uint8 value)
+Element* HAL_Encode_Array_uint8(Array_uint8 value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i)
     {
-        HAL_Encode_UInt(fp, value.elems[i]);
+        HAL_Encode_UInt(value.elems[i], array);
     }
-    HAL_Encode_CloseArray(fp);
+    return array;
 }
 
 
 
-void HAL_Encode_Array_uint16(FILE *fp, Array_uint16 value)
+Element* HAL_Encode_Array_uint16(Array_uint16 value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i)
     {
-        HAL_Encode_UInt(fp, value.elems[i]);
+        HAL_Encode_UInt(value.elems[i], array);
     }
-    HAL_Encode_CloseArray(fp);
+    return array;
 }
 
 
 
-void HAL_Encode_Array_uint32(FILE *fp, Array_uint32 value)
+Element* HAL_Encode_Array_uint32(Array_uint32 value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i)
     {
-        HAL_Encode_UInt(fp, value.elems[i]);
+        HAL_Encode_UInt(value.elems[i], array);
     }
-    HAL_Encode_CloseArray(fp);
+    return array;
 }
 
 
 
-void HAL_Encode_Array_uint64(FILE *fp, Array_uint64 value)
+Element* HAL_Encode_Array_uint64(Array_uint64 value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i)
     {
-        HAL_Encode_UInt(fp, value.elems[i]);
+        HAL_Encode_UInt(value.elems[i], array);
     }
-    HAL_Encode_CloseArray(fp);
+    return array;
 }
 
 
 
-void HAL_Encode_Array_int16(FILE *fp, Array_int16 value)
+Element* HAL_Encode_Array_int16(Array_int16 value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i)
     {
-        HAL_Encode_Int(fp, value.elems[i]);
+        HAL_Encode_Int(value.elems[i], array);
     }
-    HAL_Encode_CloseArray(fp);
+    return array;
 }
 
 
 
-void HAL_Encode_Array_int32(FILE *fp, Array_int32 value)
+Element* HAL_Encode_Array_int32(Array_int32 value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i)
     {
-        HAL_Encode_Int(fp, value.elems[i]);
+        HAL_Encode_Int(value.elems[i], array);
     }
-    HAL_Encode_CloseArray(fp);
+    return array;
 }
 
 
 
-void HAL_Encode_Array_int64(FILE *fp, Array_int64 value)
+Element* HAL_Encode_Array_int64(Array_int64 value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i)
     {
-        HAL_Encode_Int(fp, value.elems[i]);
+        HAL_Encode_Int(value.elems[i], array);
     }
-    HAL_Encode_CloseArray(fp);
+    return array;
 }
 
 
 //======================================================================
 
 
-static void skipWS(FILE* fp)
+int64_t HAL_Decode_Int(Element* elem)
 {
-    for (;;)
+    int64_t v = 0;
+
+    if (strcmp(elem->name, "scalar") == 0)
     {
-        int c = fgetc(fp);
+        const char* atype  = BSXML_GetAttribute(elem, "type");
+        const char* avalue = BSXML_GetAttribute(elem, "value");
 
-        if (c < 0)
+        if (strcmp(atype, "signed") == 0)
         {
-            break;
+            v = strtoll(avalue, NULL, 10);
         }
+    }
 
-        if (!isspace(c))
+    return v;
+}
+
+
+
+uint64_t HAL_Decode_UInt(Element* elem)
+{
+    uint64_t v = 0;
+
+    if (strcmp(elem->name, "scalar") == 0)
+    {
+        const char* atype  = BSXML_GetAttribute(elem, "type");
+        const char* avalue = BSXML_GetAttribute(elem, "value");
+
+        if (strcmp(atype, "unsigned") == 0)
         {
-            // Step back one
-            fseek(fp, -1, SEEK_CUR);
-            break;
+            v = strtoull(avalue, NULL, 10);
+        }
+    }
+
+    return v;
+}
+
+
+
+double HAL_Decode_Double(Element* elem)
+{
+    double v = 0;
+
+    if (strcmp(elem->name, "scalar") == 0)
+    {
+        const char* atype  = BSXML_GetAttribute(elem, "type");
+        const char* avalue = BSXML_GetAttribute(elem, "value");
+
+        if (strcmp(atype, "double") == 0)
+        {
+            v = strtod(avalue, NULL);
+        }
+    }
+
+    return v;
+}
+
+
+
+const char* HAL_Decode_String(Element* elem)
+{
+    const char* v = 0;
+
+    if (strcmp(elem->name, "scalar") == 0)
+    {
+        const char* atype  = BSXML_GetAttribute(elem, "type");
+        const char* avalue = BSXML_GetAttribute(elem, "value");
+
+        if (strcmp(atype, "string") == 0)
+        {
+            v = strdup(avalue);
+        }
+    }
+
+    return v;
+}
+
+
+
+void HAL_Decode_Array_Bool(Element* elem, Array_Bool *array)
+{
+    if (strcmp(elem->name, "array") == 0)
+    {
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(bool) * array->numElems);
+
+        for (size_t i = 0; i < elem->numChildren; ++i)
+        {
+            Element* child = elem->children[i];
+            array->elems[i] = (bool)(HAL_Decode_Int(child) & 1);
         }
     }
 }
 
 
 
-static void readToWS(FILE* fp, StrBuf* buf)
+void HAL_Decode_Array_string(Element* elem, Array_string *array)
 {
-    // This leaves the file on the first WS found.
-    StrBuf_Clear(buf);
-
-    for (;;)
+    if (strcmp(elem->name, "array") == 0)
     {
-        int c = fgetc(fp);
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(char*) * array->numElems);
 
-        if (c < 0)
+        for (size_t i = 0; i < elem->numChildren; ++i)
         {
-            break;
-        }
-
-        if (isspace(c))
-        {
-            break;
-        }
-
-        StrBuf_AppendChar(buf, c);
-    }
-}
-
-
-
-static int lookahead(FILE* fp, const char* token)
-{
-    /* Read ahead looking for WS followed by the token.
-       If found then the file will be left at the following
-       character. If not found then the file's position will not
-       be changed.
-
-       Returns 1 for found, 0 for not found, -1 for eof.
-    */
-    long start = ftell(fp);
-    int  result = 1;
-
-    skipWS(fp);
-
-    for (;;)
-    {
-        int c = fgetc(fp);
-
-        if (c < 0)
-        {
-            result = -1;
-            break;
-        }
-
-        if (c != *token)
-        {
-            result = 0;
-            break;
-        }
-
-        ++token;
-    }
-
-    if (result != 1)
-    {
-        fseek(fp, start, SEEK_SET);
-    }
-
-    return result;
-}
-
-
-
-static bool decode_Int(StrBuf* buf, int64_t* out)
-{
-    char* endptr = NULL;
-    *out = strtoll(buf->chars, &endptr, 10);
-    return *buf->chars && !*endptr;
-}
-
-
-
-static bool decode_UInt(StrBuf* buf, uint64_t* out)
-{
-    char* endptr = NULL;
-    *out = strtoull(buf->chars, &endptr, 10);
-    return *buf->chars && !*endptr;
-}
-
-
-
-static bool decode_Double(StrBuf* buf, double* out)
-{
-    char* endptr = NULL;
-    *out = strtod(buf->chars, &endptr);
-    return *buf->chars && !*endptr;
-}
-
-
-
-static int decode_String(FILE* fp, char** out)
-{
-    // We don't free the buffer but return its chars directly to the caller
-    // The return code is -1 if eof, -2 if a string was read or the code of rejected character.
-    StrBuf buf;
-    bool inStr = false;
-    bool done  = false;
-    int  result = -2;
-
-    skipWS(fp);
-    StrBuf_Init(&buf);
-
-    while (!done)
-    {
-        int c = fgetc(fp);
-
-        if (c < 0)
-        {
-            result = -1;
-            break;
-        }
-
-        if (!inStr)
-        {
-            if (c == '"')
-            {
-                inStr = true;
-            }
-            else
-            {
-                result = c;
-                done = true;
-            }
-        }
-        else
-        {
-            if (c == '\\')
-            {
-                // A quoted " or \xFF
-                char c2 = fgetc(fp);
-
-                if (c2 == 'x')
-                {
-                    char h1 = fgetc(fp);
-                    char h2 = fgetc(fp);
-
-                    if (isxdigit(h1) && isxdigit(h2))
-                    {
-                        char hex[3];
-                        unsigned char x;
-                        hex[0] = h1;
-                        hex[1] = h2;
-                        hex[2] = 0;
-                        sscanf(hex, "%hhx", &x);
-                        StrBuf_AppendChar(&buf, (char)x);
-                    }
-                }
-                else
-                {
-                    // For simplicity, allow anything to be quoted
-                    StrBuf_AppendChar(&buf, c2);
-                }
-            }
-            else
-            if (c == '"')
-            {
-                result = -2;
-                *out = buf.chars;
-                done = true;
-            }
-            else
-            {
-                StrBuf_AppendChar(&buf, c);
-            }
-        }
-    }
-
-    return result;
-}
-
-
-
-int64_t HAL_Decode_Int(FILE *fp)
-{
-    StrBuf buf;
-    int64_t value = 0;
-
-    StrBuf_Init(&buf);
-    skipWS(fp);
-    readToWS(fp, &buf);
-
-    if (!decode_Int(&buf, &value))
-    {
-        fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
-    }
-
-    StrBuf_Free(&buf);
-    return value;
-}
-
-
-
-uint64_t HAL_Decode_UInt(FILE *fp)
-{
-    StrBuf buf;
-    uint64_t value = 0;
-
-    StrBuf_Init(&buf);
-    skipWS(fp);
-    readToWS(fp, &buf);
-
-    if (!decode_UInt(&buf, &value))
-    {
-        fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
-    }
-
-    StrBuf_Free(&buf);
-    return value;
-}
-
-
-
-const char* HAL_Decode_String(FILE *fp)
-{
-    char* out = 0;
-
-    if (decode_String(fp, &out) != -2 )
-    {
-        fprintf(stderr, "Invalid HAL string\n");
-    }
-
-    if (!out)
-    {
-        out = strdup("");
-    }
-
-    return out;
-}
-
-
-
-double HAL_Decode_Double(FILE *fp)
-{
-    StrBuf buf;
-    double value = 0;
-
-    StrBuf_Init(&buf);
-    skipWS(fp);
-    readToWS(fp, &buf);
-
-    if (!decode_Double(&buf, &value))
-    {
-        fprintf(stderr, "Invalid HAL double %s\n", buf.chars);
-    }
-
-    StrBuf_Free(&buf);
-    return value;
-}
-
-
-
-void HAL_Decode_OpenStruct(FILE *fp)
-{
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    skipWS(fp);
-    readToWS(fp, &buf);
-
-    if (strcmp(buf.chars, "{") != 0)
-    {
-        fprintf(stderr, "Missing opening brace");
-    }
-
-    StrBuf_Free(&buf);
-}
-
-
-
-void HAL_Decode_CloseStruct(FILE *fp)
-{
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    skipWS(fp);
-    readToWS(fp, &buf);
-
-    if (strcmp(buf.chars, "}") != 0)
-    {
-        fprintf(stderr, "Missing closing brace");
-    }
-    StrBuf_Free(&buf);
-}
-
-
-
-void HAL_Decode_OpenArray(FILE *fp)
-{
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    skipWS(fp);
-    readToWS(fp, &buf);
-
-    if (strcmp(buf.chars, "[") != 0)
-    {
-        fprintf(stderr, "Missing array opening");
-    }
-    StrBuf_Free(&buf);
-}
-
-
-
-bool HAL_Decode_TestCloseArray(FILE *fp)
-{
-    // Treat eof as the closing of an array
-    return lookahead(fp, "]") != 0;
-}
-
-
-
-void HAL_Decode_CloseArray(FILE *fp)
-{
-    if (!HAL_Decode_TestCloseArray(fp))
-    {
-        fprintf(stderr, "Missing array closing");
-    }
-}
-
-
-
-void HAL_Decode_Array_Bool(FILE *fp, Array_Bool *value)
-{
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    InitArray_Bool(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
-    {
-        int64_t v = 0;
-
-        skipWS(fp);
-        readToWS(fp, &buf);
-
-        if (strcmp(buf.chars, "]") == 0)
-        {
-            break;
-        }
-
-        if (decode_Int(&buf, &v))
-        {
-            ExtendArray_Bool(value, 1);
-            value->elems[value->numElems - 1] = v;
-        }
-        else
-        {
-            fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
+            Element* child = elem->children[i];
+            array->elems[i] = (char*)HAL_Decode_String(child);
         }
     }
 }
 
 
 
-void HAL_Decode_Array_string(FILE *fp, Array_string *value)
+void HAL_Decode_Array_double(Element* elem, Array_double *array)
 {
-    InitArray_string(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
+    if (strcmp(elem->name, "array") == 0)
     {
-        char* out = 0;
-        int code = decode_String(fp, &out);
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(double) * array->numElems);
 
-        if (code == -2)
+        for (size_t i = 0; i < elem->numChildren; ++i)
         {
-            ExtendArray_string(value, 1);
-            if (!out)
-            {
-                out = strdup("");
-            }
-            value->elems[value->numElems - 1] = out;
-        }
-        else
-        if (code == -1)
-        {
-            // end of file
-            fprintf(stderr, "Invalid HAL string\n");
-        }
-        else
-        if (code == ']')
-        {
-            break;
-        }
-        else
-        {
-            fprintf(stderr, "Missing HAL string\n");
+            Element* child = elem->children[i];
+            array->elems[i] = HAL_Decode_Double(child);
         }
     }
 }
 
 
 
-void HAL_Decode_Array_double(FILE *fp, Array_double *value)
+void HAL_Decode_Array_uint8(Element* elem, Array_uint8 *array)
 {
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    InitArray_double(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
+    if (strcmp(elem->name, "array") == 0)
     {
-        double v = 0;
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(uint8_t) * array->numElems);
 
-        skipWS(fp);
-        readToWS(fp, &buf);
-
-        if (strcmp(buf.chars, "]") == 0)
+        for (size_t i = 0; i < elem->numChildren; ++i)
         {
-            break;
-        }
-
-        if (decode_Double(&buf, &v))
-        {
-            ExtendArray_double(value, 1);
-            value->elems[value->numElems - 1] = v;
-        }
-        else
-        {
-            fprintf(stderr, "Invalid HAL double %s\n", buf.chars);
+            Element* child = elem->children[i];
+            array->elems[i] = (uint8_t)HAL_Decode_UInt(child);
         }
     }
 }
 
 
 
-void HAL_Decode_Array_uint8(FILE *fp, Array_uint8 *value)
+void HAL_Decode_Array_uint16(Element* elem, Array_uint16 *array)
 {
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    InitArray_uint8(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
+    if (strcmp(elem->name, "array") == 0)
     {
-        uint64_t v = 0;
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(uint16_t) * array->numElems);
 
-        skipWS(fp);
-        readToWS(fp, &buf);
-
-        if (strcmp(buf.chars, "]") == 0)
+        for (size_t i = 0; i < elem->numChildren; ++i)
         {
-            break;
-        }
-
-        if (decode_UInt(&buf, &v))
-        {
-            ExtendArray_uint8(value, 1);
-            value->elems[value->numElems - 1] = v;
-        }
-        else
-        {
-            fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
+            Element* child = elem->children[i];
+            array->elems[i] = (uint16_t)HAL_Decode_UInt(child);
         }
     }
 }
 
 
 
-void HAL_Decode_Array_uint16(FILE *fp, Array_uint16 *value)
+void HAL_Decode_Array_uint32(Element* elem, Array_uint32 *array)
 {
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    InitArray_uint16(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
+    if (strcmp(elem->name, "array") == 0)
     {
-        uint64_t v = 0;
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(uint32_t) * array->numElems);
 
-        skipWS(fp);
-        readToWS(fp, &buf);
-
-        if (strcmp(buf.chars, "]") == 0)
+        for (size_t i = 0; i < elem->numChildren; ++i)
         {
-            break;
-        }
-
-        if (decode_UInt(&buf, &v))
-        {
-            ExtendArray_uint16(value, 1);
-            value->elems[value->numElems - 1] = v;
-        }
-        else
-        {
-            fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
+            Element* child = elem->children[i];
+            array->elems[i] = (uint32_t)HAL_Decode_UInt(child);
         }
     }
 }
 
 
 
-void HAL_Decode_Array_uint32(FILE *fp, Array_uint32 *value)
+void HAL_Decode_Array_uint64(Element* elem, Array_uint64 *array)
 {
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    InitArray_uint32(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
+    if (strcmp(elem->name, "array") == 0)
     {
-        uint64_t v = 0;
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(uint64_t) * array->numElems);
 
-        skipWS(fp);
-        readToWS(fp, &buf);
-
-        if (strcmp(buf.chars, "]") == 0)
+        for (size_t i = 0; i < elem->numChildren; ++i)
         {
-            break;
-        }
-
-        if (decode_UInt(&buf, &v))
-        {
-            ExtendArray_uint32(value, 1);
-            value->elems[value->numElems - 1] = v;
-        }
-        else
-        {
-            fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
+            Element* child = elem->children[i];
+            array->elems[i] = (uint64_t)HAL_Decode_UInt(child);
         }
     }
 }
 
 
 
-void HAL_Decode_Array_uint64(FILE *fp, Array_uint64 *value)
+void HAL_Decode_Array_int16(Element* elem, Array_int16 *array)
 {
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    InitArray_uint64(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
+    if (strcmp(elem->name, "array") == 0)
     {
-        uint64_t v = 0;
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(int16_t) * array->numElems);
 
-        skipWS(fp);
-        readToWS(fp, &buf);
-
-        if (strcmp(buf.chars, "]") == 0)
+        for (size_t i = 0; i < elem->numChildren; ++i)
         {
-            break;
-        }
-
-        if (decode_UInt(&buf, &v))
-        {
-            ExtendArray_uint64(value, 1);
-            value->elems[value->numElems - 1] = v;
-        }
-        else
-        {
-            fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
+            Element* child = elem->children[i];
+            array->elems[i] = (int16_t)HAL_Decode_UInt(child);
         }
     }
 }
 
 
 
-void HAL_Decode_Array_int16(FILE *fp, Array_int16 *value)
+void HAL_Decode_Array_int32(Element* elem, Array_int32 *array)
 {
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    InitArray_int16(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
+    if (strcmp(elem->name, "array") == 0)
     {
-        int64_t v = 0;
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(int32_t) * array->numElems);
 
-        skipWS(fp);
-        readToWS(fp, &buf);
-
-        if (strcmp(buf.chars, "]") == 0)
+        for (size_t i = 0; i < elem->numChildren; ++i)
         {
-            break;
-        }
-
-        if (decode_Int(&buf, &v))
-        {
-            ExtendArray_int16(value, 1);
-            value->elems[value->numElems - 1] = v;
-        }
-        else
-        {
-            fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
+            Element* child = elem->children[i];
+            array->elems[i] = (int32_t)HAL_Decode_UInt(child);
         }
     }
 }
 
 
 
-void HAL_Decode_Array_int32(FILE *fp, Array_int32 *value)
+void HAL_Decode_Array_int64(Element* elem, Array_int64 *array)
 {
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    InitArray_int32(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
+    if (strcmp(elem->name, "array") == 0)
     {
-        int64_t v = 0;
+        array->numElems = elem->numChildren;
+        array->elems = malloc(sizeof(int64_t) * array->numElems);
 
-        skipWS(fp);
-        readToWS(fp, &buf);
-
-        if (strcmp(buf.chars, "]") == 0)
+        for (size_t i = 0; i < elem->numChildren; ++i)
         {
-            break;
-        }
-
-        if (decode_Int(&buf, &v))
-        {
-            ExtendArray_int32(value, 1);
-            value->elems[value->numElems - 1] = v;
-        }
-        else
-        {
-            fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
+            Element* child = elem->children[i];
+            array->elems[i] = (int64_t)HAL_Decode_UInt(child);
         }
     }
 }
-
-
-
-void HAL_Decode_Array_int64(FILE *fp, Array_int64 *value)
-{
-    StrBuf buf;
-
-    StrBuf_Init(&buf);
-    InitArray_int64(value, 0);
-    HAL_Decode_OpenArray(fp);
-
-    while (!feof(fp))
-    {
-        int64_t v = 0;
-
-        skipWS(fp);
-        readToWS(fp, &buf);
-
-        if (strcmp(buf.chars, "]") == 0)
-        {
-            break;
-        }
-
-        if (decode_Int(&buf, &v))
-        {
-            ExtendArray_int64(value, 1);
-            value->elems[value->numElems - 1] = v;
-        }
-        else
-        {
-            fprintf(stderr, "Invalid HAL integer %s\n", buf.chars);
-        }
-    }
-}
-

@@ -22,56 +22,48 @@
 #include "../../../Utils/HAL.h"
 
 
+static Element* HAL_Encode_MoistureOutputLevel_AutoMode(MoistureOutputLevel_AutoMode value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_MoistureOutputLevel_AutoMode(FILE* fp, MoistureOutputLevel_AutoMode value) UNUSED_OK;
-
-static int HAL_Encode_MoistureOutputLevel_AutoMode(FILE* fp, MoistureOutputLevel_AutoMode value)
+static Element* HAL_Encode_MoistureOutputLevel_AutoMode(MoistureOutputLevel_AutoMode value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Decode_MoistureOutputLevel_AutoMode(FILE* fp, MoistureOutputLevel_AutoMode* value) UNUSED_OK;
+static void HAL_Decode_MoistureOutputLevel_AutoMode(Element* elem, MoistureOutputLevel_AutoMode* value) UNUSED_OK;
 
-static int HAL_Decode_MoistureOutputLevel_AutoMode(FILE* fp, MoistureOutputLevel_AutoMode* value)
+static void HAL_Decode_MoistureOutputLevel_AutoMode(Element* elem, MoistureOutputLevel_AutoMode* value)
 {
-    *value = (MoistureOutputLevel_AutoMode)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    *value = (MoistureOutputLevel_AutoMode)(int)HAL_Decode_Int(elem);
 }
 
 
 
-static int HAL_Encode_Array_MoistureOutputLevel_AutoMode(FILE* fp, Array_MoistureOutputLevel_AutoMode value) UNUSED_OK;
+static Element* HAL_Encode_Array_MoistureOutputLevel_AutoMode(Array_MoistureOutputLevel_AutoMode value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Array_MoistureOutputLevel_AutoMode(FILE* fp, Array_MoistureOutputLevel_AutoMode value)
+static Element* HAL_Encode_Array_MoistureOutputLevel_AutoMode(Array_MoistureOutputLevel_AutoMode value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_MoistureOutputLevel_AutoMode(FILE* fp, Array_MoistureOutputLevel_AutoMode* value) UNUSED_OK;
+static void HAL_Decode_Array_MoistureOutputLevel_AutoMode(Element* elem, Array_MoistureOutputLevel_AutoMode* value) UNUSED_OK;
 
-static int HAL_Decode_Array_MoistureOutputLevel_AutoMode(FILE* fp, Array_MoistureOutputLevel_AutoMode* value)
+static void HAL_Decode_Array_MoistureOutputLevel_AutoMode(Element* elem, Array_MoistureOutputLevel_AutoMode* value)
 {
     InitArray_MoistureOutputLevel_AutoMode(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_MoistureOutputLevel_AutoMode(value, 1);
+            value->elems[j] = (MoistureOutputLevel_AutoMode)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_MoistureOutputLevel_AutoMode(value, 1);
-        value->elems[i] = (MoistureOutputLevel_AutoMode)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
@@ -81,30 +73,17 @@ static AJ_Status GetMoistureOutputLevel(void *context, const char *objPath, uint
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MoistureOutputLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MoistureOutputLevel");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "MoistureOutputLevel", "MoistureOutputLevel");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MoistureOutputLevel");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -115,9 +94,10 @@ static AJ_Status SetMoistureOutputLevel(void *context, const char *objPath, uint
     AJ_Status result = AJ_OK;
     uint64_t value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "MoistureOutputLevel", "MoistureOutputLevel");
-    HAL_Encode_UInt(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_UInt(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "MoistureOutputLevel", "MoistureOutputLevel", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -126,30 +106,17 @@ static AJ_Status GetMaxMoistureOutputLevel(void *context, const char *objPath, u
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MaxMoistureOutputLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MaxMoistureOutputLevel");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "MoistureOutputLevel", "MaxMoistureOutputLevel");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MaxMoistureOutputLevel");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -158,30 +125,17 @@ static AJ_Status GetAutoMode(void *context, const char *objPath, MoistureOutputL
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "AutoMode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "AutoMode");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "MoistureOutputLevel", "AutoMode");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "AutoMode");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (MoistureOutputLevel_AutoMode)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -192,9 +146,10 @@ static AJ_Status SetAutoMode(void *context, const char *objPath, MoistureOutputL
     AJ_Status result = AJ_OK;
     int value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "MoistureOutputLevel", "AutoMode");
-    HAL_Encode_Int(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Int(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "MoistureOutputLevel", "AutoMode", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 

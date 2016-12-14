@@ -23,64 +23,68 @@
 
 
 
+static Element* HAL_Encode_Channel_ChannelInfoRecord(Channel_ChannelInfoRecord value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_Channel_ChannelInfoRecord(FILE* fp, Channel_ChannelInfoRecord value) UNUSED_OK;
-
-static int HAL_Encode_Channel_ChannelInfoRecord(FILE* fp, Channel_ChannelInfoRecord value)
+static Element* HAL_Encode_Channel_ChannelInfoRecord(Channel_ChannelInfoRecord value, Element* parent)
 {
-    HAL_Encode_OpenStruct(fp);
-    HAL_Encode_String(fp, value.channelID);
-    HAL_Encode_String(fp, value.channelNumber);
-    HAL_Encode_String(fp, value.channelName);
-    HAL_Encode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_Channel_ChannelInfoRecord(FILE* fp, Channel_ChannelInfoRecord* value) UNUSED_OK;
-
-static int HAL_Decode_Channel_ChannelInfoRecord(FILE* fp, Channel_ChannelInfoRecord* value)
-{
-    HAL_Decode_OpenStruct(fp);
-    value->channelID = HAL_Decode_String(fp);
-    value->channelNumber = HAL_Decode_String(fp);
-    value->channelName = HAL_Decode_String(fp);
-    HAL_Decode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Encode_Array_Channel_ChannelInfoRecord(FILE* fp, Array_Channel_ChannelInfoRecord value) UNUSED_OK;
-
-static int HAL_Encode_Array_Channel_ChannelInfoRecord(FILE* fp, Array_Channel_ChannelInfoRecord value)
-{
-    HAL_Encode_OpenArray(fp);
-    for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Channel_ChannelInfoRecord(fp, value.elems[i]);
+    Element* struc = BSXML_NewElement("struct", parent);
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "channelID");
+        BSXML_AddChild(field, HAL_Encode_String(value.channelID, field));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "channelNumber");
+        BSXML_AddChild(field, HAL_Encode_String(value.channelNumber, field));
+    }
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "channelName");
+        BSXML_AddChild(field, HAL_Encode_String(value.channelName, field));
+    }
+    return struc;
 }
 
 
-static int HAL_Decode_Array_Channel_ChannelInfoRecord(FILE* fp, Array_Channel_ChannelInfoRecord* value) UNUSED_OK;
 
-static int HAL_Decode_Array_Channel_ChannelInfoRecord(FILE* fp, Array_Channel_ChannelInfoRecord* value)
+static void HAL_Decode_Channel_ChannelInfoRecord(Element* elem, Channel_ChannelInfoRecord* value) UNUSED_OK;
+
+static void HAL_Decode_Channel_ChannelInfoRecord(Element* elem, Channel_ChannelInfoRecord* value)
+{
+    if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
+        value->channelID = HAL_Decode_String(elem->children[0]);
+        value->channelNumber = HAL_Decode_String(elem->children[1]);
+        value->channelName = HAL_Decode_String(elem->children[2]);
+    }
+}
+
+
+
+static Element* HAL_Encode_Array_Channel_ChannelInfoRecord(Array_Channel_ChannelInfoRecord value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_Channel_ChannelInfoRecord(Array_Channel_ChannelInfoRecord value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
+    for (size_t i = 0; i < value.numElems; ++i) {
+        BSXML_AddChild(array, HAL_Encode_Channel_ChannelInfoRecord(value.elems[i], array));
+    }
+    return array;
+}
+
+
+static void HAL_Decode_Array_Channel_ChannelInfoRecord(Element* elem, Array_Channel_ChannelInfoRecord* value) UNUSED_OK;
+
+static void HAL_Decode_Array_Channel_ChannelInfoRecord(Element* elem, Array_Channel_ChannelInfoRecord* value)
 {
     InitArray_Channel_ChannelInfoRecord(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_Channel_ChannelInfoRecord(value, 1);
+            HAL_Decode_Channel_ChannelInfoRecord(elem->children[i], &value->elems[j]);
         }
-        size_t i = ExtendArray_Channel_ChannelInfoRecord(value, 1);
-        HAL_Decode_Channel_ChannelInfoRecord(fp, &value->elems[i]);
     }
-    return AJ_OK;
 }
 
 static const char* BusPath = "/cdm/emulated";
@@ -122,30 +126,17 @@ static AJ_Status GetChannelId(void *context, const char *objPath, char const* *o
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Channel", "ChannelId");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Channel", "ChannelId");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Channel", "ChannelId");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        char const* const value = "";
-        HAL_Encode_String(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Channel", "ChannelId");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     char const* value;
-    value = HAL_Decode_String(fp);
+    value = HAL_Decode_String(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -156,9 +147,10 @@ static AJ_Status SetChannelId(void *context, const char *objPath, char const* in
     AJ_Status result = AJ_OK;
     char const* value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "Channel", "ChannelId");
-    HAL_Encode_String(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_String(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "Channel", "ChannelId", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -167,30 +159,17 @@ static AJ_Status GetTotalNumberOfChannels(void *context, const char *objPath, ui
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Channel", "TotalNumberOfChannels");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Channel", "TotalNumberOfChannels");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Channel", "TotalNumberOfChannels");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Channel", "TotalNumberOfChannels");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

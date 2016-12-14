@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetIsControllable(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "RemoteControllability", "IsControllable");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "RemoteControllability", "IsControllable");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "RemoteControllability", "IsControllable");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int64_t const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "RemoteControllability", "IsControllable");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int64_t value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

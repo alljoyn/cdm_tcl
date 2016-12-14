@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetVolume(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Volume");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Volume");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "AudioVolume", "Volume");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Volume");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -64,9 +49,10 @@ static AJ_Status SetVolume(void *context, const char *objPath, uint8_t input)
     AJ_Status result = AJ_OK;
     uint64_t value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "AudioVolume", "Volume");
-    HAL_Encode_UInt(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_UInt(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "AudioVolume", "Volume", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -75,30 +61,17 @@ static AJ_Status GetMaxVolume(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "MaxVolume");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "MaxVolume");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "AudioVolume", "MaxVolume");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "MaxVolume");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -107,30 +80,17 @@ static AJ_Status GetMute(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Mute");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Mute");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "AudioVolume", "Mute");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int64_t const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Mute");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int64_t value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -141,9 +101,10 @@ static AJ_Status SetMute(void *context, const char *objPath, bool input)
     AJ_Status result = AJ_OK;
     int64_t value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "AudioVolume", "Mute");
-    HAL_Encode_Int(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Int(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "AudioVolume", "Mute", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 

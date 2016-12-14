@@ -23,170 +23,170 @@
 
 
 
+static Element* HAL_Encode_AudioVideoInput_InputSource(AudioVideoInput_InputSource value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_AudioVideoInput_InputSource(FILE* fp, AudioVideoInput_InputSource value) UNUSED_OK;
-
-static int HAL_Encode_AudioVideoInput_InputSource(FILE* fp, AudioVideoInput_InputSource value)
+static Element* HAL_Encode_AudioVideoInput_InputSource(AudioVideoInput_InputSource value, Element* parent)
 {
-    HAL_Encode_OpenStruct(fp);
-    HAL_Encode_UInt(fp, value.id);
-    HAL_Encode_Int(fp, value.sourceType);
-    HAL_Encode_Int(fp, value.signalPresence);
-    HAL_Encode_UInt(fp, value.portNumber);
-    HAL_Encode_String(fp, value.friendlyName);
-    HAL_Encode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_AudioVideoInput_InputSource(FILE* fp, AudioVideoInput_InputSource* value) UNUSED_OK;
-
-static int HAL_Decode_AudioVideoInput_InputSource(FILE* fp, AudioVideoInput_InputSource* value)
-{
-    HAL_Decode_OpenStruct(fp);
-    value->id = HAL_Decode_UInt(fp);
-    value->sourceType = HAL_Decode_Int(fp);
-    value->signalPresence = HAL_Decode_Int(fp);
-    value->portNumber = HAL_Decode_UInt(fp);
-    value->friendlyName = HAL_Decode_String(fp);
-    HAL_Decode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Encode_Array_AudioVideoInput_InputSource(FILE* fp, Array_AudioVideoInput_InputSource value) UNUSED_OK;
-
-static int HAL_Encode_Array_AudioVideoInput_InputSource(FILE* fp, Array_AudioVideoInput_InputSource value)
-{
-    HAL_Encode_OpenArray(fp);
-    for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_AudioVideoInput_InputSource(fp, value.elems[i]);
+    Element* struc = BSXML_NewElement("struct", parent);
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "id");
+        BSXML_AddChild(field, HAL_Encode_UInt(value.id, field));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "sourceType");
+        BSXML_AddChild(field, HAL_Encode_Int(value.sourceType, field));
+    }
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "signalPresence");
+        BSXML_AddChild(field, HAL_Encode_Int(value.signalPresence, field));
+    }
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "portNumber");
+        BSXML_AddChild(field, HAL_Encode_UInt(value.portNumber, field));
+    }
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "friendlyName");
+        BSXML_AddChild(field, HAL_Encode_String(value.friendlyName, field));
+    }
+    return struc;
 }
 
 
-static int HAL_Decode_Array_AudioVideoInput_InputSource(FILE* fp, Array_AudioVideoInput_InputSource* value) UNUSED_OK;
 
-static int HAL_Decode_Array_AudioVideoInput_InputSource(FILE* fp, Array_AudioVideoInput_InputSource* value)
+static void HAL_Decode_AudioVideoInput_InputSource(Element* elem, AudioVideoInput_InputSource* value) UNUSED_OK;
+
+static void HAL_Decode_AudioVideoInput_InputSource(Element* elem, AudioVideoInput_InputSource* value)
+{
+    if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 5) {
+        value->id = HAL_Decode_UInt(elem->children[0]);
+        value->sourceType = HAL_Decode_Int(elem->children[1]);
+        value->signalPresence = HAL_Decode_Int(elem->children[2]);
+        value->portNumber = HAL_Decode_UInt(elem->children[3]);
+        value->friendlyName = HAL_Decode_String(elem->children[4]);
+    }
+}
+
+
+
+static Element* HAL_Encode_Array_AudioVideoInput_InputSource(Array_AudioVideoInput_InputSource value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_AudioVideoInput_InputSource(Array_AudioVideoInput_InputSource value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
+    for (size_t i = 0; i < value.numElems; ++i) {
+        BSXML_AddChild(array, HAL_Encode_AudioVideoInput_InputSource(value.elems[i], array));
+    }
+    return array;
+}
+
+
+static void HAL_Decode_Array_AudioVideoInput_InputSource(Element* elem, Array_AudioVideoInput_InputSource* value) UNUSED_OK;
+
+static void HAL_Decode_Array_AudioVideoInput_InputSource(Element* elem, Array_AudioVideoInput_InputSource* value)
 {
     InitArray_AudioVideoInput_InputSource(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_AudioVideoInput_InputSource(value, 1);
+            HAL_Decode_AudioVideoInput_InputSource(elem->children[i], &value->elems[j]);
         }
-        size_t i = ExtendArray_AudioVideoInput_InputSource(value, 1);
-        HAL_Decode_AudioVideoInput_InputSource(fp, &value->elems[i]);
     }
-    return AJ_OK;
 }
 
 
-static int HAL_Encode_AudioVideoInput_SourceType(FILE* fp, AudioVideoInput_SourceType value) UNUSED_OK;
+static Element* HAL_Encode_AudioVideoInput_SourceType(AudioVideoInput_SourceType value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_AudioVideoInput_SourceType(FILE* fp, AudioVideoInput_SourceType value)
+static Element* HAL_Encode_AudioVideoInput_SourceType(AudioVideoInput_SourceType value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_AudioVideoInput_SourceType(FILE* fp, AudioVideoInput_SourceType* value) UNUSED_OK;
-
-static int HAL_Decode_AudioVideoInput_SourceType(FILE* fp, AudioVideoInput_SourceType* value)
-{
-    *value = (AudioVideoInput_SourceType)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Encode_Array_AudioVideoInput_SourceType(FILE* fp, Array_AudioVideoInput_SourceType value) UNUSED_OK;
+static void HAL_Decode_AudioVideoInput_SourceType(Element* elem, AudioVideoInput_SourceType* value) UNUSED_OK;
 
-static int HAL_Encode_Array_AudioVideoInput_SourceType(FILE* fp, Array_AudioVideoInput_SourceType value)
+static void HAL_Decode_AudioVideoInput_SourceType(Element* elem, AudioVideoInput_SourceType* value)
 {
-    HAL_Encode_OpenArray(fp);
+    *value = (AudioVideoInput_SourceType)(int)HAL_Decode_Int(elem);
+}
+
+
+
+static Element* HAL_Encode_Array_AudioVideoInput_SourceType(Array_AudioVideoInput_SourceType value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_AudioVideoInput_SourceType(Array_AudioVideoInput_SourceType value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_AudioVideoInput_SourceType(FILE* fp, Array_AudioVideoInput_SourceType* value) UNUSED_OK;
+static void HAL_Decode_Array_AudioVideoInput_SourceType(Element* elem, Array_AudioVideoInput_SourceType* value) UNUSED_OK;
 
-static int HAL_Decode_Array_AudioVideoInput_SourceType(FILE* fp, Array_AudioVideoInput_SourceType* value)
+static void HAL_Decode_Array_AudioVideoInput_SourceType(Element* elem, Array_AudioVideoInput_SourceType* value)
 {
     InitArray_AudioVideoInput_SourceType(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_AudioVideoInput_SourceType(value, 1);
+            value->elems[j] = (AudioVideoInput_SourceType)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_AudioVideoInput_SourceType(value, 1);
-        value->elems[i] = (AudioVideoInput_SourceType)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
-static int HAL_Encode_AudioVideoInput_SignalPresence(FILE* fp, AudioVideoInput_SignalPresence value) UNUSED_OK;
+static Element* HAL_Encode_AudioVideoInput_SignalPresence(AudioVideoInput_SignalPresence value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_AudioVideoInput_SignalPresence(FILE* fp, AudioVideoInput_SignalPresence value)
+static Element* HAL_Encode_AudioVideoInput_SignalPresence(AudioVideoInput_SignalPresence value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_AudioVideoInput_SignalPresence(FILE* fp, AudioVideoInput_SignalPresence* value) UNUSED_OK;
-
-static int HAL_Decode_AudioVideoInput_SignalPresence(FILE* fp, AudioVideoInput_SignalPresence* value)
-{
-    *value = (AudioVideoInput_SignalPresence)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Encode_Array_AudioVideoInput_SignalPresence(FILE* fp, Array_AudioVideoInput_SignalPresence value) UNUSED_OK;
+static void HAL_Decode_AudioVideoInput_SignalPresence(Element* elem, AudioVideoInput_SignalPresence* value) UNUSED_OK;
 
-static int HAL_Encode_Array_AudioVideoInput_SignalPresence(FILE* fp, Array_AudioVideoInput_SignalPresence value)
+static void HAL_Decode_AudioVideoInput_SignalPresence(Element* elem, AudioVideoInput_SignalPresence* value)
 {
-    HAL_Encode_OpenArray(fp);
+    *value = (AudioVideoInput_SignalPresence)(int)HAL_Decode_Int(elem);
+}
+
+
+
+static Element* HAL_Encode_Array_AudioVideoInput_SignalPresence(Array_AudioVideoInput_SignalPresence value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_AudioVideoInput_SignalPresence(Array_AudioVideoInput_SignalPresence value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_AudioVideoInput_SignalPresence(FILE* fp, Array_AudioVideoInput_SignalPresence* value) UNUSED_OK;
+static void HAL_Decode_Array_AudioVideoInput_SignalPresence(Element* elem, Array_AudioVideoInput_SignalPresence* value) UNUSED_OK;
 
-static int HAL_Decode_Array_AudioVideoInput_SignalPresence(FILE* fp, Array_AudioVideoInput_SignalPresence* value)
+static void HAL_Decode_Array_AudioVideoInput_SignalPresence(Element* elem, Array_AudioVideoInput_SignalPresence* value)
 {
     InitArray_AudioVideoInput_SignalPresence(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_AudioVideoInput_SignalPresence(value, 1);
+            value->elems[j] = (AudioVideoInput_SignalPresence)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_AudioVideoInput_SignalPresence(value, 1);
-        value->elems[i] = (AudioVideoInput_SignalPresence)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
@@ -196,30 +196,17 @@ static AJ_Status GetInputSourceId(void *context, const char *objPath, AudioVideo
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "InputSourceId");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "InputSourceId");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "AudioVideoInput", "InputSourceId");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "InputSourceId");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (AudioVideoInput_SourceType)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -230,9 +217,10 @@ static AJ_Status SetInputSourceId(void *context, const char *objPath, AudioVideo
     AJ_Status result = AJ_OK;
     int value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "AudioVideoInput", "InputSourceId");
-    HAL_Encode_Int(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Int(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "AudioVideoInput", "InputSourceId", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -241,31 +229,18 @@ static AJ_Status GetSupportedInputSources(void *context, const char *objPath, Ar
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "SupportedInputSources");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "SupportedInputSources");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "AudioVideoInput", "SupportedInputSources");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_AudioVideoInput_InputSource const value = {0};
-        HAL_Encode_Array_AudioVideoInput_InputSource(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "SupportedInputSources");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_AudioVideoInput_InputSource value;
-    HAL_Decode_Array_AudioVideoInput_InputSource(fp, &value);
+    HAL_Decode_Array_AudioVideoInput_InputSource(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

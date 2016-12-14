@@ -21,8 +21,6 @@
 #include "OnControlModelImpl.h"
 #include "../../../Utils/HAL.h"
 
-
-
 #include <ajtcl/cdm/interfaces/operation/OnOffStatusInterface.h>
 
 static const char* s_objPath = "/cdm/emulated";
@@ -35,14 +33,9 @@ static AJ_Status MethodSwitchOn(void *context, const char *objPath)
 {
     bool value = true;
 
-    FILE* fp = HAL_WriteProperty(s_objPath, "OnOffStatus", "IsOn");
-
-    if (!fp) {
-        return AJ_ERR_FAILURE;
-    }
-
-    HAL_Encode_Int(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Bool(value, NULL);
+    HAL_WritePropertyElem(s_objPath, "OnOffStatus", "IsOn", elem);
+    BSXML_FreeElement(elem);
 
     OnControlModel* model = (OnControlModel*)context;
     Cdm_OnOffStatus_EmitIsOnChanged(model->busAttachment, s_objPath, value);

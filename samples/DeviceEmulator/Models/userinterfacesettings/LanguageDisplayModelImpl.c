@@ -18,24 +18,24 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "ColorTemperatureModelImpl.h"
+#include "LanguageDisplayModelImpl.h"
 #include "../../../Utils/HAL.h"
 
 
 
 
-static AJ_Status GetTemperature(void *context, const char *objPath, double *out)
+static AJ_Status GetDisplayLanguage(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "Temperature");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "LanguageDisplay", "DisplayLanguage");
 
     if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
+    char const* value;
+    value = HAL_Decode_String(elem);
     *out = value;
 
     BSXML_FreeElement(elem);
@@ -44,50 +44,32 @@ static AJ_Status GetTemperature(void *context, const char *objPath, double *out)
 
 
 
-static AJ_Status SetTemperature(void *context, const char *objPath, double input)
+static AJ_Status SetDisplayLanguage(void *context, const char *objPath, char const* input)
 {
     AJ_Status result = AJ_OK;
-    double value = input;
+    char const* value = input;
 
-    Element* elem = HAL_Encode_Double(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "ColorTemperature", "Temperature", elem);
+    Element* elem = HAL_Encode_String(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "LanguageDisplay", "DisplayLanguage", elem);
     BSXML_FreeElement(elem);
 
     return result;
 }
 
 
-static AJ_Status GetMinTemperature(void *context, const char *objPath, double *out)
+static AJ_Status GetSupportedDisplayLanguages(void *context, const char *objPath, Array_string *out)
 {
     AJ_Status result = AJ_OK;
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "MinTemperature");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "LanguageDisplay", "SupportedDisplayLanguages");
 
     if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
-    *out = value;
+    Array_string value;
+    HAL_Decode_Array_string(elem, &value);
 
-    BSXML_FreeElement(elem);
-    return result;
-}
-
-
-static AJ_Status GetMaxTemperature(void *context, const char *objPath, double *out)
-{
-    AJ_Status result = AJ_OK;
-
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "MaxTemperature");
-
-    if (!elem) {
-        return AJ_ERR_FAILURE;
-    }
-
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
 
     BSXML_FreeElement(elem);
@@ -97,16 +79,15 @@ static AJ_Status GetMaxTemperature(void *context, const char *objPath, double *o
 
 
 
-static ColorTemperatureModel model = {
-    GetTemperature
-    , SetTemperature
-    , GetMinTemperature
-    , GetMaxTemperature
+static LanguageDisplayModel model = {
+    GetDisplayLanguage
+    , SetDisplayLanguage
+    , GetSupportedDisplayLanguages
 
 };
 
 
-ColorTemperatureModel *GetColorTemperatureModel(void)
+LanguageDisplayModel *GetLanguageDisplayModel(void)
 {
     return &model;
 }

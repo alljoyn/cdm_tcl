@@ -14,44 +14,18 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
+#ifndef ALLJOYN_FILEIO_H
+#define ALLJOYN_FILEIO_H
 
-#include "OffControlModelImpl.h"
-#include "../../../Utils/HAL.h"
+#include "StrBuf.h"
 
-#include <ajtcl/cdm/interfaces/operation/OnOffStatusInterface.h>
+//======================================================================
 
-static const char* s_objPath = "/cdm/emulated";
+/**
+ * This appends the contents of the file to the buffer.
+ * @return true of the file was successfully read.
+ */
+extern bool ReadFile(const char *filepath, StrBuf* outBuf);
 
-
-
-
-
-static AJ_Status MethodSwitchOff(void *context, const char *objPath)
-{
-    bool value = false;
-
-    Element* elem = HAL_Encode_Bool(value, NULL);
-    HAL_WritePropertyElem(s_objPath, "OnOffStatus", "IsOn", elem);
-    BSXML_FreeElement(elem);
-
-    OffControlModel* model = (OffControlModel*)context;
-    Cdm_OnOffStatus_EmitIsOnChanged(model->busAttachment, s_objPath, value);
-
-    return AJ_OK;
-}
-
-
-
-static OffControlModel model = {
-
-    MethodSwitchOff
-};
-
-
-OffControlModel *GetOffControlModel(void)
-{
-    return &model;
-}
+//======================================================================
+#endif // ALLJOYN_FILEIO_H

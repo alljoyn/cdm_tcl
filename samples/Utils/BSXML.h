@@ -81,7 +81,7 @@ extern void BSXML_FreeElementAttr(ElementAttr* attr);
  * @param outStr  Optional string to be used for output. (Defaults to empty string.)
  * @return  XML Fragment. The caller must free it.
  */
-const char* BSXML_Generate(Element* element);
+const char* BSXML_Generate(const Element* element);
 
 /**
  * Return a C string representation of the Element
@@ -89,7 +89,7 @@ const char* BSXML_Generate(Element* element);
  * @return   XML in form of a zero-terminated string.
  *           The caller must free it.
  */
-const char* BSXML_ToString(Element* element);
+const char* BSXML_ToString(const Element* element);
 
 
 /**

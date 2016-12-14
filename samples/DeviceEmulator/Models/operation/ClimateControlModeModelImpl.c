@@ -22,107 +22,93 @@
 #include "../../../Utils/HAL.h"
 
 
+static Element* HAL_Encode_ClimateControlMode_Mode(ClimateControlMode_Mode value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_ClimateControlMode_Mode(FILE* fp, ClimateControlMode_Mode value) UNUSED_OK;
-
-static int HAL_Encode_ClimateControlMode_Mode(FILE* fp, ClimateControlMode_Mode value)
+static Element* HAL_Encode_ClimateControlMode_Mode(ClimateControlMode_Mode value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Decode_ClimateControlMode_Mode(FILE* fp, ClimateControlMode_Mode* value) UNUSED_OK;
+static void HAL_Decode_ClimateControlMode_Mode(Element* elem, ClimateControlMode_Mode* value) UNUSED_OK;
 
-static int HAL_Decode_ClimateControlMode_Mode(FILE* fp, ClimateControlMode_Mode* value)
+static void HAL_Decode_ClimateControlMode_Mode(Element* elem, ClimateControlMode_Mode* value)
 {
-    *value = (ClimateControlMode_Mode)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    *value = (ClimateControlMode_Mode)(int)HAL_Decode_Int(elem);
 }
 
 
 
-static int HAL_Encode_Array_ClimateControlMode_Mode(FILE* fp, Array_ClimateControlMode_Mode value) UNUSED_OK;
+static Element* HAL_Encode_Array_ClimateControlMode_Mode(Array_ClimateControlMode_Mode value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Array_ClimateControlMode_Mode(FILE* fp, Array_ClimateControlMode_Mode value)
+static Element* HAL_Encode_Array_ClimateControlMode_Mode(Array_ClimateControlMode_Mode value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_ClimateControlMode_Mode(FILE* fp, Array_ClimateControlMode_Mode* value) UNUSED_OK;
+static void HAL_Decode_Array_ClimateControlMode_Mode(Element* elem, Array_ClimateControlMode_Mode* value) UNUSED_OK;
 
-static int HAL_Decode_Array_ClimateControlMode_Mode(FILE* fp, Array_ClimateControlMode_Mode* value)
+static void HAL_Decode_Array_ClimateControlMode_Mode(Element* elem, Array_ClimateControlMode_Mode* value)
 {
     InitArray_ClimateControlMode_Mode(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_ClimateControlMode_Mode(value, 1);
+            value->elems[j] = (ClimateControlMode_Mode)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_ClimateControlMode_Mode(value, 1);
-        value->elems[i] = (ClimateControlMode_Mode)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
-static int HAL_Encode_ClimateControlMode_OperationalState(FILE* fp, ClimateControlMode_OperationalState value) UNUSED_OK;
+static Element* HAL_Encode_ClimateControlMode_OperationalState(ClimateControlMode_OperationalState value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_ClimateControlMode_OperationalState(FILE* fp, ClimateControlMode_OperationalState value)
+static Element* HAL_Encode_ClimateControlMode_OperationalState(ClimateControlMode_OperationalState value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_ClimateControlMode_OperationalState(FILE* fp, ClimateControlMode_OperationalState* value) UNUSED_OK;
-
-static int HAL_Decode_ClimateControlMode_OperationalState(FILE* fp, ClimateControlMode_OperationalState* value)
-{
-    *value = (ClimateControlMode_OperationalState)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Encode_Array_ClimateControlMode_OperationalState(FILE* fp, Array_ClimateControlMode_OperationalState value) UNUSED_OK;
+static void HAL_Decode_ClimateControlMode_OperationalState(Element* elem, ClimateControlMode_OperationalState* value) UNUSED_OK;
 
-static int HAL_Encode_Array_ClimateControlMode_OperationalState(FILE* fp, Array_ClimateControlMode_OperationalState value)
+static void HAL_Decode_ClimateControlMode_OperationalState(Element* elem, ClimateControlMode_OperationalState* value)
 {
-    HAL_Encode_OpenArray(fp);
+    *value = (ClimateControlMode_OperationalState)(int)HAL_Decode_Int(elem);
+}
+
+
+
+static Element* HAL_Encode_Array_ClimateControlMode_OperationalState(Array_ClimateControlMode_OperationalState value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_ClimateControlMode_OperationalState(Array_ClimateControlMode_OperationalState value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_ClimateControlMode_OperationalState(FILE* fp, Array_ClimateControlMode_OperationalState* value) UNUSED_OK;
+static void HAL_Decode_Array_ClimateControlMode_OperationalState(Element* elem, Array_ClimateControlMode_OperationalState* value) UNUSED_OK;
 
-static int HAL_Decode_Array_ClimateControlMode_OperationalState(FILE* fp, Array_ClimateControlMode_OperationalState* value)
+static void HAL_Decode_Array_ClimateControlMode_OperationalState(Element* elem, Array_ClimateControlMode_OperationalState* value)
 {
     InitArray_ClimateControlMode_OperationalState(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_ClimateControlMode_OperationalState(value, 1);
+            value->elems[j] = (ClimateControlMode_OperationalState)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_ClimateControlMode_OperationalState(value, 1);
-        value->elems[i] = (ClimateControlMode_OperationalState)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
@@ -132,30 +118,17 @@ static AJ_Status GetMode(void *context, const char *objPath, ClimateControlMode_
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "Mode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "Mode");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "ClimateControlMode", "Mode");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "Mode");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (ClimateControlMode_Mode)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -166,9 +139,10 @@ static AJ_Status SetMode(void *context, const char *objPath, ClimateControlMode_
     AJ_Status result = AJ_OK;
     int value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "ClimateControlMode", "Mode");
-    HAL_Encode_Int(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Int(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "ClimateControlMode", "Mode", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -177,31 +151,18 @@ static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_Cli
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "SupportedModes");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "SupportedModes");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "ClimateControlMode", "SupportedModes");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_ClimateControlMode_Mode const value = {0};
-        HAL_Encode_Array_ClimateControlMode_Mode(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "SupportedModes");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_ClimateControlMode_Mode value;
-    HAL_Decode_Array_ClimateControlMode_Mode(fp, &value);
+    HAL_Decode_Array_ClimateControlMode_Mode(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -210,30 +171,17 @@ static AJ_Status GetOperationalState(void *context, const char *objPath, Climate
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "OperationalState");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "OperationalState");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "ClimateControlMode", "OperationalState");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "ClimateControlMode", "OperationalState");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (ClimateControlMode_OperationalState)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

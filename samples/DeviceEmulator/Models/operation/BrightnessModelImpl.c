@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetBrightness(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Brightness", "Brightness");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Brightness", "Brightness");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Brightness", "Brightness");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Brightness", "Brightness");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -64,9 +49,10 @@ static AJ_Status SetBrightness(void *context, const char *objPath, double input)
     AJ_Status result = AJ_OK;
     double value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "Brightness", "Brightness");
-    HAL_Encode_Double(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Double(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "Brightness", "Brightness", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 

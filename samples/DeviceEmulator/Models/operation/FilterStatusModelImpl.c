@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetExpectedLifeInDays(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "ExpectedLifeInDays");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "ExpectedLifeInDays");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "FilterStatus", "ExpectedLifeInDays");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "ExpectedLifeInDays");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -62,30 +47,17 @@ static AJ_Status GetIsCleanable(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "IsCleanable");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "IsCleanable");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "FilterStatus", "IsCleanable");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int64_t const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "IsCleanable");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int64_t value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -94,30 +66,17 @@ static AJ_Status GetOrderPercentage(void *context, const char *objPath, uint8_t 
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "OrderPercentage");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "OrderPercentage");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "FilterStatus", "OrderPercentage");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "OrderPercentage");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -126,30 +85,17 @@ static AJ_Status GetManufacturer(void *context, const char *objPath, char const*
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "Manufacturer");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "Manufacturer");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "FilterStatus", "Manufacturer");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        char const* const value = "";
-        HAL_Encode_String(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "Manufacturer");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     char const* value;
-    value = HAL_Decode_String(fp);
+    value = HAL_Decode_String(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -158,30 +104,17 @@ static AJ_Status GetPartNumber(void *context, const char *objPath, char const* *
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "PartNumber");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "PartNumber");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "FilterStatus", "PartNumber");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        char const* const value = "";
-        HAL_Encode_String(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "PartNumber");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     char const* value;
-    value = HAL_Decode_String(fp);
+    value = HAL_Decode_String(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -190,30 +123,17 @@ static AJ_Status GetUrl(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "Url");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "Url");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "FilterStatus", "Url");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        char const* const value = "";
-        HAL_Encode_String(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "Url");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     char const* value;
-    value = HAL_Decode_String(fp);
+    value = HAL_Decode_String(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -222,30 +142,17 @@ static AJ_Status GetLifeRemaining(void *context, const char *objPath, uint8_t *o
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "LifeRemaining");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "LifeRemaining");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "FilterStatus", "LifeRemaining");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "FilterStatus", "LifeRemaining");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

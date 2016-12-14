@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetCumulativeEnergy(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "CumulativeEnergy");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "CumulativeEnergy");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "EnergyUsage", "CumulativeEnergy");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "CumulativeEnergy");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -62,30 +47,17 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "Precision");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "Precision");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "EnergyUsage", "Precision");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "Precision");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -94,30 +66,17 @@ static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "UpdateMinTime");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "UpdateMinTime");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "EnergyUsage", "UpdateMinTime");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "EnergyUsage", "UpdateMinTime");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -126,14 +85,9 @@ static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *
 
 static AJ_Status MethodResetCumulativeEnergy(void *context, const char *objPath)
 {
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "EnergyUsage", "CumulativeEnergy");
-
-    if (!fp) {
-        return AJ_ERR_FAILURE;
-    }
-
-    HAL_Encode_Double(fp, 0);
-    fclose(fp);
+    Element* elem = HAL_Encode_Double(0, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "EnergyUsage", "CumulativeEnergy", elem);
+    BSXML_FreeElement(elem);
     return AJ_OK;
 }
 

@@ -18,73 +18,64 @@
 #define ALLJOYN_HAL_H
 
 #include <ajtcl/cdm/utils/CDM_Array.h>
+#include "BSXML.h"
 
 //======================================================================
-
-typedef int (*HAL_ReaderFunc)(FILE *fp, const char*, void*);
 
 void HAL_Init(const char *base_path, const char *ext);
 void HAL_DefaultInit(void);
 
-// This opens the file for writing. The caller must close it.
-FILE* HAL_WriteProperty(const char *objPath, const char *interface, const char *property);
+// Write some XML to the file.
+bool HAL_WritePropertyXml(const char *objPath, const char *interface, const char *property, const char* xml, bool force);
 
-// This opens the file for reading. The caller must close it.
-FILE* HAL_ReadProperty(const char *objPath, const char *interface, const char *property);
+// Write an XML tree to the file.
+bool HAL_WritePropertyElem(const char *objPath, const char *interface, const char *property, const Element* elem);
+
+// Read the XML from the file.
+Element* HAL_ReadProperty(const char *objPath, const char *interface, const char *property);
 
 //======================================================================
 
-extern void HAL_Encode_Int(FILE *fp, int64_t value);
-extern void HAL_Encode_UInt(FILE *fp, uint64_t value);
-extern void HAL_Encode_String(FILE *fp, const char* value);
-extern void HAL_Encode_Double(FILE *fp, double value);
+extern Element* HAL_Encode_Bool(bool value, Element* parent);
+extern Element* HAL_Encode_Int(int64_t value, Element* parent);
+extern Element* HAL_Encode_UInt(uint64_t value, Element* parent);
+extern Element* HAL_Encode_String(const char* value, Element* parent);
+extern Element* HAL_Encode_Double(double value, Element* parent);
 
-extern void HAL_Encode_OpenStruct(FILE *fp);
-extern void HAL_Encode_CloseStruct(FILE *fp);
-extern void HAL_Encode_OpenArray(FILE *fp);
-extern void HAL_Encode_CloseArray(FILE *fp);
+extern Element* HAL_Encode_Array_Bool(Array_Bool value, Element* parent);
+extern Element* HAL_Encode_Array_string(Array_string value, Element* parent);
 
-extern void HAL_Encode_Array_Bool(FILE *fp, Array_Bool value);
-extern void HAL_Encode_Array_string(FILE *fp, Array_string value);
+extern Element* HAL_Encode_Array_uint8(Array_uint8 value, Element* parent);
+extern Element* HAL_Encode_Array_uint16(Array_uint16 value, Element* parent);
+extern Element* HAL_Encode_Array_uint32(Array_uint32 value, Element* parent);
+extern Element* HAL_Encode_Array_uint64(Array_uint64 value, Element* parent);
 
-extern void HAL_Encode_Array_uint8(FILE *fp, Array_uint8 value);
-extern void HAL_Encode_Array_uint16(FILE *fp, Array_uint16 value);
-extern void HAL_Encode_Array_uint32(FILE *fp, Array_uint32 value);
-extern void HAL_Encode_Array_uint64(FILE *fp, Array_uint64 value);
-
-extern void HAL_Encode_Array_int16(FILE *fp, Array_int16 value);
-extern void HAL_Encode_Array_int32(FILE *fp, Array_int32 value);
-extern void HAL_Encode_Array_int64(FILE *fp, Array_int64 value);
+extern Element* HAL_Encode_Array_int16(Array_int16 value, Element* parent);
+extern Element* HAL_Encode_Array_int32(Array_int32 value, Element* parent);
+extern Element* HAL_Encode_Array_int64(Array_int64 value, Element* parent);
 
 
 
-// These leave the file at the next character after the token.
-extern int64_t HAL_Decode_Int(FILE *fp);
-extern uint64_t HAL_Decode_UInt(FILE *fp);
-extern double HAL_Decode_Double(FILE *fp);
+// These decode an XML tree.
+extern int64_t HAL_Decode_Int(Element* elem);
+extern uint64_t HAL_Decode_UInt(Element* elem);
+extern double HAL_Decode_Double(Element* elem);
 
 // Ownership of the string is transferred to the caller
-extern const char* HAL_Decode_String(FILE *fp);
+extern const char* HAL_Decode_String(Element* elem);
 
-// These just skip the delimiters
-extern void HAL_Decode_OpenStruct(FILE *fp);
-extern void HAL_Decode_CloseStruct(FILE *fp);
-extern void HAL_Decode_OpenArray(FILE *fp);
-extern void HAL_Decode_CloseArray(FILE *fp);
-extern bool HAL_Decode_TestCloseArray(FILE *fp);
+extern void HAL_Decode_Array_Bool(Element* elem, Array_Bool *array);
+extern void HAL_Decode_Array_string(Element* elem, Array_string *array);
+extern void HAL_Decode_Array_double(Element* elem, Array_double *array);
 
-extern void HAL_Decode_Array_Bool(FILE *fp, Array_Bool *value);
-extern void HAL_Decode_Array_string(FILE *fp, Array_string *value);
-extern void HAL_Decode_Array_double(FILE *fp, Array_double *value);
+extern void HAL_Decode_Array_uint8(Element* elem, Array_uint8 *array);
+extern void HAL_Decode_Array_uint16(Element* elem, Array_uint16 *array);
+extern void HAL_Decode_Array_uint32(Element* elem, Array_uint32 *array);
+extern void HAL_Decode_Array_uint64(Element* elem, Array_uint64 *array);
 
-extern void HAL_Decode_Array_uint8(FILE *fp, Array_uint8 *value);
-extern void HAL_Decode_Array_uint16(FILE *fp, Array_uint16 *value);
-extern void HAL_Decode_Array_uint32(FILE *fp, Array_uint32 *value);
-extern void HAL_Decode_Array_uint64(FILE *fp, Array_uint64 *value);
-
-extern void HAL_Decode_Array_int16(FILE *fp, Array_int16 *value);
-extern void HAL_Decode_Array_int32(FILE *fp, Array_int32 *value);
-extern void HAL_Decode_Array_int64(FILE *fp, Array_int64 *value);
+extern void HAL_Decode_Array_int16(Element* elem, Array_int16 *array);
+extern void HAL_Decode_Array_int32(Element* elem, Array_int32 *array);
+extern void HAL_Decode_Array_int64(Element* elem, Array_int64 *array);
 
 //======================================================================
 #endif //ALLJOYN_HAL_H

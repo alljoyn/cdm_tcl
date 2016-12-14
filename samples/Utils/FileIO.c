@@ -14,44 +14,46 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
+
+#include <errno.h>
 #include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include <stdlib.h>
+#include <stddef.h>
+#include <string.h>
 
-#include "OffControlModelImpl.h"
-#include "../../../Utils/HAL.h"
+#include "FileIO.h"
 
-#include <ajtcl/cdm/interfaces/operation/OnOffStatusInterface.h>
-
-static const char* s_objPath = "/cdm/emulated";
+//======================================================================
 
 
-
-
-
-static AJ_Status MethodSwitchOff(void *context, const char *objPath)
+bool ReadFile(const char *filepath, StrBuf* outBuf)
 {
-    bool value = false;
+    char buf[BUFSIZ];
+    bool ok = false;
 
-    Element* elem = HAL_Encode_Bool(value, NULL);
-    HAL_WritePropertyElem(s_objPath, "OnOffStatus", "IsOn", elem);
-    BSXML_FreeElement(elem);
+    FILE* fp = fopen(filepath, "r");
 
-    OffControlModel* model = (OffControlModel*)context;
-    Cdm_OnOffStatus_EmitIsOnChanged(model->busAttachment, s_objPath, value);
+    if (fp) {
+        for (;;) {
+            int n = fread(buf, 1, BUFSIZ, fp);
 
-    return AJ_OK;
+            if (n > 0) {
+                StrBuf_AppendStrNum(outBuf, buf, n);
+            } else if (n == 0) {
+                ok = true;
+                break;
+            } else {
+                fprintf(stderr, "%s", filepath);
+                fprintf(stderr, ": %s\n", strerror(errno));
+                break;
+            }
+        }
+
+        fclose(fp);
+    }
+
+    return ok;
 }
 
+//======================================================================
 
-
-static OffControlModel model = {
-
-    MethodSwitchOff
-};
-
-
-OffControlModel *GetOffControlModel(void)
-{
-    return &model;
-}

@@ -14,44 +14,16 @@
  *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
+#ifndef ALLJOYN_LANGUAGEDISPLAY_MODELIMPL_H
+#define ALLJOYN_LANGUAGEDISPLAY_MODELIMPL_H
+
 #include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
 
-#include "OffControlModelImpl.h"
-#include "../../../Utils/HAL.h"
+#include <ajtcl/cdm/interfaces/userinterfacesettings/LanguageDisplayModel.h>
+#include <ajtcl/cdm/interfaces/userinterfacesettings/LanguageDisplayInterface.h>
 
-#include <ajtcl/cdm/interfaces/operation/OnOffStatusInterface.h>
+LanguageDisplayModel *GetLanguageDisplayModel(void);
 
-static const char* s_objPath = "/cdm/emulated";
+// REVISIT delete this
 
-
-
-
-
-static AJ_Status MethodSwitchOff(void *context, const char *objPath)
-{
-    bool value = false;
-
-    Element* elem = HAL_Encode_Bool(value, NULL);
-    HAL_WritePropertyElem(s_objPath, "OnOffStatus", "IsOn", elem);
-    BSXML_FreeElement(elem);
-
-    OffControlModel* model = (OffControlModel*)context;
-    Cdm_OnOffStatus_EmitIsOnChanged(model->busAttachment, s_objPath, value);
-
-    return AJ_OK;
-}
-
-
-
-static OffControlModel model = {
-
-    MethodSwitchOff
-};
-
-
-OffControlModel *GetOffControlModel(void)
-{
-    return &model;
-}
+#endif // ALLJOYN_LANGUAGEDISPLAY_MODELIMPL_H

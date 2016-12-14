@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetTargetValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "TargetValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "TargetValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "TargetTemperature", "TargetValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "TargetValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -64,9 +49,10 @@ static AJ_Status SetTargetValue(void *context, const char *objPath, double input
     AJ_Status result = AJ_OK;
     double value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "TargetTemperature", "TargetValue");
-    HAL_Encode_Double(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Double(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "TargetTemperature", "TargetValue", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -75,30 +61,17 @@ static AJ_Status GetMinValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "MinValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "MinValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "TargetTemperature", "MinValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "MinValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -107,30 +80,17 @@ static AJ_Status GetMaxValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "MaxValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "MaxValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "TargetTemperature", "MaxValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "MaxValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -139,30 +99,17 @@ static AJ_Status GetStepValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "StepValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "StepValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "TargetTemperature", "StepValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        double const value = {0};
-        HAL_Encode_Double(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "TargetTemperature", "StepValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     double value;
-    value = HAL_Decode_Double(fp);
+    value = HAL_Decode_Double(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetNumberOfHeatingZones(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "NumberOfHeatingZones");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "NumberOfHeatingZones");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "HeatingZone", "NumberOfHeatingZones");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "NumberOfHeatingZones");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -62,31 +47,18 @@ static AJ_Status GetMaxHeatingLevels(void *context, const char *objPath, Array_u
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "MaxHeatingLevels");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "MaxHeatingLevels");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "HeatingZone", "MaxHeatingLevels");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_uint8 const value = {0};
-        HAL_Encode_Array_uint8(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "MaxHeatingLevels");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_uint8 value;
-    HAL_Decode_Array_uint8(fp, &value);
+    HAL_Decode_Array_uint8(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -95,31 +67,18 @@ static AJ_Status GetHeatingLevels(void *context, const char *objPath, Array_uint
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "HeatingLevels");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "HeatingLevels");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "HeatingZone", "HeatingLevels");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_uint8 const value = {0};
-        HAL_Encode_Array_uint8(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "HeatingZone", "HeatingLevels");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_uint8 value;
-    HAL_Decode_Array_uint8(fp, &value);
+    HAL_Decode_Array_uint8(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

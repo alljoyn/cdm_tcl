@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetCurrentValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentHumidity", "CurrentValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentHumidity", "CurrentValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentHumidity", "CurrentValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentHumidity", "CurrentValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -62,30 +47,17 @@ static AJ_Status GetMaxValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentHumidity", "MaxValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentHumidity", "MaxValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentHumidity", "MaxValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentHumidity", "MaxValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

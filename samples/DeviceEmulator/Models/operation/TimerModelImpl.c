@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetReferenceTimer(void *context, const char *objPath, int32_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "ReferenceTimer");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Timer", "ReferenceTimer");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Timer", "ReferenceTimer");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int64_t const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Timer", "ReferenceTimer");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int64_t value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -62,30 +47,17 @@ static AJ_Status GetTargetTimeToStart(void *context, const char *objPath, int32_
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetTimeToStart");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetTimeToStart");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Timer", "TargetTimeToStart");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int64_t const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetTimeToStart");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int64_t value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -94,30 +66,17 @@ static AJ_Status GetTargetTimeToStop(void *context, const char *objPath, int32_t
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetTimeToStop");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetTimeToStop");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Timer", "TargetTimeToStop");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int64_t const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetTimeToStop");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int64_t value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -126,30 +85,17 @@ static AJ_Status GetEstimatedTimeToEnd(void *context, const char *objPath, int32
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "EstimatedTimeToEnd");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Timer", "EstimatedTimeToEnd");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Timer", "EstimatedTimeToEnd");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int64_t const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Timer", "EstimatedTimeToEnd");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int64_t value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -158,30 +104,17 @@ static AJ_Status GetRunningTime(void *context, const char *objPath, int32_t *out
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "RunningTime");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Timer", "RunningTime");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Timer", "RunningTime");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int64_t const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Timer", "RunningTime");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int64_t value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -190,30 +123,17 @@ static AJ_Status GetTargetDuration(void *context, const char *objPath, int32_t *
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetDuration");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetDuration");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Timer", "TargetDuration");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int64_t const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Timer", "TargetDuration");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int64_t value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -222,14 +142,9 @@ static AJ_Status GetTargetDuration(void *context, const char *objPath, int32_t *
 
 static AJ_Status MethodSetTargetTimeToStart(void *context, const char *objPath, int32_t targetTimeToStart)
 {
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "Timer", "SetTargetTimeToStart");
-
-    if (!fp) {
-        return AJ_ERR_FAILURE;
-    }
-
-    HAL_Encode_Int(fp, targetTimeToStart);
-    fclose(fp);
+    Element* elem = HAL_Encode_Int(targetTimeToStart, NULL);
+    HAL_WritePropertyElem(objPath, "Timer", "SetTargetTimeToStart", elem);
+    BSXML_FreeElement(elem);
     return AJ_OK;
 }
 
@@ -237,14 +152,9 @@ static AJ_Status MethodSetTargetTimeToStart(void *context, const char *objPath, 
 
 static AJ_Status MethodSetTargetTimeToStop(void *context, const char *objPath, int32_t targetTimeToStop)
 {
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "Timer", "SetTargetTimeToStop");
-
-    if (!fp) {
-        return AJ_ERR_FAILURE;
-    }
-
-    HAL_Encode_Int(fp, targetTimeToStop);
-    fclose(fp);
+    Element* elem = HAL_Encode_Int(targetTimeToStop, NULL);
+    HAL_WritePropertyElem(objPath, "Timer", "SetTargetTimeToStop", elem);
+    BSXML_FreeElement(elem);
     return AJ_OK;
 }
 

@@ -22,56 +22,48 @@
 #include "../../../Utils/HAL.h"
 
 
+static Element* HAL_Encode_WaterLevel_SupplySource(WaterLevel_SupplySource value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_WaterLevel_SupplySource(FILE* fp, WaterLevel_SupplySource value) UNUSED_OK;
-
-static int HAL_Encode_WaterLevel_SupplySource(FILE* fp, WaterLevel_SupplySource value)
+static Element* HAL_Encode_WaterLevel_SupplySource(WaterLevel_SupplySource value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Decode_WaterLevel_SupplySource(FILE* fp, WaterLevel_SupplySource* value) UNUSED_OK;
+static void HAL_Decode_WaterLevel_SupplySource(Element* elem, WaterLevel_SupplySource* value) UNUSED_OK;
 
-static int HAL_Decode_WaterLevel_SupplySource(FILE* fp, WaterLevel_SupplySource* value)
+static void HAL_Decode_WaterLevel_SupplySource(Element* elem, WaterLevel_SupplySource* value)
 {
-    *value = (WaterLevel_SupplySource)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    *value = (WaterLevel_SupplySource)(int)HAL_Decode_Int(elem);
 }
 
 
 
-static int HAL_Encode_Array_WaterLevel_SupplySource(FILE* fp, Array_WaterLevel_SupplySource value) UNUSED_OK;
+static Element* HAL_Encode_Array_WaterLevel_SupplySource(Array_WaterLevel_SupplySource value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Array_WaterLevel_SupplySource(FILE* fp, Array_WaterLevel_SupplySource value)
+static Element* HAL_Encode_Array_WaterLevel_SupplySource(Array_WaterLevel_SupplySource value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_WaterLevel_SupplySource(FILE* fp, Array_WaterLevel_SupplySource* value) UNUSED_OK;
+static void HAL_Decode_Array_WaterLevel_SupplySource(Element* elem, Array_WaterLevel_SupplySource* value) UNUSED_OK;
 
-static int HAL_Decode_Array_WaterLevel_SupplySource(FILE* fp, Array_WaterLevel_SupplySource* value)
+static void HAL_Decode_Array_WaterLevel_SupplySource(Element* elem, Array_WaterLevel_SupplySource* value)
 {
     InitArray_WaterLevel_SupplySource(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_WaterLevel_SupplySource(value, 1);
+            value->elems[j] = (WaterLevel_SupplySource)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_WaterLevel_SupplySource(value, 1);
-        value->elems[i] = (WaterLevel_SupplySource)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
@@ -81,30 +73,17 @@ static AJ_Status GetSupplySource(void *context, const char *objPath, WaterLevel_
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "SupplySource");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "SupplySource");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "WaterLevel", "SupplySource");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "SupplySource");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (WaterLevel_SupplySource)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -113,30 +92,17 @@ static AJ_Status GetCurrentLevel(void *context, const char *objPath, uint8_t *ou
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "CurrentLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "CurrentLevel");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "WaterLevel", "CurrentLevel");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "CurrentLevel");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -145,30 +111,17 @@ static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "MaxLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "MaxLevel");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "WaterLevel", "MaxLevel");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "WaterLevel", "MaxLevel");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

@@ -24,36 +24,21 @@
 
 
 
-
-
 static AJ_Status GetTargetValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "TargetValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "TargetValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "TargetHumidity", "TargetValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "TargetValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -64,9 +49,10 @@ static AJ_Status SetTargetValue(void *context, const char *objPath, uint8_t inpu
     AJ_Status result = AJ_OK;
     uint64_t value = input;
 
-    FILE* fp = HAL_WriteProperty("/cdm/emulated", "TargetHumidity", "TargetValue");
-    HAL_Encode_UInt(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_UInt(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "TargetHumidity", "TargetValue", elem);
+    BSXML_FreeElement(elem);
+
     return result;
 }
 
@@ -75,30 +61,17 @@ static AJ_Status GetMinValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "MinValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "MinValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "TargetHumidity", "MinValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "MinValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -107,30 +80,17 @@ static AJ_Status GetMaxValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "MaxValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "MaxValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "TargetHumidity", "MaxValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "MaxValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -139,30 +99,17 @@ static AJ_Status GetStepValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "StepValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "StepValue");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "TargetHumidity", "StepValue");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "StepValue");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -171,31 +118,18 @@ static AJ_Status GetSelectableHumidityLevels(void *context, const char *objPath,
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "SelectableHumidityLevels");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "SelectableHumidityLevels");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "TargetHumidity", "SelectableHumidityLevels");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_uint8 const value = {0};
-        HAL_Encode_Array_uint8(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "TargetHumidity", "SelectableHumidityLevels");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_uint8 value;
-    HAL_Decode_Array_uint8(fp, &value);
+    HAL_Decode_Array_uint8(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

@@ -23,173 +23,173 @@
 
 
 
+static Element* HAL_Encode_Alerts_AlertRecord(Alerts_AlertRecord value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_Alerts_AlertRecord(FILE* fp, Alerts_AlertRecord value) UNUSED_OK;
-
-static int HAL_Encode_Alerts_AlertRecord(FILE* fp, Alerts_AlertRecord value)
+static Element* HAL_Encode_Alerts_AlertRecord(Alerts_AlertRecord value, Element* parent)
 {
-    HAL_Encode_OpenStruct(fp);
-    HAL_Encode_Int(fp, value.severity);
-    HAL_Encode_UInt(fp, value.alertCode);
-    HAL_Encode_Int(fp, value.needAcknowledgement);
-    HAL_Encode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_Alerts_AlertRecord(FILE* fp, Alerts_AlertRecord* value) UNUSED_OK;
-
-static int HAL_Decode_Alerts_AlertRecord(FILE* fp, Alerts_AlertRecord* value)
-{
-    HAL_Decode_OpenStruct(fp);
-    value->severity = HAL_Decode_Int(fp);
-    value->alertCode = HAL_Decode_UInt(fp);
-    value->needAcknowledgement = HAL_Decode_Int(fp);
-    HAL_Decode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Encode_Array_Alerts_AlertRecord(FILE* fp, Array_Alerts_AlertRecord value) UNUSED_OK;
-
-static int HAL_Encode_Array_Alerts_AlertRecord(FILE* fp, Array_Alerts_AlertRecord value)
-{
-    HAL_Encode_OpenArray(fp);
-    for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Alerts_AlertRecord(fp, value.elems[i]);
+    Element* struc = BSXML_NewElement("struct", parent);
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "severity");
+        BSXML_AddChild(field, HAL_Encode_Int(value.severity, field));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "alertCode");
+        BSXML_AddChild(field, HAL_Encode_UInt(value.alertCode, field));
+    }
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "needAcknowledgement");
+        BSXML_AddChild(field, HAL_Encode_Int(value.needAcknowledgement, field));
+    }
+    return struc;
 }
 
 
-static int HAL_Decode_Array_Alerts_AlertRecord(FILE* fp, Array_Alerts_AlertRecord* value) UNUSED_OK;
 
-static int HAL_Decode_Array_Alerts_AlertRecord(FILE* fp, Array_Alerts_AlertRecord* value)
+static void HAL_Decode_Alerts_AlertRecord(Element* elem, Alerts_AlertRecord* value) UNUSED_OK;
+
+static void HAL_Decode_Alerts_AlertRecord(Element* elem, Alerts_AlertRecord* value)
+{
+    if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
+        value->severity = HAL_Decode_Int(elem->children[0]);
+        value->alertCode = HAL_Decode_UInt(elem->children[1]);
+        value->needAcknowledgement = HAL_Decode_Int(elem->children[2]);
+    }
+}
+
+
+
+static Element* HAL_Encode_Array_Alerts_AlertRecord(Array_Alerts_AlertRecord value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_Alerts_AlertRecord(Array_Alerts_AlertRecord value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
+    for (size_t i = 0; i < value.numElems; ++i) {
+        BSXML_AddChild(array, HAL_Encode_Alerts_AlertRecord(value.elems[i], array));
+    }
+    return array;
+}
+
+
+static void HAL_Decode_Array_Alerts_AlertRecord(Element* elem, Array_Alerts_AlertRecord* value) UNUSED_OK;
+
+static void HAL_Decode_Array_Alerts_AlertRecord(Element* elem, Array_Alerts_AlertRecord* value)
 {
     InitArray_Alerts_AlertRecord(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_Alerts_AlertRecord(value, 1);
+            HAL_Decode_Alerts_AlertRecord(elem->children[i], &value->elems[j]);
         }
-        size_t i = ExtendArray_Alerts_AlertRecord(value, 1);
-        HAL_Decode_Alerts_AlertRecord(fp, &value->elems[i]);
     }
-    return AJ_OK;
 }
 
 
 
-static int HAL_Encode_Alerts_AlertCodesDescriptor(FILE* fp, Alerts_AlertCodesDescriptor value) UNUSED_OK;
+static Element* HAL_Encode_Alerts_AlertCodesDescriptor(Alerts_AlertCodesDescriptor value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Alerts_AlertCodesDescriptor(FILE* fp, Alerts_AlertCodesDescriptor value)
+static Element* HAL_Encode_Alerts_AlertCodesDescriptor(Alerts_AlertCodesDescriptor value, Element* parent)
 {
-    HAL_Encode_OpenStruct(fp);
-    HAL_Encode_UInt(fp, value.alertCode);
-    HAL_Encode_String(fp, value.description);
-    HAL_Encode_CloseStruct(fp);
-    return AJ_OK;
+    Element* struc = BSXML_NewElement("struct", parent);
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "alertCode");
+        BSXML_AddChild(field, HAL_Encode_UInt(value.alertCode, field));
+    }
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "description");
+        BSXML_AddChild(field, HAL_Encode_String(value.description, field));
+    }
+    return struc;
 }
 
 
 
-static int HAL_Decode_Alerts_AlertCodesDescriptor(FILE* fp, Alerts_AlertCodesDescriptor* value) UNUSED_OK;
+static void HAL_Decode_Alerts_AlertCodesDescriptor(Element* elem, Alerts_AlertCodesDescriptor* value) UNUSED_OK;
 
-static int HAL_Decode_Alerts_AlertCodesDescriptor(FILE* fp, Alerts_AlertCodesDescriptor* value)
+static void HAL_Decode_Alerts_AlertCodesDescriptor(Element* elem, Alerts_AlertCodesDescriptor* value)
 {
-    HAL_Decode_OpenStruct(fp);
-    value->alertCode = HAL_Decode_UInt(fp);
-    value->description = HAL_Decode_String(fp);
-    HAL_Decode_CloseStruct(fp);
-    return AJ_OK;
+    if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 2) {
+        value->alertCode = HAL_Decode_UInt(elem->children[0]);
+        value->description = HAL_Decode_String(elem->children[1]);
+    }
 }
 
 
 
-static int HAL_Encode_Array_Alerts_AlertCodesDescriptor(FILE* fp, Array_Alerts_AlertCodesDescriptor value) UNUSED_OK;
+static Element* HAL_Encode_Array_Alerts_AlertCodesDescriptor(Array_Alerts_AlertCodesDescriptor value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Array_Alerts_AlertCodesDescriptor(FILE* fp, Array_Alerts_AlertCodesDescriptor value)
+static Element* HAL_Encode_Array_Alerts_AlertCodesDescriptor(Array_Alerts_AlertCodesDescriptor value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Alerts_AlertCodesDescriptor(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Alerts_AlertCodesDescriptor(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_Alerts_AlertCodesDescriptor(FILE* fp, Array_Alerts_AlertCodesDescriptor* value) UNUSED_OK;
+static void HAL_Decode_Array_Alerts_AlertCodesDescriptor(Element* elem, Array_Alerts_AlertCodesDescriptor* value) UNUSED_OK;
 
-static int HAL_Decode_Array_Alerts_AlertCodesDescriptor(FILE* fp, Array_Alerts_AlertCodesDescriptor* value)
+static void HAL_Decode_Array_Alerts_AlertCodesDescriptor(Element* elem, Array_Alerts_AlertCodesDescriptor* value)
 {
     InitArray_Alerts_AlertCodesDescriptor(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_Alerts_AlertCodesDescriptor(value, 1);
+            HAL_Decode_Alerts_AlertCodesDescriptor(elem->children[i], &value->elems[j]);
         }
-        size_t i = ExtendArray_Alerts_AlertCodesDescriptor(value, 1);
-        HAL_Decode_Alerts_AlertCodesDescriptor(fp, &value->elems[i]);
     }
-    return AJ_OK;
 }
 
 
-static int HAL_Encode_Alerts_Severity(FILE* fp, Alerts_Severity value) UNUSED_OK;
+static Element* HAL_Encode_Alerts_Severity(Alerts_Severity value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Alerts_Severity(FILE* fp, Alerts_Severity value)
+static Element* HAL_Encode_Alerts_Severity(Alerts_Severity value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_Alerts_Severity(FILE* fp, Alerts_Severity* value) UNUSED_OK;
-
-static int HAL_Decode_Alerts_Severity(FILE* fp, Alerts_Severity* value)
-{
-    *value = (Alerts_Severity)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Encode_Array_Alerts_Severity(FILE* fp, Array_Alerts_Severity value) UNUSED_OK;
+static void HAL_Decode_Alerts_Severity(Element* elem, Alerts_Severity* value) UNUSED_OK;
 
-static int HAL_Encode_Array_Alerts_Severity(FILE* fp, Array_Alerts_Severity value)
+static void HAL_Decode_Alerts_Severity(Element* elem, Alerts_Severity* value)
 {
-    HAL_Encode_OpenArray(fp);
+    *value = (Alerts_Severity)(int)HAL_Decode_Int(elem);
+}
+
+
+
+static Element* HAL_Encode_Array_Alerts_Severity(Array_Alerts_Severity value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_Alerts_Severity(Array_Alerts_Severity value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_Alerts_Severity(FILE* fp, Array_Alerts_Severity* value) UNUSED_OK;
+static void HAL_Decode_Array_Alerts_Severity(Element* elem, Array_Alerts_Severity* value) UNUSED_OK;
 
-static int HAL_Decode_Array_Alerts_Severity(FILE* fp, Array_Alerts_Severity* value)
+static void HAL_Decode_Array_Alerts_Severity(Element* elem, Array_Alerts_Severity* value)
 {
     InitArray_Alerts_Severity(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_Alerts_Severity(value, 1);
+            value->elems[j] = (Alerts_Severity)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_Alerts_Severity(value, 1);
-        value->elems[i] = (Alerts_Severity)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 static const char* BusPath = "/cdm/emulated";
@@ -233,31 +233,18 @@ static AJ_Status GetAlerts(void *context, const char *objPath, Array_Alerts_Aler
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "Alerts", "Alerts");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "Alerts", "Alerts");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "Alerts", "Alerts");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_Alerts_AlertRecord const value = {0};
-        HAL_Encode_Array_Alerts_AlertRecord(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "Alerts", "Alerts");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_Alerts_AlertRecord value;
-    HAL_Decode_Array_Alerts_AlertRecord(fp, &value);
+    HAL_Decode_Array_Alerts_AlertRecord(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

@@ -23,64 +23,68 @@
 
 
 
+static Element* HAL_Encode_DishWashingCyclePhase_CyclePhaseDescriptor(DishWashingCyclePhase_CyclePhaseDescriptor value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_DishWashingCyclePhase_CyclePhaseDescriptor(FILE* fp, DishWashingCyclePhase_CyclePhaseDescriptor value) UNUSED_OK;
-
-static int HAL_Encode_DishWashingCyclePhase_CyclePhaseDescriptor(FILE* fp, DishWashingCyclePhase_CyclePhaseDescriptor value)
+static Element* HAL_Encode_DishWashingCyclePhase_CyclePhaseDescriptor(DishWashingCyclePhase_CyclePhaseDescriptor value, Element* parent)
 {
-    HAL_Encode_OpenStruct(fp);
-    HAL_Encode_UInt(fp, value.phase);
-    HAL_Encode_String(fp, value.name);
-    HAL_Encode_String(fp, value.description);
-    HAL_Encode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Decode_DishWashingCyclePhase_CyclePhaseDescriptor(FILE* fp, DishWashingCyclePhase_CyclePhaseDescriptor* value) UNUSED_OK;
-
-static int HAL_Decode_DishWashingCyclePhase_CyclePhaseDescriptor(FILE* fp, DishWashingCyclePhase_CyclePhaseDescriptor* value)
-{
-    HAL_Decode_OpenStruct(fp);
-    value->phase = HAL_Decode_UInt(fp);
-    value->name = HAL_Decode_String(fp);
-    value->description = HAL_Decode_String(fp);
-    HAL_Decode_CloseStruct(fp);
-    return AJ_OK;
-}
-
-
-
-static int HAL_Encode_Array_DishWashingCyclePhase_CyclePhaseDescriptor(FILE* fp, Array_DishWashingCyclePhase_CyclePhaseDescriptor value) UNUSED_OK;
-
-static int HAL_Encode_Array_DishWashingCyclePhase_CyclePhaseDescriptor(FILE* fp, Array_DishWashingCyclePhase_CyclePhaseDescriptor value)
-{
-    HAL_Encode_OpenArray(fp);
-    for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_DishWashingCyclePhase_CyclePhaseDescriptor(fp, value.elems[i]);
+    Element* struc = BSXML_NewElement("struct", parent);
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "phase");
+        BSXML_AddChild(field, HAL_Encode_UInt(value.phase, field));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "name");
+        BSXML_AddChild(field, HAL_Encode_String(value.name, field));
+    }
+    {
+        Element* field = BSXML_NewElement("field", struc);
+        BSXML_AddAttribute(field, "name", "description");
+        BSXML_AddChild(field, HAL_Encode_String(value.description, field));
+    }
+    return struc;
 }
 
 
-static int HAL_Decode_Array_DishWashingCyclePhase_CyclePhaseDescriptor(FILE* fp, Array_DishWashingCyclePhase_CyclePhaseDescriptor* value) UNUSED_OK;
 
-static int HAL_Decode_Array_DishWashingCyclePhase_CyclePhaseDescriptor(FILE* fp, Array_DishWashingCyclePhase_CyclePhaseDescriptor* value)
+static void HAL_Decode_DishWashingCyclePhase_CyclePhaseDescriptor(Element* elem, DishWashingCyclePhase_CyclePhaseDescriptor* value) UNUSED_OK;
+
+static void HAL_Decode_DishWashingCyclePhase_CyclePhaseDescriptor(Element* elem, DishWashingCyclePhase_CyclePhaseDescriptor* value)
+{
+    if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
+        value->phase = HAL_Decode_UInt(elem->children[0]);
+        value->name = HAL_Decode_String(elem->children[1]);
+        value->description = HAL_Decode_String(elem->children[2]);
+    }
+}
+
+
+
+static Element* HAL_Encode_Array_DishWashingCyclePhase_CyclePhaseDescriptor(Array_DishWashingCyclePhase_CyclePhaseDescriptor value, Element* parent) UNUSED_OK;
+
+static Element* HAL_Encode_Array_DishWashingCyclePhase_CyclePhaseDescriptor(Array_DishWashingCyclePhase_CyclePhaseDescriptor value, Element* parent)
+{
+    Element* array = BSXML_NewElement("array", parent);
+    for (size_t i = 0; i < value.numElems; ++i) {
+        BSXML_AddChild(array, HAL_Encode_DishWashingCyclePhase_CyclePhaseDescriptor(value.elems[i], array));
+    }
+    return array;
+}
+
+
+static void HAL_Decode_Array_DishWashingCyclePhase_CyclePhaseDescriptor(Element* elem, Array_DishWashingCyclePhase_CyclePhaseDescriptor* value) UNUSED_OK;
+
+static void HAL_Decode_Array_DishWashingCyclePhase_CyclePhaseDescriptor(Element* elem, Array_DishWashingCyclePhase_CyclePhaseDescriptor* value)
 {
     InitArray_DishWashingCyclePhase_CyclePhaseDescriptor(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_DishWashingCyclePhase_CyclePhaseDescriptor(value, 1);
+            HAL_Decode_DishWashingCyclePhase_CyclePhaseDescriptor(elem->children[i], &value->elems[j]);
         }
-        size_t i = ExtendArray_DishWashingCyclePhase_CyclePhaseDescriptor(value, 1);
-        HAL_Decode_DishWashingCyclePhase_CyclePhaseDescriptor(fp, &value->elems[i]);
     }
-    return AJ_OK;
 }
 
 static Array_DishWashingCyclePhase_CyclePhaseDescriptor* getPhases(void)
@@ -117,30 +121,17 @@ static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "DishWashingCyclePhase", "CyclePhase");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "DishWashingCyclePhase", "CyclePhase");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "DishWashingCyclePhase", "CyclePhase");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "DishWashingCyclePhase", "CyclePhase");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -149,31 +140,18 @@ static AJ_Status GetSupportedCyclePhases(void *context, const char *objPath, Arr
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "DishWashingCyclePhase", "SupportedCyclePhases");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "DishWashingCyclePhase", "SupportedCyclePhases");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "DishWashingCyclePhase", "SupportedCyclePhases");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        Array_uint8 const value = {0};
-        HAL_Encode_Array_uint8(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "DishWashingCyclePhase", "SupportedCyclePhases");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     Array_uint8 value;
-    HAL_Decode_Array_uint8(fp, &value);
+    HAL_Decode_Array_uint8(elem, &value);
 
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 

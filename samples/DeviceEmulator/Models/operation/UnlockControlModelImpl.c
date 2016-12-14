@@ -21,8 +21,6 @@
 #include "UnlockControlModelImpl.h"
 #include "../../../Utils/HAL.h"
 
-
-
 #include <ajtcl/cdm/interfaces/operation/LockedStatusInterface.h>
 
 static const char* s_objPath = "/cdm/emulated";
@@ -35,14 +33,9 @@ static AJ_Status MethodUnlock(void *context, const char *objPath)
 {
     bool value = false;
 
-    FILE* fp = HAL_WriteProperty(s_objPath, "LockedStatus", "IsLocked");
-
-    if (!fp) {
-        return AJ_ERR_FAILURE;
-    }
-
-    HAL_Encode_Int(fp, value);
-    fclose(fp);
+    Element* elem = HAL_Encode_Bool(value, NULL);
+    HAL_WritePropertyElem(s_objPath, "LockedStatus", "IsLocked", elem);
+    BSXML_FreeElement(elem);
 
     UnlockControlModel* model = (UnlockControlModel*)context;
     Cdm_LockedStatus_EmitIsLockedChanged(model->busAttachment, s_objPath, value);

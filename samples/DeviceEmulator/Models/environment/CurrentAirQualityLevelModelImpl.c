@@ -22,56 +22,48 @@
 #include "../../../Utils/HAL.h"
 
 
+static Element* HAL_Encode_CurrentAirQualityLevel_ContaminantType(CurrentAirQualityLevel_ContaminantType value, Element* parent) UNUSED_OK;
 
-
-static int HAL_Encode_CurrentAirQualityLevel_ContaminantType(FILE* fp, CurrentAirQualityLevel_ContaminantType value) UNUSED_OK;
-
-static int HAL_Encode_CurrentAirQualityLevel_ContaminantType(FILE* fp, CurrentAirQualityLevel_ContaminantType value)
+static Element* HAL_Encode_CurrentAirQualityLevel_ContaminantType(CurrentAirQualityLevel_ContaminantType value, Element* parent)
 {
-    HAL_Encode_Int(fp, value);
-    return AJ_OK;
+    return HAL_Encode_Int(value, parent);
 }
 
 
 
-static int HAL_Decode_CurrentAirQualityLevel_ContaminantType(FILE* fp, CurrentAirQualityLevel_ContaminantType* value) UNUSED_OK;
+static void HAL_Decode_CurrentAirQualityLevel_ContaminantType(Element* elem, CurrentAirQualityLevel_ContaminantType* value) UNUSED_OK;
 
-static int HAL_Decode_CurrentAirQualityLevel_ContaminantType(FILE* fp, CurrentAirQualityLevel_ContaminantType* value)
+static void HAL_Decode_CurrentAirQualityLevel_ContaminantType(Element* elem, CurrentAirQualityLevel_ContaminantType* value)
 {
-    *value = (CurrentAirQualityLevel_ContaminantType)(int)HAL_Decode_Int(fp);
-    return AJ_OK;
+    *value = (CurrentAirQualityLevel_ContaminantType)(int)HAL_Decode_Int(elem);
 }
 
 
 
-static int HAL_Encode_Array_CurrentAirQualityLevel_ContaminantType(FILE* fp, Array_CurrentAirQualityLevel_ContaminantType value) UNUSED_OK;
+static Element* HAL_Encode_Array_CurrentAirQualityLevel_ContaminantType(Array_CurrentAirQualityLevel_ContaminantType value, Element* parent) UNUSED_OK;
 
-static int HAL_Encode_Array_CurrentAirQualityLevel_ContaminantType(FILE* fp, Array_CurrentAirQualityLevel_ContaminantType value)
+static Element* HAL_Encode_Array_CurrentAirQualityLevel_ContaminantType(Array_CurrentAirQualityLevel_ContaminantType value, Element* parent)
 {
-    HAL_Encode_OpenArray(fp);
+    Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        HAL_Encode_Int(fp, value.elems[i]);
+        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
     }
-    HAL_Encode_CloseArray(fp);
-    return AJ_OK;
+    return array;
 }
 
 
-static int HAL_Decode_Array_CurrentAirQualityLevel_ContaminantType(FILE* fp, Array_CurrentAirQualityLevel_ContaminantType* value) UNUSED_OK;
+static void HAL_Decode_Array_CurrentAirQualityLevel_ContaminantType(Element* elem, Array_CurrentAirQualityLevel_ContaminantType* value) UNUSED_OK;
 
-static int HAL_Decode_Array_CurrentAirQualityLevel_ContaminantType(FILE* fp, Array_CurrentAirQualityLevel_ContaminantType* value)
+static void HAL_Decode_Array_CurrentAirQualityLevel_ContaminantType(Element* elem, Array_CurrentAirQualityLevel_ContaminantType* value)
 {
     InitArray_CurrentAirQualityLevel_ContaminantType(value, 0);
 
-    HAL_Decode_OpenArray(fp);
-    for (;;) {
-        if (HAL_Decode_TestCloseArray(fp)) {
-            break;
+    if (strcmp(elem->name, "array") == 0) {
+        for (size_t i = 0; i < value->numElems; ++i) {
+            size_t j = ExtendArray_CurrentAirQualityLevel_ContaminantType(value, 1);
+            value->elems[j] = (CurrentAirQualityLevel_ContaminantType)(int)HAL_Decode_Int(elem->children[i]);
         }
-        size_t i = ExtendArray_CurrentAirQualityLevel_ContaminantType(value, 1);
-        value->elems[i] = (CurrentAirQualityLevel_ContaminantType)(int)HAL_Decode_Int(fp);
     }
-    return AJ_OK;
 }
 
 
@@ -81,30 +73,17 @@ static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentA
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "ContaminantType");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "ContaminantType");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentAirQualityLevel", "ContaminantType");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        int const value = {0};
-        HAL_Encode_Int(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "ContaminantType");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     int value;
-    value = HAL_Decode_Int(fp);
+    value = HAL_Decode_Int(elem);
     *out = (CurrentAirQualityLevel_ContaminantType)(int)value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -113,30 +92,17 @@ static AJ_Status GetCurrentLevel(void *context, const char *objPath, uint8_t *ou
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "CurrentLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "CurrentLevel");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentAirQualityLevel", "CurrentLevel");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "CurrentLevel");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -145,30 +111,17 @@ static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
 
-    FILE* fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "MaxLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "MaxLevel");
 
-    if (!fp) {
-        fp = HAL_WriteProperty("/cdm/emulated", "CurrentAirQualityLevel", "MaxLevel");
-
-        if (!fp) {
-            return AJ_ERR_FAILURE;
-        }
-
-        uint64_t const value = {0};
-        HAL_Encode_UInt(fp, value);
-        fclose(fp);
-    }
-
-    fp = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "MaxLevel");
-
-    if (!fp) {
+    if (!elem) {
         return AJ_ERR_FAILURE;
     }
 
     uint64_t value;
-    value = HAL_Decode_UInt(fp);
+    value = HAL_Decode_UInt(elem);
     *out = value;
-    fclose(fp);
+
+    BSXML_FreeElement(elem);
     return result;
 }
 
