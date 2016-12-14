@@ -27,18 +27,16 @@
 static AJ_Status GetIsOn(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
+    bool value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "OnOffStatus", "IsOn");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.OnOffStatus", "IsOn");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Bool(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int64_t value;
-    value = HAL_Decode_Int(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

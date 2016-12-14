@@ -72,18 +72,16 @@ static void HAL_Decode_Array_MoistureOutputLevel_AutoMode(Element* elem, Array_M
 static AJ_Status GetMoistureOutputLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MoistureOutputLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.MoistureOutputLevel", "MoistureOutputLevel");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -95,7 +93,7 @@ static AJ_Status SetMoistureOutputLevel(void *context, const char *objPath, uint
     uint64_t value = input;
 
     Element* elem = HAL_Encode_UInt(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "MoistureOutputLevel", "MoistureOutputLevel", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.MoistureOutputLevel", "MoistureOutputLevel", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -105,18 +103,16 @@ static AJ_Status SetMoistureOutputLevel(void *context, const char *objPath, uint
 static AJ_Status GetMaxMoistureOutputLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "MaxMoistureOutputLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.MoistureOutputLevel", "MaxMoistureOutputLevel");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -124,18 +120,16 @@ static AJ_Status GetMaxMoistureOutputLevel(void *context, const char *objPath, u
 static AJ_Status GetAutoMode(void *context, const char *objPath, MoistureOutputLevel_AutoMode *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "MoistureOutputLevel", "AutoMode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.MoistureOutputLevel", "AutoMode");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (MoistureOutputLevel_AutoMode)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -147,7 +141,7 @@ static AJ_Status SetAutoMode(void *context, const char *objPath, MoistureOutputL
     int value = input;
 
     Element* elem = HAL_Encode_Int(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "MoistureOutputLevel", "AutoMode", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.MoistureOutputLevel", "AutoMode", elem);
     BSXML_FreeElement(elem);
 
     return result;

@@ -21,6 +21,8 @@ srcs = env.Glob('*.c')
 srcs += env.Glob('../Utils/*.c')
 srcs += env.Glob('Models/operation/*.c')
 srcs += env.Glob('Models/environment/*.c')
+srcs += env.Glob('Models/input/*.c')
+srcs += env.Glob('Models/userinterfacesettings/*.c')
 
 objs = env.Object(srcs)
 

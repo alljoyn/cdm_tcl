@@ -117,18 +117,16 @@ static void HAL_Decode_Array_CycleControl_OperationalCommands(Element* elem, Arr
 static AJ_Status GetOperationalState(void *context, const char *objPath, CycleControl_OperationalState *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CycleControl", "OperationalState");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.CycleControl", "OperationalState");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (CycleControl_OperationalState)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -136,19 +134,17 @@ static AJ_Status GetOperationalState(void *context, const char *objPath, CycleCo
 static AJ_Status GetSupportedOperationalStates(void *context, const char *objPath, Array_CycleControl_OperationalState *out)
 {
     AJ_Status result = AJ_OK;
+    Array_CycleControl_OperationalState value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalStates");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.CycleControl", "SupportedOperationalStates");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        HAL_Decode_Array_CycleControl_OperationalState(elem, &value);
+
+        BSXML_FreeElement(elem);
     }
 
-    Array_CycleControl_OperationalState value;
-    HAL_Decode_Array_CycleControl_OperationalState(elem, &value);
-
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -156,19 +152,17 @@ static AJ_Status GetSupportedOperationalStates(void *context, const char *objPat
 static AJ_Status GetSupportedOperationalCommands(void *context, const char *objPath, Array_CycleControl_OperationalCommands *out)
 {
     AJ_Status result = AJ_OK;
+    Array_CycleControl_OperationalCommands value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CycleControl", "SupportedOperationalCommands");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.CycleControl", "SupportedOperationalCommands");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        HAL_Decode_Array_CycleControl_OperationalCommands(elem, &value);
+
+        BSXML_FreeElement(elem);
     }
 
-    Array_CycleControl_OperationalCommands value;
-    HAL_Decode_Array_CycleControl_OperationalCommands(elem, &value);
-
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

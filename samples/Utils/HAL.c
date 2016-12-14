@@ -385,6 +385,26 @@ Element* HAL_Encode_Array_int64(Array_int64 value, Element* parent)
 //======================================================================
 
 
+bool HAL_Decode_Bool(Element* elem)
+{
+    bool v = 0;
+
+    if (strcmp(elem->name, "scalar") == 0)
+    {
+        const char* atype  = BSXML_GetAttribute(elem, "type");
+        const char* avalue = BSXML_GetAttribute(elem, "value");
+
+        if (strcmp(atype, "bool") == 0)
+        {
+            v = strcmp(avalue, "true") == 0;
+        }
+    }
+
+    return v;
+}
+
+
+
 int64_t HAL_Decode_Int(Element* elem)
 {
     int64_t v = 0;

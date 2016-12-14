@@ -41,7 +41,7 @@ static Element* HAL_Encode_PlugInUnits_PlugInInfo(PlugInUnits_PlugInInfo value, 
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "pluggedIn");
-        BSXML_AddChild(field, HAL_Encode_Int(value.pluggedIn, field));
+        BSXML_AddChild(field, HAL_Encode_Bool(value.pluggedIn, field));
     }
     return struc;
 }
@@ -55,7 +55,7 @@ static void HAL_Decode_PlugInUnits_PlugInInfo(Element* elem, PlugInUnits_PlugInI
     if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
         value->objectPath = HAL_Decode_String(elem->children[0]);
         value->deviceId = HAL_Decode_UInt(elem->children[1]);
-        value->pluggedIn = HAL_Decode_Int(elem->children[2]);
+        value->pluggedIn = HAL_Decode_Bool(elem->children[2]);
     }
 }
 
@@ -93,19 +93,17 @@ static void HAL_Decode_Array_PlugInUnits_PlugInInfo(Element* elem, Array_PlugInU
 static AJ_Status GetPlugInUnits(void *context, const char *objPath, Array_PlugInUnits_PlugInInfo *out)
 {
     AJ_Status result = AJ_OK;
+    Array_PlugInUnits_PlugInInfo value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "PlugInUnits", "PlugInUnits");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.PlugInUnits", "PlugInUnits");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        HAL_Decode_Array_PlugInUnits_PlugInInfo(elem, &value);
+
+        BSXML_FreeElement(elem);
     }
 
-    Array_PlugInUnits_PlugInInfo value;
-    HAL_Decode_Array_PlugInUnits_PlugInInfo(elem, &value);
-
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

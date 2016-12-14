@@ -27,18 +27,16 @@
 static AJ_Status GetVolume(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Volume");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVolume", "Volume");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -50,7 +48,7 @@ static AJ_Status SetVolume(void *context, const char *objPath, uint8_t input)
     uint64_t value = input;
 
     Element* elem = HAL_Encode_UInt(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "AudioVolume", "Volume", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVolume", "Volume", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -60,18 +58,16 @@ static AJ_Status SetVolume(void *context, const char *objPath, uint8_t input)
 static AJ_Status GetMaxVolume(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "MaxVolume");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVolume", "MaxVolume");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -79,18 +75,16 @@ static AJ_Status GetMaxVolume(void *context, const char *objPath, uint8_t *out)
 static AJ_Status GetMute(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
+    bool value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVolume", "Mute");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVolume", "Mute");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Bool(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int64_t value;
-    value = HAL_Decode_Int(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -99,10 +93,10 @@ static AJ_Status GetMute(void *context, const char *objPath, bool *out)
 static AJ_Status SetMute(void *context, const char *objPath, bool input)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = input;
+    bool value = input;
 
-    Element* elem = HAL_Encode_Int(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "AudioVolume", "Mute", elem);
+    Element* elem = HAL_Encode_Bool(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVolume", "Mute", elem);
     BSXML_FreeElement(elem);
 
     return result;

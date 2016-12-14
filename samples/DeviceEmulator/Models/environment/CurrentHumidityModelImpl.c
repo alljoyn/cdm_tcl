@@ -27,18 +27,16 @@
 static AJ_Status GetCurrentValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentHumidity", "CurrentValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentHumidity", "CurrentValue");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -46,18 +44,16 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, uint8_t *ou
 static AJ_Status GetMaxValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentHumidity", "MaxValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentHumidity", "MaxValue");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

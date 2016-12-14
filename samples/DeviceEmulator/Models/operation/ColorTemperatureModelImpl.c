@@ -27,18 +27,16 @@
 static AJ_Status GetTemperature(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "Temperature");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.ColorTemperature", "Temperature");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -50,7 +48,7 @@ static AJ_Status SetTemperature(void *context, const char *objPath, double input
     double value = input;
 
     Element* elem = HAL_Encode_Double(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "ColorTemperature", "Temperature", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.ColorTemperature", "Temperature", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -60,18 +58,16 @@ static AJ_Status SetTemperature(void *context, const char *objPath, double input
 static AJ_Status GetMinTemperature(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "MinTemperature");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.ColorTemperature", "MinTemperature");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -79,18 +75,16 @@ static AJ_Status GetMinTemperature(void *context, const char *objPath, double *o
 static AJ_Status GetMaxTemperature(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "ColorTemperature", "MaxTemperature");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.ColorTemperature", "MaxTemperature");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

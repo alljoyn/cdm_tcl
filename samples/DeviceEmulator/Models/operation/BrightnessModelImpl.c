@@ -27,18 +27,16 @@
 static AJ_Status GetBrightness(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "Brightness", "Brightness");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.Brightness", "Brightness");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -50,7 +48,7 @@ static AJ_Status SetBrightness(void *context, const char *objPath, double input)
     double value = input;
 
     Element* elem = HAL_Encode_Double(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "Brightness", "Brightness", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.Brightness", "Brightness", elem);
     BSXML_FreeElement(elem);
 
     return result;

@@ -27,18 +27,16 @@
 static AJ_Status GetCurrentValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "BatteryStatus", "CurrentValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.BatteryStatus", "CurrentValue");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -46,18 +44,16 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, uint8_t *ou
 static AJ_Status GetIsCharging(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
+    bool value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "BatteryStatus", "IsCharging");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.BatteryStatus", "IsCharging");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Bool(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int64_t value;
-    value = HAL_Decode_Int(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

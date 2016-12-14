@@ -41,7 +41,7 @@ static Element* HAL_Encode_Alerts_AlertRecord(Alerts_AlertRecord value, Element*
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "needAcknowledgement");
-        BSXML_AddChild(field, HAL_Encode_Int(value.needAcknowledgement, field));
+        BSXML_AddChild(field, HAL_Encode_Bool(value.needAcknowledgement, field));
     }
     return struc;
 }
@@ -55,7 +55,7 @@ static void HAL_Decode_Alerts_AlertRecord(Element* elem, Alerts_AlertRecord* val
     if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
         value->severity = HAL_Decode_Int(elem->children[0]);
         value->alertCode = HAL_Decode_UInt(elem->children[1]);
-        value->needAcknowledgement = HAL_Decode_Int(elem->children[2]);
+        value->needAcknowledgement = HAL_Decode_Bool(elem->children[2]);
     }
 }
 
@@ -232,19 +232,17 @@ static void CopyAlerts_AlertCodesDescriptor(Alerts_AlertCodesDescriptor* value, 
 static AJ_Status GetAlerts(void *context, const char *objPath, Array_Alerts_AlertRecord *out)
 {
     AJ_Status result = AJ_OK;
+    Array_Alerts_AlertRecord value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "Alerts", "Alerts");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.Alerts", "Alerts");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        HAL_Decode_Array_Alerts_AlertRecord(elem, &value);
+
+        BSXML_FreeElement(elem);
     }
 
-    Array_Alerts_AlertRecord value;
-    HAL_Decode_Array_Alerts_AlertRecord(elem, &value);
-
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

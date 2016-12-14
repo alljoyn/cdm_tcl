@@ -34,7 +34,7 @@ static AJ_Status MethodSwitchOn(void *context, const char *objPath)
     bool value = true;
 
     Element* elem = HAL_Encode_Bool(value, NULL);
-    HAL_WritePropertyElem(s_objPath, "OnOffStatus", "IsOn", elem);
+    HAL_WritePropertyElem(s_objPath, "org.alljoyn.SmartSpaces.Operation.OnOffStatus", "IsOn", elem);
     BSXML_FreeElement(elem);
 
     OnControlModel* model = (OnControlModel*)context;

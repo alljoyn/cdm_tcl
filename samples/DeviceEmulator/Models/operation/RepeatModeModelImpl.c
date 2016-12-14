@@ -27,18 +27,16 @@
 static AJ_Status GetRepeatMode(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
+    bool value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "RepeatMode", "RepeatMode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.RepeatMode", "RepeatMode");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Bool(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int64_t value;
-    value = HAL_Decode_Int(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -47,10 +45,10 @@ static AJ_Status GetRepeatMode(void *context, const char *objPath, bool *out)
 static AJ_Status SetRepeatMode(void *context, const char *objPath, bool input)
 {
     AJ_Status result = AJ_OK;
-    int64_t value = input;
+    bool value = input;
 
-    Element* elem = HAL_Encode_Int(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "RepeatMode", "RepeatMode", elem);
+    Element* elem = HAL_Encode_Bool(value, NULL);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.RepeatMode", "RepeatMode", elem);
     BSXML_FreeElement(elem);
 
     return result;

@@ -72,18 +72,16 @@ static void HAL_Decode_Array_FanSpeedLevel_AutoMode(Element* elem, Array_FanSpee
 static AJ_Status GetFanSpeedLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "FanSpeedLevel", "FanSpeedLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.FanSpeedLevel", "FanSpeedLevel");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -95,7 +93,7 @@ static AJ_Status SetFanSpeedLevel(void *context, const char *objPath, uint8_t in
     uint64_t value = input;
 
     Element* elem = HAL_Encode_UInt(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "FanSpeedLevel", "FanSpeedLevel", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.FanSpeedLevel", "FanSpeedLevel", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -105,18 +103,16 @@ static AJ_Status SetFanSpeedLevel(void *context, const char *objPath, uint8_t in
 static AJ_Status GetMaxFanSpeedLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "FanSpeedLevel", "MaxFanSpeedLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.FanSpeedLevel", "MaxFanSpeedLevel");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -124,18 +120,16 @@ static AJ_Status GetMaxFanSpeedLevel(void *context, const char *objPath, uint8_t
 static AJ_Status GetAutoMode(void *context, const char *objPath, FanSpeedLevel_AutoMode *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "FanSpeedLevel", "AutoMode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.FanSpeedLevel", "AutoMode");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (FanSpeedLevel_AutoMode)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -147,7 +141,7 @@ static AJ_Status SetAutoMode(void *context, const char *objPath, FanSpeedLevel_A
     int value = input;
 
     Element* elem = HAL_Encode_Int(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "FanSpeedLevel", "AutoMode", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.FanSpeedLevel", "AutoMode", elem);
     BSXML_FreeElement(elem);
 
     return result;

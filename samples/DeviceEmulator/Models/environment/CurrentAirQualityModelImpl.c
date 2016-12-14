@@ -72,18 +72,16 @@ static void HAL_Decode_Array_CurrentAirQuality_ContaminantType(Element* elem, Ar
 static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentAirQuality_ContaminantType *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "ContaminantType");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentAirQuality", "ContaminantType");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (CurrentAirQuality_ContaminantType)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -91,18 +89,16 @@ static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentA
 static AJ_Status GetCurrentValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "CurrentValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentAirQuality", "CurrentValue");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -110,18 +106,16 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, double *out
 static AJ_Status GetMinValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MinValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentAirQuality", "MinValue");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -129,18 +123,16 @@ static AJ_Status GetMinValue(void *context, const char *objPath, double *out)
 static AJ_Status GetMaxValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "MaxValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentAirQuality", "MaxValue");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -148,18 +140,16 @@ static AJ_Status GetMaxValue(void *context, const char *objPath, double *out)
 static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "Precision");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentAirQuality", "Precision");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -167,18 +157,16 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQuality", "UpdateMinTime");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentAirQuality", "UpdateMinTime");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

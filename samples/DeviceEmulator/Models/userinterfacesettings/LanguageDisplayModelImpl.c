@@ -27,18 +27,16 @@
 static AJ_Status GetDisplayLanguage(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
+    char const* value = "";
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "LanguageDisplay", "DisplayLanguage");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.UserInterfaceSettings.LanguageDisplay", "DisplayLanguage");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_String(elem);
+        BSXML_FreeElement(elem);
     }
 
-    char const* value;
-    value = HAL_Decode_String(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -50,7 +48,7 @@ static AJ_Status SetDisplayLanguage(void *context, const char *objPath, char con
     char const* value = input;
 
     Element* elem = HAL_Encode_String(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "LanguageDisplay", "DisplayLanguage", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.UserInterfaceSettings.LanguageDisplay", "DisplayLanguage", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -60,19 +58,17 @@ static AJ_Status SetDisplayLanguage(void *context, const char *objPath, char con
 static AJ_Status GetSupportedDisplayLanguages(void *context, const char *objPath, Array_string *out)
 {
     AJ_Status result = AJ_OK;
+    Array_string value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "LanguageDisplay", "SupportedDisplayLanguages");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.UserInterfaceSettings.LanguageDisplay", "SupportedDisplayLanguages");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        HAL_Decode_Array_string(elem, &value);
+
+        BSXML_FreeElement(elem);
     }
 
-    Array_string value;
-    HAL_Decode_Array_string(elem, &value);
-
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

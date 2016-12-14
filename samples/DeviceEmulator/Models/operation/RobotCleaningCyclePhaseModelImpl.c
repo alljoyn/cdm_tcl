@@ -114,18 +114,16 @@ static Array_RobotCleaningCyclePhase_CyclePhaseDescriptor* getPhases(void)
 static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "RobotCleaningCyclePhase", "CyclePhase");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.RobotCleaningCyclePhase", "CyclePhase");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -133,19 +131,17 @@ static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
 static AJ_Status GetSupportedCyclePhases(void *context, const char *objPath, Array_uint8 *out)
 {
     AJ_Status result = AJ_OK;
+    Array_uint8 value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "RobotCleaningCyclePhase", "SupportedCyclePhases");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.RobotCleaningCyclePhase", "SupportedCyclePhases");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        HAL_Decode_Array_uint8(elem, &value);
+
+        BSXML_FreeElement(elem);
     }
 
-    Array_uint8 value;
-    HAL_Decode_Array_uint8(elem, &value);
-
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

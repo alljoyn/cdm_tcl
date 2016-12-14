@@ -72,18 +72,16 @@ static void HAL_Decode_Array_HvacFanMode_Mode(Element* elem, Array_HvacFanMode_M
 static AJ_Status GetMode(void *context, const char *objPath, HvacFanMode_Mode *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "Mode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.HvacFanMode", "Mode");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (HvacFanMode_Mode)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -95,7 +93,7 @@ static AJ_Status SetMode(void *context, const char *objPath, HvacFanMode_Mode in
     int value = input;
 
     Element* elem = HAL_Encode_Int(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "HvacFanMode", "Mode", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.HvacFanMode", "Mode", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -105,19 +103,17 @@ static AJ_Status SetMode(void *context, const char *objPath, HvacFanMode_Mode in
 static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_HvacFanMode_Mode *out)
 {
     AJ_Status result = AJ_OK;
+    Array_HvacFanMode_Mode value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "HvacFanMode", "SupportedModes");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.HvacFanMode", "SupportedModes");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        HAL_Decode_Array_HvacFanMode_Mode(elem, &value);
+
+        BSXML_FreeElement(elem);
     }
 
-    Array_HvacFanMode_Mode value;
-    HAL_Decode_Array_HvacFanMode_Mode(elem, &value);
-
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

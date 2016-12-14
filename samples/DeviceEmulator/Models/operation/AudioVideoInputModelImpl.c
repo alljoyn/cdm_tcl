@@ -195,18 +195,16 @@ static void HAL_Decode_Array_AudioVideoInput_SignalPresence(Element* elem, Array
 static AJ_Status GetInputSourceId(void *context, const char *objPath, AudioVideoInput_SourceType *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "InputSourceId");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVideoInput", "InputSourceId");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (AudioVideoInput_SourceType)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -218,7 +216,7 @@ static AJ_Status SetInputSourceId(void *context, const char *objPath, AudioVideo
     int value = input;
 
     Element* elem = HAL_Encode_Int(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "AudioVideoInput", "InputSourceId", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVideoInput", "InputSourceId", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -228,19 +226,17 @@ static AJ_Status SetInputSourceId(void *context, const char *objPath, AudioVideo
 static AJ_Status GetSupportedInputSources(void *context, const char *objPath, Array_AudioVideoInput_InputSource *out)
 {
     AJ_Status result = AJ_OK;
+    Array_AudioVideoInput_InputSource value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "SupportedInputSources");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVideoInput", "SupportedInputSources");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        HAL_Decode_Array_AudioVideoInput_InputSource(elem, &value);
+
+        BSXML_FreeElement(elem);
     }
 
-    Array_AudioVideoInput_InputSource value;
-    HAL_Decode_Array_AudioVideoInput_InputSource(elem, &value);
-
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

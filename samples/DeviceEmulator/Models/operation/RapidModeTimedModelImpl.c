@@ -27,18 +27,16 @@
 static AJ_Status GetRapidModeMinutesRemaining(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "RapidModeMinutesRemaining");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.RapidModeTimed", "RapidModeMinutesRemaining");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -50,7 +48,7 @@ static AJ_Status SetRapidModeMinutesRemaining(void *context, const char *objPath
     uint64_t value = input;
 
     Element* elem = HAL_Encode_UInt(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "RapidModeTimed", "RapidModeMinutesRemaining", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.RapidModeTimed", "RapidModeMinutesRemaining", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -60,18 +58,16 @@ static AJ_Status SetRapidModeMinutesRemaining(void *context, const char *objPath
 static AJ_Status GetMaxSetMinutes(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "RapidModeTimed", "MaxSetMinutes");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.RapidModeTimed", "MaxSetMinutes");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

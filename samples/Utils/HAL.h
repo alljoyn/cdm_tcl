@@ -57,6 +57,7 @@ extern Element* HAL_Encode_Array_int64(Array_int64 value, Element* parent);
 
 
 // These decode an XML tree.
+extern bool HAL_Decode_Bool(Element* elem);
 extern int64_t HAL_Decode_Int(Element* elem);
 extern uint64_t HAL_Decode_UInt(Element* elem);
 extern double HAL_Decode_Double(Element* elem);

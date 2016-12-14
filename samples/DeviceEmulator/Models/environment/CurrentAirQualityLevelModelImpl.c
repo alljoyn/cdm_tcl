@@ -72,18 +72,16 @@ static void HAL_Decode_Array_CurrentAirQualityLevel_ContaminantType(Element* ele
 static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentAirQualityLevel_ContaminantType *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "ContaminantType");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentAirQualityLevel", "ContaminantType");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (CurrentAirQualityLevel_ContaminantType)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -91,18 +89,16 @@ static AJ_Status GetContaminantType(void *context, const char *objPath, CurrentA
 static AJ_Status GetCurrentLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "CurrentLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentAirQualityLevel", "CurrentLevel");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -110,18 +106,16 @@ static AJ_Status GetCurrentLevel(void *context, const char *objPath, uint8_t *ou
 static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentAirQualityLevel", "MaxLevel");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentAirQualityLevel", "MaxLevel");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

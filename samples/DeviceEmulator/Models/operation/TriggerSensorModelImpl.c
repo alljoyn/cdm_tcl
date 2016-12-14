@@ -27,18 +27,16 @@
 static AJ_Status GetCurrentlyTriggered(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
+    bool value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "TriggerSensor", "CurrentlyTriggered");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.TriggerSensor", "CurrentlyTriggered");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Bool(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int64_t value;
-    value = HAL_Decode_Int(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 

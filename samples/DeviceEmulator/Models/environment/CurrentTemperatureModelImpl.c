@@ -27,18 +27,16 @@
 static AJ_Status GetCurrentValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentTemperature", "CurrentValue");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentTemperature", "CurrentValue");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -46,18 +44,16 @@ static AJ_Status GetCurrentValue(void *context, const char *objPath, double *out
 static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
+    double value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentTemperature", "Precision");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentTemperature", "Precision");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Double(elem);
+        BSXML_FreeElement(elem);
     }
 
-    double value;
-    value = HAL_Decode_Double(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -65,18 +61,16 @@ static AJ_Status GetPrecision(void *context, const char *objPath, double *out)
 static AJ_Status GetUpdateMinTime(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "CurrentTemperature", "UpdateMinTime");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.CurrentTemperature", "UpdateMinTime");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
