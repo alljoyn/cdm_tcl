@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ *  *    Copyright (c) Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright (c) Open Connectivity Foundation and Contributors to AllSeen
+ *    Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -72,18 +85,16 @@ static void HAL_Decode_Array_WindDirection_AutoMode(Element* elem, Array_WindDir
 static AJ_Status GetHorizontalDirection(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalDirection");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "HorizontalDirection");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -95,7 +106,7 @@ static AJ_Status SetHorizontalDirection(void *context, const char *objPath, uint
     uint64_t value = input;
 
     Element* elem = HAL_Encode_UInt(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "WindDirection", "HorizontalDirection", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "HorizontalDirection", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -105,18 +116,16 @@ static AJ_Status SetHorizontalDirection(void *context, const char *objPath, uint
 static AJ_Status GetHorizontalMax(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalMax");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "HorizontalMax");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -124,18 +133,16 @@ static AJ_Status GetHorizontalMax(void *context, const char *objPath, uint16_t *
 static AJ_Status GetHorizontalAutoMode(void *context, const char *objPath, WindDirection_AutoMode *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "HorizontalAutoMode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "HorizontalAutoMode");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (WindDirection_AutoMode)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -147,7 +154,7 @@ static AJ_Status SetHorizontalAutoMode(void *context, const char *objPath, WindD
     int value = input;
 
     Element* elem = HAL_Encode_Int(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "WindDirection", "HorizontalAutoMode", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "HorizontalAutoMode", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -157,18 +164,16 @@ static AJ_Status SetHorizontalAutoMode(void *context, const char *objPath, WindD
 static AJ_Status GetVerticalDirection(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalDirection");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "VerticalDirection");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -180,7 +185,7 @@ static AJ_Status SetVerticalDirection(void *context, const char *objPath, uint16
     uint64_t value = input;
 
     Element* elem = HAL_Encode_UInt(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "WindDirection", "VerticalDirection", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "VerticalDirection", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -190,18 +195,16 @@ static AJ_Status SetVerticalDirection(void *context, const char *objPath, uint16
 static AJ_Status GetVerticalMax(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
+    uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalMax");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "VerticalMax");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_UInt(elem);
+        BSXML_FreeElement(elem);
     }
 
-    uint64_t value;
-    value = HAL_Decode_UInt(elem);
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -209,18 +212,16 @@ static AJ_Status GetVerticalMax(void *context, const char *objPath, uint16_t *ou
 static AJ_Status GetVerticalAutoMode(void *context, const char *objPath, WindDirection_AutoMode *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "WindDirection", "VerticalAutoMode");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "VerticalAutoMode");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (WindDirection_AutoMode)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -232,7 +233,7 @@ static AJ_Status SetVerticalAutoMode(void *context, const char *objPath, WindDir
     int value = input;
 
     Element* elem = HAL_Encode_Int(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "WindDirection", "VerticalAutoMode", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Environment.WindDirection", "VerticalAutoMode", elem);
     BSXML_FreeElement(elem);
 
     return result;

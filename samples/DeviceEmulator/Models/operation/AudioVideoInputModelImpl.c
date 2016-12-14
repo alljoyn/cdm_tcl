@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ *  *    Copyright (c) Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright (c) Open Connectivity Foundation and Contributors to AllSeen
+ *    Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -195,18 +208,16 @@ static void HAL_Decode_Array_AudioVideoInput_SignalPresence(Element* elem, Array
 static AJ_Status GetInputSourceId(void *context, const char *objPath, AudioVideoInput_SourceType *out)
 {
     AJ_Status result = AJ_OK;
+    int value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "InputSourceId");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVideoInput", "InputSourceId");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        value = HAL_Decode_Int(elem);
+        BSXML_FreeElement(elem);
     }
 
-    int value;
-    value = HAL_Decode_Int(elem);
     *out = (AudioVideoInput_SourceType)(int)value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
@@ -218,7 +229,7 @@ static AJ_Status SetInputSourceId(void *context, const char *objPath, AudioVideo
     int value = input;
 
     Element* elem = HAL_Encode_Int(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "AudioVideoInput", "InputSourceId", elem);
+    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVideoInput", "InputSourceId", elem);
     BSXML_FreeElement(elem);
 
     return result;
@@ -228,19 +239,17 @@ static AJ_Status SetInputSourceId(void *context, const char *objPath, AudioVideo
 static AJ_Status GetSupportedInputSources(void *context, const char *objPath, Array_AudioVideoInput_InputSource *out)
 {
     AJ_Status result = AJ_OK;
+    Array_AudioVideoInput_InputSource value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "AudioVideoInput", "SupportedInputSources");
+    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.AudioVideoInput", "SupportedInputSources");
 
-    if (!elem) {
-        return AJ_ERR_FAILURE;
+    if (elem) {
+        HAL_Decode_Array_AudioVideoInput_InputSource(elem, &value);
+
+        BSXML_FreeElement(elem);
     }
 
-    Array_AudioVideoInput_InputSource value;
-    HAL_Decode_Array_AudioVideoInput_InputSource(elem, &value);
-
     *out = value;
-
-    BSXML_FreeElement(elem);
     return result;
 }
 
