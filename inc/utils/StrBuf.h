@@ -19,10 +19,8 @@
 
 #include <ajtcl/cdm/utils/CDM_Array.h>
 
-//======================================================================
-
 typedef struct {
-    char* chars;                // never NULL, always NUL-terminated
+    char* chars;                /* never NULL, always NUL-terminated */
     size_t numChars;
     size_t capacity;
     } StrBuf;
@@ -56,5 +54,4 @@ const char* StrBuf_FetchFree(StrBuf* buf);
 
 void StrBuf_Clear(StrBuf* buf);
 
-//======================================================================
-#endif //ALLJOYN_STRBUF_H
+#endif /*ALLJOYN_STRBUF_H*/

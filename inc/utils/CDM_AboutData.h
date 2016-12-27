@@ -25,4 +25,4 @@ typedef char* CDM_AboutDataBuf;
 const CDM_AboutDataBuf CDM_CreateAboutDataFromXml(const char *aboutData);
 void CDM_DestroyAboutData(CDM_AboutDataBuf aboutData);
 
-#endif //ALLJOYN_CDM_ABOUTDATA_H
+#endif /* ALLJOYN_CDM_ABOUTDATA_H */

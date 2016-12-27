@@ -34,7 +34,7 @@ void Cdm_DisableSPEKE(void);
 void Cdm_EnableECDSA(const char *privateKey, const char *certificate);
 void Cdm_DisableECDSA(void);
 
-//AJ_Status Cdm_EnableFromFile(const char* pathPrefix);
+/* AJ_Status Cdm_EnableFromFile(const char* pathPrefix); */
 
 /**
  * Enable security.
@@ -46,4 +46,4 @@ void Cdm_DisableECDSA(void);
  */
 AJ_Status Cdm_EnableSecurity(AJ_BusAttachment *busAttachment, AJ_AuthListenerFunc authListenerCallback);
 
-#endif //ALLJOYN_CDM_SECURITY_H
+#endif /* ALLJOYN_CDM_SECURITY_H */

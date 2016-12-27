@@ -18,7 +18,7 @@
 #include <ajtcl/cdm/utils/CDM_AboutData.h>
 #include <ajtcl/cdm/utils/PropertyStoreOEMProvisioning.h>
 
-#include <expat.h>
+#include <ajtcl/cdm/utils/BSXML.h>
 
 /*
  * TODO: Support multi languages properly
@@ -26,19 +26,19 @@
 
 const char *deviceManufactureName;
 const char *deviceProductName;
-const char* const* propertyStoreDefaultLanguages; // = SUPPORTED_LANGUAGES;
+const char* const* propertyStoreDefaultLanguages;
 
 static const char* DEFAULT_DEVICETYPEDESC[] = { "" };
 
 const char **propertyStoreDefaultValues[CDM_PROPERTY_STORE_NUMBER_OF_KEYS] =
 {
-// "Default Values per language",   "Key Name"
-// Runtime keys.
+/* "Default Values per language",   "Key Name" */
+/* Runtime keys. */
     NULL,                           /*DeviceId*/
     NULL,                           /*AppId*/
     NULL,                           /*DeviceName*/
 
-// Mandatory about keys.
+/*  Mandatory about keys. */
     NULL,                           /*DefaultLanguage*/
     NULL,                           /*AppName*/
     NULL,                           /*Description*/
@@ -48,11 +48,11 @@ const char **propertyStoreDefaultValues[CDM_PROPERTY_STORE_NUMBER_OF_KEYS] =
     NULL,                           /*SoftwareVersion*/
     NULL,                           /*AJSoftwareVersion*/
 
-// Optional about keys.
+/* Optional about keys. */
     NULL,                           /*HardwareVersion*/
     NULL,                           /*SupportUrl*/
 
-// CDM about keys.
+/* CDM about keys. */
     NULL,                           /*CountryOfProduction*/
     NULL,                           /*CorporateBrand*/
     NULL,                           /*ProductBrand*/
@@ -67,7 +67,6 @@ static char *deviceNameVars[] = { deviceNameVar, deviceNameVar };
 
 PropertyStoreConfigEntry propertyStoreRuntimeValues[AJSVC_PROPERTY_STORE_NUMBER_OF_RUNTIME_KEYS] =
     {
-//  {"Buffers for Values per language", "Buffer Size"},                  "Key Name"
         { machineIdVars,             MACHINE_ID_LENGTH + 1 },               /*DeviceId*/
         { machineIdVars,             MACHINE_ID_LENGTH + 1 },               /*AppId*/
         { deviceNameVars,            DEVICE_NAME_VALUE_LENGTH + 1 },        /*DeviceName*/
@@ -105,7 +104,7 @@ typedef struct {
     Array hardwareVersions;
     Array supportUrls;
 
-    //cdm additions
+    /* cdm additions */
     Array countries;
     Array corporateBrands;
     Array productBrands;
@@ -114,13 +113,7 @@ typedef struct {
     Array deviceTypes;
     Array devicePaths;
 
-    Array *curArray;
-
     int numDevices;
-
-    int skip;
-    int depth;
-    XML_Parser parser;
 } ABOUT_ANALYSIS;
 
 static void AddArrayElement(Array* array, const char* element, int elemSize)
@@ -137,144 +130,168 @@ static void AddArrayElement(Array* array, const char* element, int elemSize)
     ++array->numElements;
 }
 
-static int isElement(const char *name, const char *expected) {
-    return strncmp(name, expected, strlen(expected)) == 0;
-}
-
-static void XMLCALL StartElement(void *data, const char* name, const char **attrs)
+static int ProcessElement(Element *root, const char *elementName, Array* array, long *dataSize)
 {
-    ABOUT_ANALYSIS *analysis = (ABOUT_ANALYSIS*)data;
-    ++analysis->depth;
+    Element **elems = BSXML_GetPath(root, elementName);
+    Element **elemItr;
 
-    if (isElement(name, "DefaultLanguage")) {
-        analysis->curArray = &analysis->languages;
-        analysis->defaultLanguage = &analysis->languages.values[analysis->languages.numElements];
-    }
-    else if (isElement(name, "DeviceName"))
-        analysis->curArray = &analysis->deviceNames;
-    else if (isElement(name, "AppName"))
-        analysis->curArray = &analysis->appNames;
-    else if (isElement(name, "Manufacturer"))
-        analysis->curArray = &analysis->manufacturers;
-    else if (isElement(name, "ModelNumber"))
-        analysis->curArray = &analysis->deviceModels;
-    else if (isElement(name, "Description"))
-        analysis->curArray = &analysis->descriptions;
-    else if (isElement(name, "DateOfManufacture"))
-        analysis->curArray = &analysis->manufactureDates;
-    else if (isElement(name, "SoftwareVersion"))
-        analysis->curArray = &analysis->softwareVersions;
-    else if (isElement(name, "HardwareVersion"))
-        analysis->curArray = &analysis->hardwareVersions;
-    else if (isElement(name, "SupportUrl"))
-        analysis->curArray = &analysis->supportUrls;
-    else if (isElement(name, "CountryOfProduction"))
-        analysis->curArray = &analysis->countries;
-    else if (isElement(name, "Location"))
-        analysis->curArray = &analysis->locations;
-    else if (isElement(name, "CorporateBrand"))
-        analysis->curArray = &analysis->corporateBrands;
-    else if (isElement(name, "ProductBrand"))
-        analysis->curArray = &analysis->productBrands;
-    else if (isElement(name, "TypeDescription"))
-        ++analysis->numDevices;
-    else if (isElement(name, "device_type"))
-        analysis->curArray = &analysis->deviceTypes;
-    else if (isElement(name, "object_path"))
-        analysis->curArray = &analysis->devicePaths;
-}
-
-static void XMLCALL CharHandler(void *data, const char *txt, int txtLen)
-{
-    ABOUT_ANALYSIS *analysis = (ABOUT_ANALYSIS*)data;
-    int dataSize = (analysis->curArray == &analysis->deviceTypes) ? 0 : (txtLen + 1);
-    if (analysis->curArray) {
-        AddArrayElement(analysis->curArray, txt, txtLen);
-        analysis->dataSize += dataSize;
-    }
-}
-
-static void XMLCALL EndElement(void *data, const char *name)
-{
-    ABOUT_ANALYSIS *analysis = (ABOUT_ANALYSIS*)data;
-
-    if (analysis->skip == analysis->depth) {
-        analysis->skip = 0;
-    }
-
-    analysis->curArray = NULL;
-    --analysis->depth;
-}
-
-static int PreparseXML(const char *xmlBuf, int bufSize, ABOUT_ANALYSIS *analysis)
-{
-    int retVal = 0;
-    XML_Parser xmlParser = XML_ParserCreate(NULL);
-    if (!xmlParser)
-    {
-        fprintf(stderr, "Error create xml parser.\n");
+    if (!elems)
         return 0;
+
+    elemItr = &elems[0];
+
+    while ((*elemItr)) {
+        int len = (int)strlen((*elemItr)->content);
+        AddArrayElement(array, (*elemItr)->content, len);
+        *dataSize += len + 1;
+        ++elemItr;
     }
 
-    analysis->parser = xmlParser;
-
-    XML_SetUserData(xmlParser, analysis);
-    XML_SetCharacterDataHandler(xmlParser, CharHandler);
-    XML_SetElementHandler(xmlParser, StartElement, EndElement);
-    retVal = XML_Parse(xmlParser, xmlBuf, bufSize, 1);
-
-    XML_ParserFree(xmlParser);
-    analysis->parser = NULL;
-
-    return retVal;
+    return 1;
 }
+
+static int ProcessDevices(Element *root, ABOUT_ANALYSIS *analysis)
+{
+    Element **elems = BSXML_GetPath(root, "DeviceTypeDescription");
+    Element **elemItr;
+
+    if (!elems)
+        return 0;
+
+    elemItr = &elems[0];
+    while((*elemItr)) {
+        if (!ProcessElement(*(*elemItr)->children, "device_type", &analysis->deviceTypes, &analysis->dataSize))
+            return 0;
+
+        if (!ProcessElement(*(*elemItr)->children, "object_path", &analysis->devicePaths, &analysis->dataSize))
+            return 0;
+
+        ++analysis->numDevices;
+        ++elemItr;
+    }
+    return 1;
+}
+
+static Element *PreparseXML(const char *xmlBuf, ABOUT_ANALYSIS *analysis)
+{
+    Element *root = BSXML_GetRoot(xmlBuf);
+
+    if (!root)
+        return NULL;
+
+    if (!ProcessElement(root, "DefaultLanguage", &analysis->languages, &analysis->dataSize))
+        goto ELEM_MISSING_ERROR;
+
+    analysis->defaultLanguage = &analysis->languages.values[0];
+
+    if (!ProcessElement(root, "DeviceName", &analysis->deviceNames, &analysis->dataSize))
+        goto ELEM_MISSING_ERROR;
+
+    if (!ProcessElement(root, "AppName", &analysis->appNames, &analysis->dataSize))
+        goto ELEM_MISSING_ERROR;
+
+    if (!ProcessElement(root, "Manufacturer", &analysis->manufacturers, &analysis->dataSize))
+        goto ELEM_MISSING_ERROR;
+
+    if (!ProcessElement(root, "ModelNumber", &analysis->deviceModels, &analysis->dataSize))
+        goto ELEM_MISSING_ERROR;
+
+    if (!ProcessElement(root, "Description", &analysis->descriptions, &analysis->dataSize))
+        goto ELEM_MISSING_ERROR;
+
+    if (!ProcessElement(root, "DateOfManufacture", &analysis->manufactureDates, &analysis->dataSize))
+        goto ELEM_MISSING_ERROR;
+
+    if (!ProcessElement(root, "SoftwareVersion", &analysis->softwareVersions, &analysis->dataSize))
+        goto ELEM_MISSING_ERROR;
+
+    /* These are optional */
+    ProcessElement(root, "HardwareVersion", &analysis->hardwareVersions, &analysis->dataSize);
+    ProcessElement(root, "SupportUrl", &analysis->supportUrls, &analysis->dataSize);
+    ProcessElement(root, "CountryOfProduction", &analysis->countries, &analysis->dataSize);
+    ProcessElement(root, "Location", &analysis->locations, &analysis->dataSize);
+    ProcessElement(root, "CorporateBrand", &analysis->corporateBrands, &analysis->dataSize);
+    ProcessElement(root, "ProductBrand", &analysis->productBrands, &analysis->dataSize);
+
+    if (!ProcessDevices(root, analysis))
+        goto ELEM_MISSING_ERROR;
+
+    return root;
+
+ELEM_MISSING_ERROR:
+    BSXML_FreeElement(root);
+    return NULL;
+
+}
+
 
 typedef struct
 {
     CDM_AboutDataBuf buf;
-    long itr;
+    CDM_AboutDataBuf dataSegStart;
+    long dataItr;
+    long arrayItr;
     long bufSize;
 } AboutDataBuilder;
 
-static int WriteArray(const Array *array, AboutDataBuilder *writer)
-{
-    int i;
-    void *curPos;
-
-    for (i=0; i<array->numElements; ++i)
-    {
-        if (writer->itr > writer->bufSize)
-            return 0;
-
-        curPos = writer->buf + writer->itr;
-        memcpy(curPos, array->values[i].element, array->values[i].elemSize);
-        writer->itr += array->values[i].elemSize + 1;
-    }
-
-    writer->itr += sizeof(void*);
-    return 1;
-}
 
 typedef struct {
     Array *array;
     int index;
 } ArrayToPropertyStoreMap;
 
-static int countArraysWithEntries(ArrayToPropertyStoreMap *mapping, int numEntries)
+
+static int countArrayElements(ArrayToPropertyStoreMap *mapping, int numEntries, const ABOUT_ANALYSIS *analysis)
 {
     int total = 0;
     int i;
+
     for (i=0; i<numEntries; ++i)
-        total += (mapping[i].array->numElements > 0) ? 1 : 0;
+        total += mapping[i].array->numElements;
+
+    /* Count the nulls */
+    total += numEntries;
 
     return total;
 }
 
+
+static int WriteArray(const Array *array, AboutDataBuilder *writer)
+{
+    int i;
+    void *curArrayPos;
+    void *curDataPos;
+
+    for (i=0; i<array->numElements; ++i)
+    {
+        if (writer->dataItr + array->values[i].elemSize> writer->bufSize)
+            return 0;
+
+        /* write data entry to the data part */
+        curDataPos = writer->dataSegStart + writer->dataItr;
+        memcpy(curDataPos, array->values[i].element, array->values[i].elemSize);
+        writer->dataItr += array->values[i].elemSize + 1;
+
+        /* write address of data into the array entry */
+        curArrayPos = writer->buf + writer->arrayItr;
+        if ((char*)curArrayPos + sizeof(void*) >= writer->dataSegStart)
+            return 0;
+
+        memcpy(curArrayPos, &curDataPos, sizeof(void*));
+        writer->arrayItr += sizeof(void*);
+    }
+
+    /* Array is done. Add extra for a null terminator */
+    writer->arrayItr += sizeof(void*);
+
+    return 1;
+}
+
+
 static int WritePropertyStoreDefaultValues(ArrayToPropertyStoreMap *mapping, int numEntries, AboutDataBuilder *aboutDataBuf)
 {
-    char *propertyArrayItr = aboutDataBuf->buf;
     int i;
-    char *entry;
+    void *curArrayStart;
 
     if (mapping == NULL || aboutDataBuf == NULL || aboutDataBuf->buf == NULL)
         return 0;
@@ -283,19 +300,17 @@ static int WritePropertyStoreDefaultValues(ArrayToPropertyStoreMap *mapping, int
         if (mapping[i].array->numElements == 0)
             continue;
 
-        entry = aboutDataBuf->buf + aboutDataBuf->itr;
+        curArrayStart = aboutDataBuf->buf + aboutDataBuf->arrayItr;
         if (!WriteArray(mapping[i].array, aboutDataBuf)) {
             printf("Error writing %d array to buffer.\n", i);
             return 0;
         }
-
-        // Setup the property store array of lists of strings
-        memcpy(propertyArrayItr, &entry, sizeof(void*));
-        memcpy(&propertyStoreDefaultValues[mapping[i].index], &propertyArrayItr, sizeof(void*));
-        propertyArrayItr += sizeof(void*);
+        /* write the array start into the property store array */
+        memcpy(&propertyStoreDefaultValues[mapping[i].index], &curArrayStart, sizeof(void*));
     }
     return 1;
 }
+
 
 static int WriteSupportedLanguages(const ABOUT_ANALYSIS *analysis, char *languagesArrayStart)
 {
@@ -310,6 +325,7 @@ static int WriteSupportedLanguages(const ABOUT_ANALYSIS *analysis, char *languag
 
     return 1;
 }
+
 
 static int WriteStandAlonePropertyStoreData(void *languagesArrayStart, void *deviceTypeArrayStart)
 {
@@ -338,28 +354,26 @@ static int WriteDeviceTypesDescriptions(const ABOUT_ANALYSIS *analysis, void *de
 
     for (i=0; i<analysis->numDevices; ++i)
     {
-        if (aboutDataBuf->itr > aboutDataBuf->bufSize)
+        if (aboutDataBuf->dataItr > aboutDataBuf->bufSize)
             return 0;
 
-        curPos = aboutDataBuf->buf + aboutDataBuf->itr;
+        curPos = aboutDataBuf->dataSegStart + aboutDataBuf->dataItr;
         memcpy(curPos, analysis->devicePaths.values[i].element, analysis->devicePaths.values[i].elemSize);
-        aboutDataBuf->itr += analysis->devicePaths.values[i].elemSize + 1;
+        aboutDataBuf->dataItr += analysis->devicePaths.values[i].elemSize + 1;
 
         desc[i].type = (DeviceType)(int)atoi(analysis->deviceTypes.values[i].element);
         desc[i].objectpath = curPos;
     }
-
-    //void *nullDesc = &desc[i];
-    //memcpy(&propertyStoreDefaultValues[17], &desc, sizeof(void*));
     return 1;
 }
+
 
 const CDM_AboutDataBuf CDM_CreateAboutDataFromXml(const char *aboutData)
 {
     static ABOUT_ANALYSIS analysis;
     static ArrayToPropertyStoreMap mapping[] = {
-        // 0 Device Id
-        // 1 App Id
+        /* 0 Device Id */
+        /* 1 App Id */
         {&analysis.deviceNames, 2},
         {&analysis.languages, 3},
         {&analysis.appNames, 4},
@@ -368,7 +382,7 @@ const CDM_AboutDataBuf CDM_CreateAboutDataFromXml(const char *aboutData)
         {&analysis.deviceModels, 7},
         {&analysis.manufactureDates, 8},
         {&analysis.softwareVersions, 9},
-        // 10 is ajVersion
+        /* 10 is ajVersion */
         {&analysis.hardwareVersions, 11},
         {&analysis.supportUrls, 12},
         {&analysis.countries, 13},
@@ -377,11 +391,11 @@ const CDM_AboutDataBuf CDM_CreateAboutDataFromXml(const char *aboutData)
         {&analysis.locations, 16},
     };
 
-    int bufSize = (int)strlen(aboutData);
     AboutDataBuilder aboutDataBuf;
     char *languagesArrayStart;
     char *deviceTypesArrayStart;
-    int numArrays;
+    int numArrayElements;
+    int numPropStoreArrays = (sizeof(mapping) / sizeof(ArrayToPropertyStoreMap));
 
     int propertyStoreArraySize;
     int supportedLanguagesArraySize;
@@ -390,21 +404,33 @@ const CDM_AboutDataBuf CDM_CreateAboutDataFromXml(const char *aboutData)
     int totalArraysSize;
 
     memset(&analysis, 0, sizeof(ABOUT_ANALYSIS));
-    if (!PreparseXML(aboutData, bufSize, &analysis))
+    Element *xmlRoot = PreparseXML(aboutData, &analysis);
+    if (!xmlRoot)
         return NULL;
 
-    numArrays = countArraysWithEntries(mapping, (sizeof(mapping) / sizeof(ArrayToPropertyStoreMap)));
-    propertyStoreArraySize = (numArrays + 1) * sizeof(void*);
+    /* The total number of pointers across all the arrays */
+    numArrayElements = countArrayElements(mapping, numPropStoreArrays, &analysis);
+
+    /* The total amount of memory required by the property store arrays */
+    propertyStoreArraySize = numArrayElements * sizeof(void*);
+
+    /* the total amount of memory required by the supported languages array */
     supportedLanguagesArraySize = (analysis.languages.numElements + 1) * sizeof(void*);
+
+    /* the total amount of memory required by the device types array */
     deviceTypeArraySize = (analysis.numDevices + 1) * sizeof(DeviceTypeDescription);
+
+    /* The total size of all the arrays */
     totalArraysSize = propertyStoreArraySize + supportedLanguagesArraySize + deviceTypeArraySize;
 
-    analysis.dataSize += numArrays * sizeof(void*) + totalArraysSize;
+    analysis.dataSize += totalArraysSize;
     aboutDataBuf.buf = malloc(analysis.dataSize);
     memset(aboutDataBuf.buf, 0, analysis.dataSize);
 
     aboutDataBuf.bufSize = analysis.dataSize;
-    aboutDataBuf.itr = totalArraysSize;
+    aboutDataBuf.dataSegStart = aboutDataBuf.buf + totalArraysSize;
+    aboutDataBuf.dataItr = 0;
+    aboutDataBuf.arrayItr = 0;
 
     languagesArrayStart = aboutDataBuf.buf + propertyStoreArraySize;
     deviceTypesArrayStart = aboutDataBuf.buf + propertyStoreArraySize + supportedLanguagesArraySize;
@@ -421,9 +447,11 @@ const CDM_AboutDataBuf CDM_CreateAboutDataFromXml(const char *aboutData)
     if (!WriteStandAlonePropertyStoreData(languagesArrayStart, deviceTypesArrayStart))
         goto ERROR;
 
+    BSXML_FreeElement(xmlRoot);
     return aboutDataBuf.buf;
 
 ERROR:
+    BSXML_FreeElement(xmlRoot);
     free(aboutDataBuf.buf);
     return NULL;
 }

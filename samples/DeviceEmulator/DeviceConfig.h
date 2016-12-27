@@ -59,4 +59,4 @@ typedef struct
 DEM_Config *DEM_CreateConfig(const char *deviceXmlPath);
 void DEM_FreeConfig(DEM_Config *config);
 
-#endif //ALLJOYN_DEVICECONFIG_H
+#endif /* ALLJOYN_DEVICECONFIG_H */

@@ -19,9 +19,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "BSXML.h"
-
-//======================================================================
+#include <ajtcl/cdm/utils/BSXML.h>
 
 extern Element* Serialize_PutBool(Element* parent, bool value);
 extern bool Serialize_GetBool(Element* element);
@@ -47,5 +45,4 @@ extern uint32_t Serializer_GetUInt32(Element* element);
 extern Element* Serializer_PutUInt8(Element* parent, uint8_t value);
 extern uint8_t Serializer_GetUInt8(Element* element);
 
-//======================================================================
-#endif // ALLJOYN_SERIALIZE_H
+#endif /* ALLJOYN_SERIALIZE_H */

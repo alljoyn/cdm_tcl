@@ -21,10 +21,10 @@
 #include <stdlib.h>
 
 typedef enum {
-    SIGNATURE_BASIC = 0,        // Basic type, length of 1 (e.g. 'n')
-    SIGNATURE_ARRAY_BASIC,      // Array of basic type, length of 2 (e.g. 'an')
-    SIGNATURE_STRUCT,           // Struct, begins and ends with braces (e.g. '(nnn)')
-    SIGNATURE_ARRAY_STRUCT,     // Array of structs, prefixes struct with 'a' (e.g. 'a(nnn)')
+    SIGNATURE_BASIC = 0,        /* Basic type, length of 1 (e.g. 'n') */
+    SIGNATURE_ARRAY_BASIC,      /* Array of basic type, length of 2 (e.g. 'an') */
+    SIGNATURE_STRUCT,           /* Struct, begins and ends with braces (e.g. '(nnn)') */
+    SIGNATURE_ARRAY_STRUCT,     /* Array of structs, prefixes struct with 'a' (e.g. 'a(nnn)') */
 
     SIGNATURE_TYPE_COUNT,
     
@@ -174,17 +174,17 @@ static AJ_Status MarshalSignatureStruct(va_list* vaList, AJ_Message* msg, const 
     AJ_MarshalVariant(msg, signature);
     AJ_MarshalContainer(msg, &argStruct, AJ_ARG_STRUCT);
 
-    size_t structSigLen = (strLength - 1);   // Includes null terminator.
+    size_t structSigLen = (strLength - 1);   /* Includes null terminator. */
     char* structSignature = malloc(structSigLen * sizeof(char));
     if (!structSignature) {
         return AJ_ERR_RESOURCES;
     }
 
-    // Extract struct signature within the braces (e.g. 'nnn' from '(nnn)').
+    /* Extract struct signature within the braces (e.g. 'nnn' from '(nnn)'). */
     strncpy(structSignature, (signature + 1), (structSigLen - 1));
     structSignature[structSigLen - 1] = '\0';
 
-    // Delegate marshaling of struct arguments to interface's handler function.
+    /* Delegate marshaling of struct arguments to interface's handler function. */
     void* structure = va_arg(*vaList, void*);
     MarshalStructFunc func = va_arg(*vaList, MarshalStructFunc);
     status = func(msg, structure, structSignature);
@@ -220,17 +220,17 @@ static AJ_Status MarshalSignatureArrayStruct(va_list* vaList, AJ_Message* msg, c
     size_t sizeOfStruct = va_arg(*vaList, size_t);
     MarshalStructFunc func = va_arg(*vaList, MarshalStructFunc);
 
-    size_t structSigLen = (strLength - 2);   // Includes null terminator.
+    size_t structSigLen = (strLength - 2);   /* Includes null terminator. */
     char* structSignature = malloc(structSigLen * sizeof(char));
     if (!structSignature) {
         return AJ_ERR_RESOURCES;
     }
 
-    // Extract struct signature within the braces (e.g. 'nnn' from 'a(nnn)').
+    /* Extract struct signature within the braces (e.g. 'nnn' from 'a(nnn)'). */
     strncpy(structSignature, (signature + 2), (structSigLen - 1));
     structSignature[structSigLen - 1] = '\0';
 
-    // Delegate marshaling of struct arguments to interface's handler function.
+    /* Delegate marshaling of struct arguments to interface's handler function. */
     char* p = (char*)structures;
     for (int i = 0; i < arrayLength; i++) {
         AJ_MarshalContainer(msg, &argStruct, AJ_ARG_STRUCT);

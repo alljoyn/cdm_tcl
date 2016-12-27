@@ -21,9 +21,6 @@
 #include <ajtcl/cdm/CdmControllee.h>
 
 typedef struct cdmIntfInfo {
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-    CdmInterfaceTypes type;    // Deprecated, no dependency on this when using Cdm_AddInterface().
-#endif
     const char* name;
     AJ_InterfaceDescription desc;
     const InterfaceHandler* handler;
@@ -38,16 +35,5 @@ typedef struct cdmObjInfo {
     CdmInterfaceInfo* intfLast;
     struct cdmObjInfo* nextNode;
 } CdmObjectInfo;
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-// Deprecation transitional struct - used to maintain backwards compatibility.
-typedef struct cdmRegisteredIntfInfo {
-    CdmInterfaceTypes type;
-    const char* name;
-    AJ_InterfaceDescription desc;
-    const InterfaceHandler* handler;
-    struct cdmRegisteredIntfInfo* nextNode;
-} CdmRegisteredInterfaceInfo;
-#endif
 
 #endif /* CDMCONTROLLEEIMPL_H_ */

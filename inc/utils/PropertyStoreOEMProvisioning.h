@@ -43,20 +43,20 @@ extern const char* deviceProductName;
 #define DEVICE_NAME_VALUE_LENGTH 32
 #define PASSWORD_VALUE_LENGTH (AJ_ADHOC_LEN * 2)
 
-extern const char* const* propertyStoreDefaultLanguages;   // A NULL termminated list of language strings
+extern const char* const* propertyStoreDefaultLanguages;   /* A NULL termminated list of language strings */
 
 /**
  * A convenience macro for the number of languages
  */
-#define AJSVC_PROPERTY_STORE_NUMBER_OF_LANGUAGES (AJSVC_PropertyStore_GetNumberOfLanguages()) // The number of language strings calculated upon PropertyStore initialization
+#define AJSVC_PROPERTY_STORE_NUMBER_OF_LANGUAGES (AJSVC_PropertyStore_GetNumberOfLanguages()) /* The number of language strings calculated upon PropertyStore initialization */
 
 /**
  * property structure
  */
 typedef struct _PropertyStoreEntry {
-    const char* keyName; // The property key name as shown in About and Config documentation
+    const char* keyName; /* The property key name as shown in About and Config documentation */
 
-    // msb=public/private; bit number 3 - initialise once; bit number 2 - multi-language value; bit number 1 - announce; bit number 0 - read/write
+    /* msb=public/private; bit number 3 - initialise once; bit number 2 - multi-language value; bit number 1 - announce; bit number 0 - read/write */
     uint8_t mode0Write : 1;
     uint8_t mode1Announce : 1;
     uint8_t mode2MultiLng : 1;
@@ -85,14 +85,14 @@ extern const PropertyStoreEntry propertyStoreProperties[CDM_PROPERTY_STORE_NUMBE
 /**
  * properties array variable with default values
  */
-extern const char** propertyStoreDefaultValues[CDM_PROPERTY_STORE_NUMBER_OF_KEYS]; // Array of Array of size 1 or AJSVC_PROPERTY_STORE_NUMBER_OF_LANGUAGES constant buffers depending on whether the property is multilingual
+extern const char** propertyStoreDefaultValues[CDM_PROPERTY_STORE_NUMBER_OF_KEYS]; /* Array of Array of size 1 or AJSVC_PROPERTY_STORE_NUMBER_OF_LANGUAGES constant buffers depending on whether the property is multilingual */
 
 /**
  * properties container for runtime values
  */
 typedef struct _PropertyStoreRuntimeEntry {
-    char** value; // An array of size 1 or AJSVC_PROPERTY_STORE_NUMBER_OF_LANGUAGES mutable buffers depending on whether the property is multilingual
-    uint8_t size; // The size of the value buffer(s)
+    char** value; /* An array of size 1 or AJSVC_PROPERTY_STORE_NUMBER_OF_LANGUAGES mutable buffers depending on whether the property is multilingual */
+    uint8_t size; /* The size of the value buffer(s) */
 } PropertyStoreConfigEntry;
 
 /**
@@ -159,4 +159,4 @@ extern DeviceTypeDescription *deviceTypeDescription;
 
 
 /** @} */
- #endif //_PROPERTYSTOREOEMPROVISIONING_H_
+ #endif /*_PROPERTYSTOREOEMPROVISIONING_H_*/

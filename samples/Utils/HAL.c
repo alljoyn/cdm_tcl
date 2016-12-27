@@ -26,12 +26,11 @@
 
 #include <ajtcl/aj_msg.h>
 #include <ajtcl/cdm/utils/CDM_Array.h>
+#include <ajtcl/cdm/utils/StrBuf.h>
 
 #include "HAL.h"
-#include "StrBuf.h"
 #include "FileIO.h"
 
-//======================================================================
 
 static int PathExists(const char *path)
 {
@@ -84,7 +83,6 @@ void HAL_Init(const char *base_path, const char *ext)
 }
 
 
-
 void HAL_DefaultInit(void)
 {
     static const char *root = "device_state";
@@ -92,9 +90,6 @@ void HAL_DefaultInit(void)
     ROOT = root;
     EXT = ext;
 }
-
-
-//======================================================================
 
 
 bool HAL_WritePropertyXml(const char *objPath, const char *interface, const char *property, const char* xml, bool force)
@@ -135,7 +130,7 @@ bool HAL_WritePropertyXml(const char *objPath, const char *interface, const char
 
     if (!force)
     {
-        // See if it exists first.
+        /* See if it exists first. */
         FILE* fp = fopen(path, "r");
 
         if (fp)
@@ -217,8 +212,6 @@ Element* HAL_ReadProperty(const char *objPath, const char *interface, const char
     return elem;
 }
 
-
-//======================================================================
 
 Element* HAL_Encode_Bool(bool value, Element* parent)
 {
@@ -380,10 +373,6 @@ Element* HAL_Encode_Array_int64(Array_int64 value, Element* parent)
     }
     return array;
 }
-
-
-//======================================================================
-
 
 bool HAL_Decode_Bool(Element* elem)
 {

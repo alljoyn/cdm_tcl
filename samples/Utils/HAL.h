@@ -18,23 +18,19 @@
 #define ALLJOYN_HAL_H
 
 #include <ajtcl/cdm/utils/CDM_Array.h>
-#include "BSXML.h"
-
-//======================================================================
+#include <ajtcl/cdm/utils/BSXML.h>
 
 void HAL_Init(const char *base_path, const char *ext);
 void HAL_DefaultInit(void);
 
-// Write some XML to the file.
+/* Write some XML to the file. */
 bool HAL_WritePropertyXml(const char *objPath, const char *interface, const char *property, const char* xml, bool force);
 
-// Write an XML tree to the file.
+/* Write an XML tree to the file. */
 bool HAL_WritePropertyElem(const char *objPath, const char *interface, const char *property, const Element* elem);
 
-// Read the XML from the file.
+/* Read the XML from the file. */
 Element* HAL_ReadProperty(const char *objPath, const char *interface, const char *property);
-
-//======================================================================
 
 extern Element* HAL_Encode_Bool(bool value, Element* parent);
 extern Element* HAL_Encode_Int(int64_t value, Element* parent);
@@ -56,13 +52,13 @@ extern Element* HAL_Encode_Array_int64(Array_int64 value, Element* parent);
 
 
 
-// These decode an XML tree.
+/* These decode an XML tree. */
 extern bool HAL_Decode_Bool(Element* elem);
 extern int64_t HAL_Decode_Int(Element* elem);
 extern uint64_t HAL_Decode_UInt(Element* elem);
 extern double HAL_Decode_Double(Element* elem);
 
-// Ownership of the string is transferred to the caller
+/* Ownership of the string is transferred to the caller */
 extern const char* HAL_Decode_String(Element* elem);
 
 extern void HAL_Decode_Array_Bool(Element* elem, Array_Bool *array);
@@ -78,5 +74,4 @@ extern void HAL_Decode_Array_int16(Element* elem, Array_int16 *array);
 extern void HAL_Decode_Array_int32(Element* elem, Array_int32 *array);
 extern void HAL_Decode_Array_int64(Element* elem, Array_int64 *array);
 
-//======================================================================
-#endif //ALLJOYN_HAL_H
+#endif /* ALLJOYN_HAL_H */

@@ -39,27 +39,6 @@
  */
 
 static const uint32_t suites[4] = { AUTH_SUITE_ECDHE_ECDSA, AUTH_SUITE_ECDHE_SPEKE, AUTH_SUITE_ECDHE_PSK, AUTH_SUITE_ECDHE_NULL };
-//static const char pem_prv[] = {
-//    "-----BEGIN EC PRIVATE KEY-----"
-//        "MDECAQEEICCRJMbxSiWUqj4Zs7jFQRXDJdBRPWX6fIVqE1BaXd08oAoGCCqGSM49"
-//        "AwEH"
-//        "-----END EC PRIVATE KEY-----"
-//};
-//
-//static const char pem_x509[] = {
-//    "-----BEGIN CERTIFICATE-----"
-//        "MIIBuDCCAV2gAwIBAgIHMTAxMDEwMTAKBggqhkjOPQQDAjBCMRUwEwYDVQQLDAxv"
-//        "cmdhbml6YXRpb24xKTAnBgNVBAMMIDgxM2FkZDFmMWNiOTljZTk2ZmY5MTVmNTVk"
-//        "MzQ4MjA2MB4XDTE1MDcyMjIxMDYxNFoXDTE2MDcyMTIxMDYxNFowQjEVMBMGA1UE"
-//        "CwwMb3JnYW5pemF0aW9uMSkwJwYDVQQDDCAzOWIxZGNmMjBmZDJlNTNiZGYzMDU3"
-//        "NzMzMjBlY2RjMzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABGJ/9F4xHn3Klw7z"
-//        "6LREmHJgzu8yJ4i09b4EWX6a5MgUpQoGKJcjWgYGWb86bzbciMCFpmKzfZ42Hg+k"
-//        "BJs2ZWajPjA8MAwGA1UdEwQFMAMBAf8wFQYDVR0lBA4wDAYKKwYBBAGC3nwBATAV"
-//        "BgNVHSMEDjAMoAoECELxjRK/fVhaMAoGCCqGSM49BAMCA0kAMEYCIQDixoulcO7S"
-//        "df6Iz6lvt2CDy0sjt/bfuYVW3GeMLNK1LAIhALNklms9SP8ZmTkhCKdpC+/fuwn0"
-//        "+7RX8CMop11eWCih"
-//        "-----END CERTIFICATE-----"
-//};
 
 static const char ecspeke_password[] = "1234";
 static const char psk_password[] = "faaa0af3dd3f1e0379da046a3ab6ca44";
@@ -75,7 +54,7 @@ static void CreateInterfaces(DEM_Config* config)
             fprintf(stdout, "Creating interface %s\n", iface->name);
             createInterface(objPath, iface->name);
 
-            // Set some initial property values.
+            /* Set some initial property values. */
             for (int k = 0; k < iface->numProperties; ++k) {
                 DEM_Property* prop = &iface->properties[k];
                 if (prop->initialState) {

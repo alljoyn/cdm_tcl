@@ -31,11 +31,11 @@
 #define FAILED_INIT_REATTEMPT_TIME 0
 
 #define CDMAPP_BUS_LINK_TIMEOUT        60
-#define CDMAPP_CONNECT_TIMEOUT         (1000 * 10)      // Override AJ_CONNECT_TIMEOUT to wait longer for a successful connection to a Routing Node
-#define CDMAPP_CONNECT_PAUSE           (1000 * 2)       // Override AJ_CONNECT_PAUSE to be more responsive
-#define CDMAPP_PRE_DISCONNECT_PAUSE    (1000 * 2)       // A little pause to let things settle
-#define CDMAPP_POST_DISCONNECT_PAUSE   (1000 * 2)       // A little pause to let things settle
-#define CDMAPP_UNMARSHAL_TIMEOUT       (1000 * 1)       // Override AJ_UNMARSHAL_TIMEOUT to be more responsive
+#define CDMAPP_CONNECT_TIMEOUT         (1000 * 10)      /* Override AJ_CONNECT_TIMEOUT to wait longer for a successful connection to a Routing Node */
+#define CDMAPP_CONNECT_PAUSE           (1000 * 2)       /* Override AJ_CONNECT_PAUSE to be more responsive */
+#define CDMAPP_PRE_DISCONNECT_PAUSE    (1000 * 2)       /* A little pause to let things settle */
+#define CDMAPP_POST_DISCONNECT_PAUSE   (1000 * 2)       /* A little pause to let things settle */
+#define CDMAPP_UNMARSHAL_TIMEOUT       (1000 * 1)       /* Override AJ_UNMARSHAL_TIMEOUT to be more responsive */
 
 
 /**
@@ -105,7 +105,7 @@ ErrorExit:
     if (status == AJ_ERR_RESOURCES) {
         initAttempts++;
         if (initAttempts > maxInitAttempts) {
-            status = AJ_ERR_READ; // Force disconnect from Routing Node
+            status = AJ_ERR_READ; /* Force disconnect from Routing Node */
         } else {
             AJ_ErrPrintf(("Application UpdateHandler init attempt %u of %u.\n", initAttempts, maxInitAttempts));
 
@@ -114,7 +114,7 @@ ErrorExit:
             }
         }
     } else if (status == AJ_ERR_WRITE) {
-        status = AJ_ERR_READ; // Force disconnect from Routing Node
+        status = AJ_ERR_READ; /* Force disconnect from Routing Node */
     }
 
     return status;
@@ -131,7 +131,7 @@ static AJSVC_ServiceStatus DefaultAppMessageProcessor(AJ_BusAttachment* busAttac
 {
     AJSVC_ServiceStatus serviceStatus = AJSVC_SERVICE_STATUS_HANDLED;
 
-    if (msg->msgId == AJ_METHOD_ACCEPT_SESSION) {    // Process all incoming request to join a session and pass request for acceptance by all services
+    if (msg->msgId == AJ_METHOD_ACCEPT_SESSION) {    /* Process all incoming request to join a session and pass request for acceptance by all services */
         uint16_t port;
         char* joiner;
         uint32_t sessionId = 0;
@@ -253,7 +253,7 @@ AJ_Status Cdm_MessageLoop(CDM_BusAttachment *busAttachment)
 
             if (status==AJ_ERR_TIMEOUT) {
                 if (AJ_ERR_LINK_TIMEOUT==AJ_BusLinkStateProc(&busAttachment->bus)) {
-                    status = AJ_ERR_READ;             // Something's not right. force disconnect
+                    status = AJ_ERR_READ;  /* Something's not right. force disconnect */
                 }
             }
 
@@ -264,13 +264,13 @@ AJ_Status Cdm_MessageLoop(CDM_BusAttachment *busAttachment)
                     serviceStatus = messageProcessor(&busAttachment->bus, &msg, &status);
                 }
                 if (serviceStatus==AJSVC_SERVICE_STATUS_NOT_HANDLED) {
-                    //Pass to the built-in bus message handlers
+                    /* Pass to the built-in bus message handlers */
                     status = AJ_BusHandleBusMessage(&msg);
                 }
                 AJ_NotifyLinkActive();
             }
 
-            //Unmarshaled messages must be closed to free resources
+            /* Unmarshaled messages must be closed to free resources */
             AJ_CloseMsg(&msg);
         }
     }

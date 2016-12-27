@@ -26,68 +26,6 @@ static CdmObjectInfo* objInfoFirst;
 static CdmObjectInfo* objInfoLast;
 static AJ_Object* ajObjects;
 
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-static CdmRegisteredInterfaceInfo* regIntfInfoFirst;
-static CdmRegisteredInterfaceInfo* regIntfInfoLast;
-static uint32_t vdiIntfInfoCount;
-#endif
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-static bool CheckInterfaceAlreadyRegistered(const char* intfName)
-{
-    if (!intfName) {
-        return false;
-    }
-
-    CdmRegisteredInterfaceInfo* regIntfInfo = regIntfInfoFirst;
-    while (regIntfInfo) {
-        if (!strcmp(intfName, regIntfInfo->name)) {
-            break;
-        }
-        regIntfInfo = regIntfInfo->nextNode;
-    }
-
-    return (regIntfInfo != NULL);
-}
-
-
-
-// Helper function to maintain backwards compatibility of old create / register vendor-defined
-// interface functions, but also allow the old HAE interfaces to undergo a similar registration
-// process as the vendor defined interfaces (so the one list of interfaces can be used).
-static AJ_Status RegisterInterface(const char* intfName, CdmInterfaceTypes intfType, AJ_InterfaceDescription intfDesc, const VendorDefinedInterfaceHandler* intfHandler)
-{
-    if (!intfName || !intfDesc || !intfHandler) {
-        return AJ_ERR_INVALID;
-    }
-
-    if (CheckInterfaceAlreadyRegistered(intfName)) {
-        return AJ_ERR_DISALLOWED;
-    }
-
-    CdmRegisteredInterfaceInfo* regIntfInfo = malloc(sizeof(CdmRegisteredInterfaceInfo));
-    if (!regIntfInfo) {
-        return AJ_ERR_RESOURCES;
-    }
-    memset(regIntfInfo, 0, sizeof(CdmRegisteredInterfaceInfo));
-
-    {
-        CdmRegisteredInterfaceInfo tempInfo = { intfType, intfName, intfDesc, intfHandler, NULL };
-        memcpy(regIntfInfo, &tempInfo, sizeof(tempInfo));
-    }
-    if (!regIntfInfoFirst) {
-        regIntfInfoFirst = regIntfInfo;
-    }
-    if (regIntfInfoLast) {
-        regIntfInfoLast->nextNode = regIntfInfo;
-    }
-    regIntfInfoLast = regIntfInfo;
-
-    return AJ_OK;
-}
-#endif
-
-
 
 AJ_Status Cdm_Init(void)
 {
@@ -95,22 +33,10 @@ AJ_Status Cdm_Init(void)
     objInfoLast = NULL;
     ajObjects = NULL;
 
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-    regIntfInfoFirst = NULL;
-    regIntfInfoLast = NULL;
-    vdiIntfInfoCount = 0;
-#endif
-
     AJ_Status status = AJ_OK;
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-    // Register old HAE interfaces for backwards compatibility (doesn't affect Cdm_AddInterface()).
-    status = RegisterInterface(TARGET_TEMPERATURE_INTERFACE_NAME, TARGET_TEMPERATURE_INTERFACE, intfDescEnvironmentTargetTemperature, &intfHandlerEnvironmentTargetTemperature);
-#endif
 
     return status;
 }
-
 
 
 void Cdm_Deinit(void)
@@ -119,11 +45,6 @@ void Cdm_Deinit(void)
     CdmObjectInfo* tempObjInfo = NULL;
     CdmInterfaceInfo* intfInfo = NULL;
     CdmInterfaceInfo* tempIntfInfo = NULL;
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-    CdmRegisteredInterfaceInfo* regIntfInfo = regIntfInfoFirst;
-    CdmRegisteredInterfaceInfo* tempRegIntfInfo = NULL;
-#endif
 
     if (ajObjects) {
         free(ajObjects);
@@ -146,14 +67,6 @@ void Cdm_Deinit(void)
         objInfo = objInfo->nextNode;
         free(tempObjInfo);
     }
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-    while (regIntfInfo) {
-        tempRegIntfInfo = regIntfInfo;
-        regIntfInfo = regIntfInfo->nextNode;
-        free(tempRegIntfInfo);
-    }
-#endif
 }
 
 
@@ -178,108 +91,6 @@ static CdmObjectInfo* GetObjectInfoByPath(const char* objPath)
 }
 
 
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-AJ_Status Cdm_RegisterVendorDefinedInterface(const char* intfName, const char* const* intfDesc, VendorDefinedInterfaceHandler* handler, CdmInterfaceTypes* intfType)
-{
-    if (!intfName || !intfDesc || !handler || !intfType) {
-        return AJ_ERR_INVALID;
-    }
-
-    CdmInterfaceTypes type = VENDOR_DEFINED_INTERFACE + vdiIntfInfoCount;
-
-    AJ_Status status = RegisterInterface(intfName, type, intfDesc, handler);
-    if (status == AJ_OK) {
-        vdiIntfInfoCount++;
-        if (handler->InterfaceRegistered) {
-            handler->InterfaceRegistered(type);
-        }
-        *intfType = type;
-    } else {
-        *intfType = UNDEFINED_INTERFACE;
-    }
-
-    return status;
-}
-
-
-
-static CdmRegisteredInterfaceInfo* GetRegisteredInterfaceInfo(CdmInterfaceTypes intfType)
-{
-    CdmRegisteredInterfaceInfo* regIntfInfo = regIntfInfoFirst;
-
-    while (regIntfInfo) {
-        if (regIntfInfo->type == intfType) {
-            break;
-        }
-        regIntfInfo = regIntfInfo->nextNode;
-    }
-
-    return regIntfInfo;
-}
-
-
-
-AJ_Status Cdm_CreateInterface(CdmInterfaceTypes intfType, const char* objPath, void* listener)
-{
-    CdmObjectInfo* objInfo = NULL;
-
-    if (!objPath) {
-        return AJ_ERR_INVALID;
-    }
-
-    objInfo = GetObjectInfoByPath(objPath);
-    if (!objInfo) {
-        objInfo = malloc(sizeof(CdmObjectInfo));
-        if (!objInfo) {
-            return AJ_ERR_RESOURCES;
-        }
-        memset(objInfo, 0, sizeof(CdmObjectInfo));
-
-        {
-            CdmObjectInfo tempObj = { objPath, NULL, NULL, NULL, NULL };
-            memcpy(objInfo, &tempObj, sizeof(tempObj));
-        }
-
-        if (!objInfoFirst) {
-            objInfoFirst = objInfo;
-        }
-        if (objInfoLast) {
-            objInfoLast->nextNode = objInfo;
-        }
-        objInfoLast = objInfo;
-    }
-
-    CdmRegisteredInterfaceInfo* regIntfInfo = GetRegisteredInterfaceInfo(intfType);
-    if (!regIntfInfo) {
-        return AJ_ERR_NO_MATCH;  // Interface needs registering first.
-    }
-
-    CdmInterfaceInfo* intfInfo = malloc(sizeof(CdmInterfaceInfo));
-    if (!intfInfo) {
-        return AJ_ERR_RESOURCES;
-    }
-    memset(intfInfo, 0, sizeof(CdmInterfaceInfo));
-
-    {
-        CdmInterfaceInfo tempIntfInfo = { regIntfInfo->type, regIntfInfo->name, regIntfInfo->desc, regIntfInfo->handler, listener, NULL };
-        memcpy(intfInfo, &tempIntfInfo, sizeof(tempIntfInfo));
-    }
-
-    if (!objInfo->intfFirst) {
-        objInfo->intfFirst = intfInfo;
-        objInfo->intfLast = intfInfo;
-    } else {
-        objInfo->intfLast->nextNode = intfInfo;
-        objInfo->intfLast = intfInfo;
-    }
-
-    return AJ_OK;
-}
-#endif
-
-
-
 static bool CheckInterfaceAlreadyAdded(CdmObjectInfo* objInfo, const char* intfName)
 {
     if (!objInfo) {
@@ -296,7 +107,6 @@ static bool CheckInterfaceAlreadyAdded(CdmObjectInfo* objInfo, const char* intfN
 
     return (intfInfo != NULL);
 }
-
 
 
 AJ_Status Cdm_AddInterface(const char* objPath, const char* intfName, const char* const* intfDesc, const InterfaceHandler* intfHandler, void* intfModel)
@@ -340,11 +150,7 @@ AJ_Status Cdm_AddInterface(const char* objPath, const char* intfName, const char
     memset(intfInfo, 0, sizeof(CdmInterfaceInfo));
 
     {
-        CdmInterfaceInfo tempIntfInfo = {
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-            UNDEFINED_INTERFACE,
-#endif
-            intfName, intfDesc, intfHandler, intfModel, NULL };
+        CdmInterfaceInfo tempIntfInfo = {intfName, intfDesc, intfHandler, intfModel, NULL };
         memcpy(intfInfo, &tempIntfInfo, sizeof(tempIntfInfo));
     }
 
@@ -389,7 +195,7 @@ AJ_Status Cdm_Start(void)
         numOfObjs++;
     }
 
-    ajObjects = malloc(sizeof(AJ_Object) * (numOfObjs + 1)); //+1 is for last NULL
+    ajObjects = malloc(sizeof(AJ_Object) * (numOfObjs + 1)); /* +1 is for last NULL */
     if (!ajObjects) {
         return AJ_ERR_RESOURCES;
     }
@@ -405,7 +211,7 @@ AJ_Status Cdm_Start(void)
             numOfIntfs++;
         }
 
-        objInfo->descs = malloc(sizeof(AJ_InterfaceDescription) * (numOfIntfs + 2)); //+2 are for AJ_PropertiesIface and last NULL
+        objInfo->descs = malloc(sizeof(AJ_InterfaceDescription) * (numOfIntfs + 2)); /* +2 are for AJ_PropertiesIface and last NULL */
         if (!objInfo->descs) {
             CleanInterfaceDescs();
             free(ajObjects);
@@ -456,7 +262,6 @@ static uint8_t GetMemberIndex(uint32_t msgId)
 }
 
 
-
 static CdmObjectInfo* GetObjectInfoByIndex(uint8_t objIndex)
 {
     CdmObjectInfo* objInfo = objInfoFirst;
@@ -473,13 +278,12 @@ static CdmObjectInfo* GetObjectInfoByIndex(uint8_t objIndex)
 }
 
 
-
 static CdmInterfaceInfo* GetInterfaceInfo(CdmObjectInfo* objInfo, uint8_t intfIndex)
 {
     if (!objInfo) {
         return NULL;
     }
-    if (intfIndex < 1) { //0 is org.freedesktop.DBus.Properties
+    if (intfIndex < 1) { /* 0 is org.freedesktop.DBus.Properties */
         return NULL;
     }
 
@@ -585,7 +389,7 @@ AJSVC_ServiceStatus Cdm_MessageProcessor(AJ_BusAttachment* busAttachment, AJ_Mes
     uint8_t intfIndex = GetInterfaceIndex(msg->msgId);
     uint8_t memberIndex = GetMemberIndex(msg->msgId);
 
-    if (intfIndex == (uint8_t)0) { //org.freedesktop.DBus.Properties handling
+    if (intfIndex == (uint8_t)0) { /* org.freedesktop.DBus.Properties handling */
         if (memberIndex == AJ_PROP_GET) {
             *status = PropGetHandler(msg, busAttachment);
         } else if (memberIndex == AJ_PROP_SET) {
@@ -593,7 +397,7 @@ AJSVC_ServiceStatus Cdm_MessageProcessor(AJ_BusAttachment* busAttachment, AJ_Mes
         } else {
             *status = AJ_ERR_INVALID;
         }
-    } else { //method
+    } else { /* method */
         CdmObjectInfo* objInfo = GetObjectInfoByIndex(objIndex);
         CdmInterfaceInfo* intfInfo = GetInterfaceInfo(objInfo, intfIndex);
 
@@ -610,61 +414,6 @@ AJSVC_ServiceStatus Cdm_MessageProcessor(AJ_BusAttachment* busAttachment, AJ_Mes
 
     return AJSVC_SERVICE_STATUS_HANDLED;
 }
-
-
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-AJ_Status MakeMsgId(const char* objPath, CdmInterfaceTypes intfType, uint8_t memberIndex, uint32_t* msgId)
-{
-    if (!objPath) {
-        return AJ_ERR_INVALID;
-    }
-    if (!msgId) {
-        return AJ_ERR_INVALID;
-    }
-
-    *msgId = CDM_OBJECT_LIST_INDEX << 24;
-
-    uint8_t objIndex = -1;
-    CdmObjectInfo* objInfo = objInfoFirst;
-    while (objInfo) {
-        objIndex++;
-
-        if (!strcmp(objInfo->path, objPath)) {
-            break;
-        } else {
-            objInfo = objInfo->nextNode;
-        }
-    }
-
-    if (!objInfo) {
-        return AJ_ERR_NO_MATCH;
-    }
-
-    *msgId |= (objIndex << 16);
-
-    uint8_t intfIndex = 0;
-    CdmInterfaceInfo* intfInfo = objInfo->intfFirst;
-    while (intfInfo) {
-        intfIndex++;
-        if (intfInfo->type == intfType) {
-            break;
-        } else {
-            intfInfo = intfInfo->nextNode;
-        }
-    }
-
-    if (!intfInfo) {
-        return AJ_ERR_NO_MATCH;
-    }
-
-    *msgId |= (intfIndex << 8);
-    *msgId |= memberIndex;
-
-    return AJ_OK;
-}
-#endif
-
 
 
 void* GetInterfaceModel(const char* objPath, const char* intfName)
@@ -693,7 +442,6 @@ void* GetInterfaceModel(const char* objPath, const char* intfName)
 
     return NULL;
 }
-
 
 
 AJ_Status MakeMessageId(const char* objPath, const char* intfName, uint8_t memberIndex, uint32_t* msgId)

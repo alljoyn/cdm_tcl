@@ -41,19 +41,19 @@ extern AJ_EXPORT uint8_t dbgAJSVCAPP;
 
 const PropertyStoreEntry propertyStoreProperties[CDM_PROPERTY_STORE_NUMBER_OF_KEYS] =
 {
-//  { "Key Name              ", W, A, M, I .. . . ., P },
+/*  { "Key Name              ", W, A, M, I .. . . ., P }, */
     { "DeviceId",               0, 1, 0, 1, 0, 0, 0, 1 },
     { "AppId",                  0, 1, 0, 1, 0, 0, 0, 1 },
 #ifndef CONFIG_SERVICE
     { "DeviceName",             0, 1, 1, 1, 0, 0, 0, 1 },
-// Add other runtime keys above this line
+/* Add other runtime keys above this line */
     { "DefaultLanguage",        0, 1, 0, 0, 0, 0, 0, 1 },
 #else
     { "DeviceName",             1, 1, 1, 1, 0, 0, 0, 1 },
     { "DefaultLanguage",        1, 1, 0, 0, 0, 0, 0, 1 },
     { "Passcode",               1, 0, 0, 0, 0, 0, 0, 0 },
     { "RealmName",              1, 0, 0, 0, 0, 0, 0, 0 },
-// Add other runtime keys above this line
+/* Add other runtime keys above this line */
 #endif
     { "AppName",                0, 1, 0, 0, 0, 0, 0, 1 },
     { "Description",            0, 0, 1, 0, 0, 0, 0, 1 },
@@ -65,10 +65,10 @@ const PropertyStoreEntry propertyStoreProperties[CDM_PROPERTY_STORE_NUMBER_OF_KE
 #ifdef CONFIG_SERVICE
     { "MaxLength",              0, 1, 0, 0, 0, 0, 0, 1 },
 #endif
-// Add other mandatory about keys above this line
+/* Add other mandatory about keys above this line */
     { "HardwareVersion",        0, 0, 0, 0, 0, 0, 0, 1 },
     { "SupportUrl",             0, 0, 1, 0, 0, 0, 0, 1 },
-// Add other optional about keys above this line
+/* Add other optional about keys above this line */
     { "CountryOfProduction",    0, 1, 1, 0, 0, 0, 0, 1 },
     { "CorporateBrand",         0, 1, 1, 0, 0, 0, 0, 1 },
     { "ProductBrand",           0, 1, 1, 0, 0, 0, 0, 1 },
@@ -178,7 +178,7 @@ int8_t AJSVC_PropertyStore_GetLanguageIndex(const char* const language)
     const char* search = language;
 
     if (search != NULL) {
-        if (search[0] == '\0') { // Check for empty language, if yes then search for current default language index
+        if (search[0] == '\0') { /* Check for empty language, if yes then search for current default language index */
             search = AJSVC_PropertyStore_GetValue(AJSVC_PROPERTY_STORE_DEFAULT_LANGUAGE);
             if (search == NULL) {
                 return AJSVC_PROPERTY_STORE_ERROR_LANGUAGE_INDEX;
@@ -206,8 +206,8 @@ uint8_t AJSVC_PropertyStore_SetValueForLang(int8_t fieldIndex, int8_t langIndex,
     }
     AJ_InfoPrintf(("Set key [%s] defaultValue [%s]\n", propertyStoreProperties[fieldIndex].keyName, value));
     var_size = propertyStoreRuntimeValues[fieldIndex].size;
-    //Check that the field we are trying to write into is not actually the same value.
-    //On Darwin this will fail per the strncpy function definition
+    /* Check that the field we are trying to write into is not actually the same value. */
+    /* On Darwin this will fail per the strncpy function definition */
     if (propertyStoreRuntimeValues[fieldIndex].value[langIndex] != value) {
         strncpy(propertyStoreRuntimeValues[fieldIndex].value[langIndex], value, var_size - 1);
         (propertyStoreRuntimeValues[fieldIndex].value[langIndex])[var_size - 1] = '\0';
@@ -428,7 +428,7 @@ AJ_Status AJSVC_PropertyStore_SaveAll()
             }
         }
     }
-    AJ_AboutSetShouldAnnounce(); // Set flag for sending an updated Announcement
+    AJ_AboutSetShouldAnnounce(); /* Set flag for sending an updated Announcement */
 
     return status;
 }
@@ -478,7 +478,7 @@ AJ_Status AJSVC_PropertyStore_ReadAll(AJ_Message* msg, AJSVC_PropertyStoreCatego
 #endif
             value = AJSVC_PropertyStore_GetValueForLang(fieldIndex, langIndex);
 
-            if (value == NULL && (int8_t)fieldIndex >= (int8_t)AJSVC_PROPERTY_STORE_NUMBER_OF_MANDATORY_KEYS) {     // Non existing values are skipped!
+            if (value == NULL && (int8_t)fieldIndex >= (int8_t)AJSVC_PROPERTY_STORE_NUMBER_OF_MANDATORY_KEYS) {     /* Non existing values are skipped! */
                 AJ_WarnPrintf(("PropertyStore_ReadAll - Failed to get value for field=(name=%s, index=%d) and language=(name=%s, index=%d), skipping.\n", AJSVC_PropertyStore_GetFieldName(fieldIndex), (int)fieldIndex, AJSVC_PropertyStore_GetLanguageName(langIndex), (int)langIndex));
             } else {
                 if (fieldIndex == AJSVC_PROPERTY_STORE_APP_ID) {
@@ -522,7 +522,7 @@ AJ_Status AJSVC_PropertyStore_ReadAll(AJ_Message* msg, AJSVC_PropertyStoreCatego
                     }
                     AJ_InfoPrintf(("Has key [%s] runtime Value [%s]\n", propertyStoreProperties[AJSVC_PROPERTY_STORE_AJ_SOFTWARE_VERSION].keyName, ajVersion));
                 } else if (fieldIndex == AJSVC_PROPERTY_STORE_DEVICE_TYPE_DESCRIPTION ) {
-                    // DeviceTypeDescription
+                    /* DeviceTypeDescription */
                     AJ_Arg arr;
                     AJ_Arg structure;
 
@@ -591,7 +591,7 @@ AJ_Status AJSVC_PropertyStore_ReadAll(AJ_Message* msg, AJSVC_PropertyStoreCatego
     }
 
     if (filter.bit0About) {
-        // Add supported languages
+        /* Add supported languages */
         status = AJ_MarshalContainer(msg, &dict, AJ_ARG_DICT_ENTRY);
         if (status != AJ_OK) {
             return status;

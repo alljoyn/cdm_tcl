@@ -27,7 +27,7 @@
 typedef struct CDM_Array {
     void* elems;
     size_t numElems;
-    } CDM_Array;
+} CDM_Array;
 
 
 /*
@@ -40,17 +40,18 @@ extern void Init_Array(CDM_Array* array, size_t elemSize, size_t numElems);
 extern void Copy_Array(CDM_Array* array, size_t elemSize, CDM_Array* copy);
 extern size_t Extend_Array(CDM_Array* array, size_t elemSize, size_t numElems);
 
-// These structs must match CDM_Array.
-#define MK_ARRAY(TYPE, NAME) typedef struct Array_ ## NAME {TYPE* elems; size_t numElems;} Array_ ## NAME; \
+#define FREE_ARRAY(TYPE, NAME) UNUSED_OK extern void FreeArray_##NAME(Array_##NAME* array);
+#define INIT_ARRAY(TYPE, NAME) UNUSED_OK static void InitArray_##NAME(Array_##NAME* array, size_t numElems){Init_Array((CDM_Array*)array, sizeof(TYPE), numElems);}
+#define EXTEND_ARRAY(TYPE, NAME) UNUSED_OK static size_t ExtendArray_ ## NAME(Array_ ## NAME* array, size_t numElems){return Extend_Array((CDM_Array*)array, sizeof(TYPE), numElems);}
+
+/* These structs must match CDM_Array. */
+#define MK_ARRAY(TYPE, NAME) typedef struct Array_##NAME {TYPE* elems; size_t numElems;} Array_##NAME; \
 FREE_ARRAY(TYPE, NAME) \
 INIT_ARRAY(TYPE, NAME) \
 EXTEND_ARRAY(TYPE, NAME)
 
-#define FREE_ARRAY(TYPE, NAME) extern void FreeArray_ ## NAME(Array_ ## NAME* array);
-#define INIT_ARRAY(TYPE, NAME) static inline void InitArray_ ## NAME(Array_ ## NAME* array, size_t numElems){Init_Array((CDM_Array*)array, sizeof(TYPE), numElems);}
-#define EXTEND_ARRAY(TYPE, NAME) static inline size_t ExtendArray_ ## NAME(Array_ ## NAME* array, size_t numElems){return Extend_Array((CDM_Array*)array, sizeof(TYPE), numElems);}
 
-// Beware that stdbool.h defines a macro called 'bool'
+/* Beware that stdbool.h defines a macro called 'bool' */
 #define MAKE_ARRAYS \
 MK_ARRAY(bool, Bool) \
 MK_ARRAY(char*, string) \
@@ -65,8 +66,8 @@ MK_ARRAY(double, double)
 
 MAKE_ARRAYS
 
-// We only need some of these and strings are a special case
-#define COPY_ARRAY(TYPE, NAME) static inline void CopyArray_ ## NAME(Array_ ## NAME* array, Array_ ## NAME* copy){Copy_Array((CDM_Array*)array, sizeof(TYPE), (CDM_Array*)copy);}
+/* We only need some of these and strings are a special case */
+#define COPY_ARRAY(TYPE, NAME) UNUSED_OK static void CopyArray_ ## NAME(Array_ ## NAME* array, Array_ ## NAME* copy){Copy_Array((CDM_Array*)array, sizeof(TYPE), (CDM_Array*)copy);}
 
 COPY_ARRAY(bool, Bool) \
 COPY_ARRAY(uint8_t, uint8) \
@@ -85,4 +86,4 @@ extern void CopyArray_string(Array_string* array, Array_string* copy);
 #undef INIT_ARRAY
 #undef MAKE_ARRAYS
 
-#endif //ALLJOYN_CDM_ARRAY_H
+#endif /* ALLJOYN_CDM_ARRAY_H */

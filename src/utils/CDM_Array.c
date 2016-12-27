@@ -17,18 +17,23 @@
 #include <ajtcl/cdm/utils/CDM_Array.h>
 #include <string.h>
 
-#define MK_ARRAY(TYPE, NAME) void FreeArray_ ## NAME(struct Array_ ## NAME* array){free(array->elems));
+#define MK_FREE_FUNC(TYPE, NAME) void FreeArray_ ## NAME(struct Array_ ## NAME* array) \
+{\
+    free(array->elems);\
+}\
 
-#define MAKE_ARRAYS \
-MK_ARRAY(bool, Bool) \
-MK_ARRAY(uint8_t, uint8) \
-MK_ARRAY(int16_t, int16) \
-MK_ARRAY(uint16_t, uint16) \
-MK_ARRAY(int32_t, int32) \
-MK_ARRAY(uint32_t, uint32) \
-MK_ARRAY(int64_t, int64) \
-MK_ARRAY(uint64_t, uint64) \
-MK_ARRAY(double, double)
+#define MK_FREE_FUNCS \
+MK_FREE_FUNC(bool, Bool) \
+MK_FREE_FUNC(uint8_t, uint8) \
+MK_FREE_FUNC(int16_t, int16) \
+MK_FREE_FUNC(uint16_t, uint16) \
+MK_FREE_FUNC(int32_t, int32) \
+MK_FREE_FUNC(uint32_t, uint32) \
+MK_FREE_FUNC(int64_t, int64) \
+MK_FREE_FUNC(uint64_t, uint64) \
+MK_FREE_FUNC(double, double)
+
+MK_FREE_FUNCS
 
 void FreeArray_string(Array_string* array)
 {

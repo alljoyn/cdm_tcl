@@ -19,10 +19,8 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#include "BSXML.h"
-#include "StrBuf.h"
-
-//======================================================================
+#include <ajtcl/cdm/utils/BSXML.h>
+#include <ajtcl/cdm/utils/StrBuf.h>
 
 typedef enum {
     IN_ELEMENT,
@@ -35,28 +33,27 @@ typedef enum {
 } ParseState;
 
 
-
 typedef struct Context {
     const char* source;
     const char* getter;
 
     ParseState parseState;
-    Element *root;         // Parsed root element 
-    Element *curElem;      // XML element currently being parsed 
-    StrBuf rawContent;   // Text content for current element 
-    StrBuf elemName;     // Name of current element 
-    StrBuf attrName;     // Name of attribute currently being parsed. 
-    StrBuf attrValue;    // Value of attribute currently being parsed. 
+    Element *root;         /* Parsed root element */
+    Element *curElem;      /* XML element currently being parsed */
+    StrBuf rawContent;   /* Text content for current element */
+    StrBuf elemName;     /* Name of current element */
+    StrBuf attrName;     /* Name of attribute currently being parsed. */
+    StrBuf attrValue;    /* Value of attribute currently being parsed. */
     StrBuf doctypeStr;
-    bool attrInQuote;         // true iff inside attribute value quotes 
-    char quoteChar;           // a " or ' character used for quote matching of an attribute 
-    bool isEndTag;            // true iff currently parsed tag is an end tag 
-    bool isDoctype;           // true iff currently parsed tag is a doctype tag 
-    bool foundHyphen;         // true iff a hyphen was found during the current pass 
-    bool isCommentDelim;      // true iff a comment tag delimeter (--) was found 
-    bool shouldIgnore;        // true iff currently parsed tag is a comment 
-    bool isTextDecleration;   // true iff currently parsed tag is a text decleration tag (<?) 
-    bool foundTxtDeclDelim;   // true iff a question mark was found during the current pass 
+    bool attrInQuote;         /* true iff inside attribute value quotes */
+    char quoteChar;           /* a " or ' character used for quote matching of an attribute */
+    bool isEndTag;            /* true iff currently parsed tag is an end tag */
+    bool isDoctype;           /* true iff currently parsed tag is a doctype tag */
+    bool foundHyphen;         /* true iff a hyphen was found during the current pass */
+    bool isCommentDelim;      /* true iff a comment tag delimeter (--) was found */
+    bool shouldIgnore;        /* true iff currently parsed tag is a comment */
+    bool isTextDecleration;   /* true iff currently parsed tag is a text decleration tag (<?) */
+    bool foundTxtDeclDelim;   /* true iff a question mark was found during the current pass */
     } Context;
 
 
@@ -154,7 +151,7 @@ void BSXML_AddAttribute(Element* element, const char* name, const char* value)
 
 static void XferName(Element* element, const char* name)
 {
-    // transfer ownership
+    /* transfer ownership */
     if (element->name) {
         free((void*)element->name);
     }
@@ -241,7 +238,6 @@ void BSXML_FreeElementAttr(ElementAttr* attr)
     }
 }
 
-//======================================================================
 
 static bool IsWhite(char c)
 {
@@ -260,7 +256,7 @@ static const char* Trim(const char* s)
     }
 
     size_t n = strlen(s);
-    const char* p = s + n;  // the char past the last non-white
+    const char* p = s + n;  /* the char past the last non-white */
 
     while (p > s && IsWhite(p[-1])) {
         --p;
@@ -477,7 +473,7 @@ Element* BSXML_GetRoot(const char* xml)
 
 static void FinalizeElement(Context* ctxt)
 {
-    // Finish off the current element in the context.
+    /* Finish off the current element in the context. */
 
     if (ctxt->curElem == NULL) {
         return;
@@ -588,7 +584,7 @@ static Element* Parse(Context* ctxt)
 
             case IN_ELEMENT_START:
                 if (!ctxt->elemName.chars[0] && !ctxt->isEndTag) {
-                    // We have started the element name
+                    /* We have started the element name */
                     if ('/' == c) {
                         ctxt->isEndTag = true;
                     } else if ('!' == c) {
@@ -680,8 +676,8 @@ static Element* Parse(Context* ctxt)
                     } else if ('/' == c) {
                         ctxt->isEndTag = true;
                     } else if ('>' == c) {
-                        // IGNORE MALFORMED ATTRIBUTE
-                        // End current element if necessary
+                        /* IGNORE MALFORMED ATTRIBUTE */
+                        /* End current element if necessary */
                         if (ctxt->isEndTag) {
                             FinalizeElement(ctxt);
                             done = (NULL == ctxt->curElem);
@@ -717,8 +713,9 @@ static void GenerateInt(const Element* element, StrBuf* outStr)
 {
     StrBuf_AppendStr(outStr, "\n<");
     StrBuf_AppendStr(outStr, element->name);
+    size_t i;
 
-    for (size_t i = 0; i < element->numAttributes; ++i) {
+    for (i = 0; i < element->numAttributes; ++i) {
         ElementAttr* attr = &element->attributes[i];
         const char* v = BSXML_EscapeXml(attr->value);
     
@@ -741,7 +738,7 @@ static void GenerateInt(const Element* element, StrBuf* outStr)
     StrBuf_AppendChar(outStr, '>');
 
     if (hasChildren) {
-        for (size_t i = 0; i < element->numChildren; ++i) {
+        for (i = 0; i < element->numChildren; ++i) {
             GenerateInt(element->children[i], outStr);
         }
     } else if (hasContent) {
@@ -837,18 +834,18 @@ Element** BSXML_GetPath(Element* element, const char* inPath)
 {
     Element** matches = NULL;
 
-    // We'll split this by putting in NUL chars.
+    /* We'll split this by putting in NUL chars. */
     char* copy = strdup(inPath);
     char* path = copy;
 
-    // Split off an attribute name.
+    /* Split off an attribute name. */
     char* attr = strchr(path, '@');
 
     if (attr) {
         *attr = 0;
     }
 
-    // Split off the first part.
+    /* Split off the first part. */
     char* pos = strchr(path, '/');
 
     if (pos) {
@@ -857,7 +854,7 @@ Element** BSXML_GetPath(Element* element, const char* inPath)
     
     while (element) {
         if (!pos) {
-            // Reached the end.
+            /* Reached the end. */
             matches = BSXML_GetChildren(element, path);
             break;
         }
@@ -872,24 +869,27 @@ Element** BSXML_GetPath(Element* element, const char* inPath)
         }
     }
 
-    // Filter out matches that don't have the required attribute
+    /* Filter out matches that don't have the required attribute */
     if (matches && attr) {
         size_t num = 0;
+        size_t i;
+        Element** m;
+        Element** matches2;
+        size_t putter = 0;
 
-        for (Element** m = matches; *m; ++m) {
+        for (m = matches; *m; ++m) {
             ++num;
         }
 
-        // Make a copy
-        Element** matches2 = malloc(sizeof(Element*) * num + 1);
-        size_t putter = 0;
+        /* Make a copy */
+        matches2 = malloc(sizeof(Element*) * num + 1);
 
-        for (size_t i = 0; i < num; ++i) {
-            Element* m = matches[i];
-            const char* a = BSXML_GetAttribute(m, attr);
+
+        for (i = 0; i < num; ++i) {
+            const char* a = BSXML_GetAttribute(matches[i], attr);
 
             if (a) {
-                matches2[putter++] = m;
+                matches2[putter++] = matches[i];
             }
         }
 
@@ -901,5 +901,3 @@ Element** BSXML_GetPath(Element* element, const char* inPath)
     free((void*)copy);
     return matches;
 }
-
-//======================================================================

@@ -17,9 +17,7 @@
 #ifndef ALLJOYN_FILEIO_H
 #define ALLJOYN_FILEIO_H
 
-#include "StrBuf.h"
-
-//======================================================================
+#include <ajtcl/cdm/utils/StrBuf.h>
 
 /**
  * This appends the contents of the file to the buffer.
@@ -27,5 +25,4 @@
  */
 extern bool ReadFile(const char *filepath, StrBuf* outBuf);
 
-//======================================================================
-#endif // ALLJOYN_FILEIO_H
+#endif /* ALLJOYN_FILEIO_H */

@@ -60,4 +60,4 @@ AJ_Status Cdm_MessageLoop(CDM_BusAttachment *busAttachment);
 void CDM_SystemStop(void);
 
 
-#endif //ALLJOYN_CDM_SYSTEM_H
+#endif /* ALLJOYN_CDM_SYSTEM_H */

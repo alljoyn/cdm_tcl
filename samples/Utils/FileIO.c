@@ -23,8 +23,6 @@
 
 #include "FileIO.h"
 
-//======================================================================
-
 
 bool ReadFile(const char *filepath, StrBuf* outBuf)
 {
@@ -54,6 +52,3 @@ bool ReadFile(const char *filepath, StrBuf* outBuf)
 
     return ok;
 }
-
-//======================================================================
-

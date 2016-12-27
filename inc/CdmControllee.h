@@ -21,15 +21,12 @@
 #include <ajtcl/alljoyn.h>
 #include <stdbool.h>
 
-//#define USE_DEPRECATED_INTERFACE_TYPES      // Remove this define once deprecation period is over.
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
 typedef enum {
     UNDEFINED_INTERFACE             = 0,
-    //INPUT
+    /* INPUT */
     HID_INTERFACE,
 
-    //Environment
+    /* Environment */
     CURRENT_AIR_QUALITY_INTERFACE,
     CURRENT_AIR_QUALITY_LEVEL_INTERFACE,
     CURRENT_HUMIDITY_INTERFACE,
@@ -40,7 +37,7 @@ typedef enum {
     WATER_LEVEL_INTERFACE,
     WIND_DIRECTION_INTERFACE,
 
-    //Operation
+    /* Operation */
     AIR_RECIRCULATION_MODE_INTERFACE,
     ALERTS_INTERFACE,
     AUDIO_VIDEO_INPUT_INTERFACE,
@@ -74,36 +71,20 @@ typedef enum {
     SPIN_SPEED_LEVEL_INTERFACE,
     TIMER_INTERFACE,
 
-    //UserInterfaceSettings
+    /* UserInterfaceSettings */
     LANGUAGE_DISPLAY_INTERFACE,
     TEMPERATURE_DISPLAY_INTERFACE,
     TIME_DISPLAY_INTERFACE,
 
-    //////////////////////////////
     LAST_BASIC_INTERFACE_TYPE,
     NUMBER_OF_BASIC_INTERFACE_TYPE,
     MAX_BASIC_INTERFACE_TYPE        = NUMBER_OF_BASIC_INTERFACE_TYPE,
-
-    // Vendor Defined Interface
-    VENDOR_DEFINED_INTERFACE        = 0x1000,
-
 } CdmInterfaceTypes;
-#endif
 
 /**
  * Structure which holds the handler functions for a given interface.
  */
 typedef struct {
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-    /**
-     * @deprecated No longer used, only called by Cdm_RegisterVendorDefinedInterface() which is deprecated.
-     * Handler called when the interface is registered.
-     * @param[in] intfType registered interface type
-     */
-    AJ_DEPRECATED_ON(void (*InterfaceRegistered)(CdmInterfaceTypes intfType), 16.10);
-#endif
-
     /**
      * Handler called when getting property value is requested.
      * @param[in] replyMsg put the reply in here and call AJ_DeliverMsg
@@ -133,10 +114,6 @@ typedef struct {
     AJ_Status (*OnMethodHandler)(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex);
 } InterfaceHandler;
 
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-AJ_DEPRECATED_ON(typedef InterfaceHandler VendorDefinedInterfaceHandler, 16.10);
-#endif
-
 /**
  * Initialize CDM service framework.
  * @return AJ_OK on success.
@@ -147,29 +124,6 @@ AJ_Status Cdm_Init(void);
  * Deinitialize CDM service framework.
  */
 void Cdm_Deinit(void);
-
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-/**
- * @deprecated See Cdm_AddInterface(const char*, const char*, const char* const*, InterfaceHandler*, void*)
- * Register vendor defined interface.
- * @param[in] intfName vendor defined interface name
- * @param[in] intfDesc vendor defined interface description
- * @param[in] handler vendor defined interface handler
- * @param[out] intfType registered interface type
- * @return AJ_OK on success
- */
-AJ_DEPRECATED_ON(AJ_Status Cdm_RegisterVendorDefinedInterface(const char* intfName, const char* const* intfDesc, VendorDefinedInterfaceHandler* handler, CdmInterfaceTypes* intfType), 16.10);
-
-/**
- * Create interface.
- * @deprecated See Cdm_AddInterface(const char*, const char*, const char* const*, InterfaceHandler*, void*)
- * @param[in] intfType interface type
- * @param[in] objPath the object path including the interface
- * @param[in] listener interface listener
- * @return AJ_OK on success
- */
-AJ_DEPRECATED_ON(AJ_Status Cdm_CreateInterface(CdmInterfaceTypes intfType, const char* objPath, void* listener), 16.10);
-#endif
 
 /**
  * Add interface.
@@ -205,19 +159,6 @@ AJ_Status Cdm_Start(void);
  */
 AJSVC_ServiceStatus Cdm_MessageProcessor(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Status* status);
 
-#ifdef USE_DEPRECATED_INTERFACE_TYPES
-/**
- * @deprecated See MakeMessageId(const char*, const char*, uint8_t, uint32_t*)
- * Make message identifier (mainly used for emitting signal)
- * @param[in] objPath the object path including the interface
- * @param[in] intfType interface type
- * @param[in] memberIndex index of the member in the interface description
- * @param[out] msgId message identifier made
- * @return AJ_OK on success
- */
-AJ_DEPRECATED_ON(AJ_Status MakeMsgId(const char* objPath, CdmInterfaceTypes intfType, uint8_t memberIndex, uint32_t* msgId), 16.10);
-#endif
-
 /**
  * Get pointer to the interface's model
  * @param[in] objPath the object path
@@ -244,4 +185,4 @@ AJ_Status MakeMessageId(const char* objPath, const char* intfName, uint8_t membe
  */
 AJ_Status MakePropChangedId(const char* objPath, uint32_t* msgId);
 
-#endif // CDMCONTROLLEE_H_
+#endif /* CDMCONTROLLEE_H_ */

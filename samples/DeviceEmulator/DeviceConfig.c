@@ -18,9 +18,10 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#include <ajtcl/cdm/utils/BSXML.h>
+#include <ajtcl/cdm/utils/StrBuf.h>
+
 #include "DeviceConfig.h"
-#include "../Utils/BSXML.h"
-#include "../Utils/StrBuf.h"
 #include "../Utils/FileIO.h"
 
 

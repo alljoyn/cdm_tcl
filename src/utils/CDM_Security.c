@@ -27,8 +27,8 @@ static const char *ecdsaPEMPrivateKey = NULL;
 static const char *ecdsaPEMCertificate = NULL;
 static uint32_t keyExpiration =  0xFFFFFFFF;
 
-//static char *publicBuf = NULL;
-//static char *privateBuf = NULL;
+/* static char *publicBuf = NULL; */
+/* static char *privateBuf = NULL; */
 
 static const uint32_t *securitySuites;
 static int numSecuritySuites = 0;
@@ -73,10 +73,10 @@ void Cdm_DisableECDSA(void)
     ecdsaPEMCertificate = NULL;
 }
 
-//AJ_Status Cdm_EnableFromFile(const char* pathPrefix)
-//{
-//    return AJ_OK;
-//}
+/* AJ_Status Cdm_EnableFromFile(const char* pathPrefix)
+{
+    return AJ_OK;
+}*/
 
 static AJ_Status retreiveSPEKE(AJ_Credential* cred)
 {
@@ -126,7 +126,7 @@ static AJ_Status DefaultAuthListenerCallback(uint32_t authmechanism, uint32_t co
             }
             break;
 
-        //The ECDHE_PSK auth mechanism is deprecated as of 16.04 and ECDHE_SPEKE should be used instead.
+        /* The ECDHE_PSK auth mechanism is deprecated as of 16.04 and ECDHE_SPEKE should be used instead. */
         case AUTH_SUITE_ECDHE_PSK:
             switch (command) {
                 case AJ_CRED_PUB_KEY:
@@ -148,7 +148,7 @@ static AJ_Status DefaultAuthListenerCallback(uint32_t authmechanism, uint32_t co
                 case AJ_CRED_CERT_CHAIN:
                     switch (cred->direction) {
                         case AJ_CRED_REQUEST:
-                            // Free previous certificate chain
+                            /* Free previous certificate chain */
                             AJ_X509FreeDecodedCertificateChain(chain);
                             chain = AJ_X509DecodeCertificateChainPEM(ecdsaPEMCertificate);
                             if (NULL == chain) {
@@ -183,14 +183,14 @@ AJ_Status Cdm_EnableSecurity(AJ_BusAttachment *busAttachment, AJ_AuthListenerFun
     AJ_Status status = (securitySuites == NULL || numSecuritySuites == 0) ? AJ_ERR_FAILURE : AJ_OK;
     if (status != AJ_OK)
     {
-        //AJ_ErrPrintf("Security suites have not been set.\n");
+        /* AJ_ErrPrintf("Security suites have not been set.\n"); */
         return status;
     }
 
     status = AJ_BusEnableSecurity(busAttachment, securitySuites, numSecuritySuites);
     if (status != AJ_OK)
     {
-        //AJ_ErrPrintf(("Error enabling security on the bus attachment: %s\n", (AJ_StatusText(status))));
+        /* AJ_ErrPrintf(("Error enabling security on the bus attachment: %s\n", (AJ_StatusText(status)))); */
         return status;
     }
 

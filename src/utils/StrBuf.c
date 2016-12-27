@@ -15,14 +15,14 @@
  ******************************************************************************/
 
 #include <string.h>
-#include "StrBuf.h"
+#include <ajtcl/cdm/utils/StrBuf.h>
 
 
 static void need(StrBuf* buf, size_t amount)
 {
-    // Allow for the NUL
-    // This doesn't advance numChars
-    int need = (buf->numChars + amount + 1) - buf->capacity;
+    /* Allow for the NUL */
+    /* This doesn't advance numChars */
+    int need = (int)((buf->numChars + amount + 1) - buf->capacity);
 
     if (need > 0)
     {

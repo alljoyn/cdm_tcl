@@ -20,8 +20,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-//======================================================================
-
 /**
  * This is not a full-blown XML parser/generator and performs no DTD validation
  * or other advanced features.
@@ -34,13 +32,13 @@ typedef struct ElementAttr {
 
 
 typedef struct Element {
-    const char* name;                   // Element name 
-    struct Element** children;          // array of pointers to child nodes
+    const char* name;                   /* Element name */
+    struct Element** children;          /* array of pointers to child nodes */
     size_t numChildren;
-    ElementAttr* attributes;            // array of attribute records
+    ElementAttr* attributes;            /* array of attribute records */
     size_t numAttributes;
-    const char* content;                // XML text content (unescaped) 
-    struct Element* parent;             // XML parent element or NULL if root 
+    const char* content;                /* XML text content (unescaped) */
+    struct Element* parent;             /* XML parent element or NULL if root */
     } Element;
 
 
@@ -197,5 +195,4 @@ const char* BSXML_EscapeXml(const char* str);
  */
 const char* BSXML_UnescapeXml(const char* str);
 
-//======================================================================
-#endif //ALLJOYN_BSXML_H
+#endif /* ALLJOYN_BSXML_H */
