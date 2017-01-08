@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/ColorInterface.h>
 #include <ajtcl/cdm/interfaces/operation/ColorModel.h>
 
@@ -55,10 +69,22 @@ static AJ_Status Color_GetHue(AJ_BusAttachment* busAttachment, const char* objPa
     return model->GetHue(model, objPath, out);
 }
 
-
-
-static AJ_Status Color_SetHue(AJ_BusAttachment* busAttachment, const char* objPath, double value)
+static AJ_Status clampHue(ColorModel* model, const char* objPath, double value, double *out)
 {
+
+    double minValue = 0.0;
+
+    double maxValue = 360.0;
+    double stepValue = 0;
+
+    *out = clamp_double(value, minValue, maxValue, stepValue);
+    return AJ_OK;
+}
+
+static AJ_Status Color_SetHue(AJ_BusAttachment* busAttachment, const char* objPath, double *value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -71,8 +97,13 @@ static AJ_Status Color_SetHue(AJ_BusAttachment* busAttachment, const char* objPa
         return AJ_ERR_NULL;
     }
 
+    status = clampHue(model, objPath, *value, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetHue(model, objPath, value);
+    status = model->SetHue(model, objPath, *value);
+    return status;
 }
 
 
@@ -102,10 +133,22 @@ static AJ_Status Color_GetSaturation(AJ_BusAttachment* busAttachment, const char
     return model->GetSaturation(model, objPath, out);
 }
 
-
-
-static AJ_Status Color_SetSaturation(AJ_BusAttachment* busAttachment, const char* objPath, double value)
+static AJ_Status clampSaturation(ColorModel* model, const char* objPath, double value, double *out)
 {
+
+    double minValue = 0.0;
+
+    double maxValue = 1.0;
+    double stepValue = 0;
+
+    *out = clamp_double(value, minValue, maxValue, stepValue);
+    return AJ_OK;
+}
+
+static AJ_Status Color_SetSaturation(AJ_BusAttachment* busAttachment, const char* objPath, double *value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -118,8 +161,13 @@ static AJ_Status Color_SetSaturation(AJ_BusAttachment* busAttachment, const char
         return AJ_ERR_NULL;
     }
 
+    status = clampSaturation(model, objPath, *value, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetSaturation(model, objPath, value);
+    status = model->SetSaturation(model, objPath, *value);
+    return status;
 }
 
 
@@ -132,9 +180,9 @@ AJ_Status Cdm_Color_EmitSaturationChanged(AJ_BusAttachment *bus, const char *obj
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status Color_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -147,6 +195,7 @@ static AJ_Status Color_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
         case COLOR_PROP_HUE:
         {
             double hue;
+            memset(&hue, 0, sizeof(double));
             status = Color_GetHue(busAttachment, objPath, &hue);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "d", hue);
@@ -161,6 +210,7 @@ static AJ_Status Color_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
         case COLOR_PROP_SATURATION:
         {
             double saturation;
+            memset(&saturation, 0, sizeof(double));
             status = Color_GetSaturation(busAttachment, objPath, &saturation);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "d", saturation);
@@ -178,7 +228,7 @@ static AJ_Status Color_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
 
 
 
-static AJ_Status Color_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status Color_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -192,9 +242,9 @@ static AJ_Status Color_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message
             double hue;
             status = AJ_UnmarshalArgs(msg, "d", &hue);
             if (status == AJ_OK) {
-                status = Color_SetHue(busAttachment, objPath, hue);
-                if (status == AJ_OK) {
-                    status= Cdm_Color_EmitHueChanged(busAttachment, objPath, hue);
+                status = Color_SetHue(busAttachment, objPath, &hue);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_Color_EmitHueChanged(busAttachment, objPath, hue);
                 }
             }
             break;
@@ -205,9 +255,9 @@ static AJ_Status Color_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message
             double saturation;
             status = AJ_UnmarshalArgs(msg, "d", &saturation);
             if (status == AJ_OK) {
-                status = Color_SetSaturation(busAttachment, objPath, saturation);
-                if (status == AJ_OK) {
-                    status= Cdm_Color_EmitSaturationChanged(busAttachment, objPath, saturation);
+                status = Color_SetSaturation(busAttachment, objPath, &saturation);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_Color_EmitSaturationChanged(busAttachment, objPath, saturation);
                 }
             }
             break;

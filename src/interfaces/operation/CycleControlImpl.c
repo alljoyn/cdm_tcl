@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/CycleControlInterface.h>
 #include <ajtcl/cdm/interfaces/operation/CycleControlModel.h>
 
@@ -89,7 +103,7 @@ size_t ExtendArray_CycleControl_OperationalCommands(Array_CycleControl_Operation
 
 
 
-static AJ_Status CycleControl_GetOperationalState(AJ_BusAttachment* busAttachment, const char* objPath, CycleControl_OperationalState* out)
+static AJ_Status CycleControl_GetOperationalState(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -109,7 +123,7 @@ static AJ_Status CycleControl_GetOperationalState(AJ_BusAttachment* busAttachmen
 
 
 
-AJ_Status Cdm_CycleControl_EmitOperationalStateChanged(AJ_BusAttachment *bus, const char *objPath, CycleControl_OperationalState newValue)
+AJ_Status Cdm_CycleControl_EmitOperationalStateChanged(AJ_BusAttachment *bus, const char *objPath, uint8_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "OperationalState", "y", newValue);
 }
@@ -176,9 +190,9 @@ static AJ_Status Cdm_CycleControl_CallExecuteOperationalCommand(AJ_BusAttachment
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status CycleControl_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -190,7 +204,8 @@ static AJ_Status CycleControl_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_
 
         case CYCLECONTROL_PROP_OPERATIONAL_STATE:
         {
-            CycleControl_OperationalState operational_state;
+            uint8_t operational_state;
+            memset(&operational_state, 0, sizeof(uint8_t));
             status = CycleControl_GetOperationalState(busAttachment, objPath, &operational_state);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", operational_state);
@@ -205,9 +220,10 @@ static AJ_Status CycleControl_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_
         case CYCLECONTROL_PROP_SUPPORTED_OPERATIONAL_STATES:
         {
             Array_CycleControl_OperationalState supported_operational_states;
+            memset(&supported_operational_states, 0, sizeof(Array_CycleControl_OperationalState));
             status = CycleControl_GetSupportedOperationalStates(busAttachment, objPath, &supported_operational_states);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "ay", supported_operational_states.elems, supported_operational_states.numElems);
+                status = AJ_MarshalArgs(replyMsg, "ay", supported_operational_states.elems, sizeof(uint8_t) * supported_operational_states.numElems);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -219,9 +235,10 @@ static AJ_Status CycleControl_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_
         case CYCLECONTROL_PROP_SUPPORTED_OPERATIONAL_COMMANDS:
         {
             Array_CycleControl_OperationalCommands supported_operational_commands;
+            memset(&supported_operational_commands, 0, sizeof(Array_CycleControl_OperationalCommands));
             status = CycleControl_GetSupportedOperationalCommands(busAttachment, objPath, &supported_operational_commands);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "ay", supported_operational_commands.elems, supported_operational_commands.numElems);
+                status = AJ_MarshalArgs(replyMsg, "ay", supported_operational_commands.elems, sizeof(uint8_t) * supported_operational_commands.numElems);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -236,7 +253,7 @@ static AJ_Status CycleControl_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_
 
 
 
-static AJ_Status CycleControl_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status CycleControl_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -259,6 +276,7 @@ static AJ_Status CycleControl_OnMethodHandler(AJ_BusAttachment* busAttachment, A
 
     case CYCLECONTROL_METHOD_EXECUTE_OPERATIONAL_COMMAND:
     {
+        AJ_Message reply;
         CycleControl_OperationalCommands command;
         status = AJ_UnmarshalArgs(msg, "y", &command);
 
@@ -268,9 +286,7 @@ static AJ_Status CycleControl_OnMethodHandler(AJ_BusAttachment* busAttachment, A
 
         status = Cdm_CycleControl_CallExecuteOperationalCommand(busAttachment, objPath, command);
 
-        AJ_Message reply;
         AJ_MarshalReplyMsg(msg, &reply);
-
         if (status == AJ_OK) {
             status = AJ_DeliverMsg(&reply);
         }

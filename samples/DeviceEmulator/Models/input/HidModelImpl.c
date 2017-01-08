@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -53,9 +66,9 @@ static void HAL_Decode_Hid_InputEvent(Element* elem, Hid_InputEvent* value) UNUS
 static void HAL_Decode_Hid_InputEvent(Element* elem, Hid_InputEvent* value)
 {
     if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
-        value->type = HAL_Decode_UInt(elem->children[0]);
-        value->code = HAL_Decode_UInt(elem->children[1]);
-        value->value = HAL_Decode_Int(elem->children[2]);
+        value->type = HAL_Decode_UInt(elem->children[0]->children[0]);
+        value->code = HAL_Decode_UInt(elem->children[1]->children[0]);
+        value->value = HAL_Decode_Int(elem->children[2]->children[0]);
     }
 }
 
@@ -80,7 +93,7 @@ static void HAL_Decode_Array_Hid_InputEvent(Element* elem, Array_Hid_InputEvent*
     InitArray_Hid_InputEvent(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < value->numElems; ++i) {
+        for (size_t i = 0; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Hid_InputEvent(value, 1);
             HAL_Decode_Hid_InputEvent(elem->children[i], &value->elems[j]);
         }
@@ -124,10 +137,10 @@ static void HAL_Decode_Hid_SupportedInputEvent(Element* elem, Hid_SupportedInput
 static void HAL_Decode_Hid_SupportedInputEvent(Element* elem, Hid_SupportedInputEvent* value)
 {
     if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 4) {
-        value->type = HAL_Decode_UInt(elem->children[0]);
-        value->code = HAL_Decode_UInt(elem->children[1]);
-        value->min = HAL_Decode_Int(elem->children[2]);
-        value->max = HAL_Decode_Int(elem->children[3]);
+        value->type = HAL_Decode_UInt(elem->children[0]->children[0]);
+        value->code = HAL_Decode_UInt(elem->children[1]->children[0]);
+        value->min = HAL_Decode_Int(elem->children[2]->children[0]);
+        value->max = HAL_Decode_Int(elem->children[3]->children[0]);
     }
 }
 
@@ -152,7 +165,7 @@ static void HAL_Decode_Array_Hid_SupportedInputEvent(Element* elem, Array_Hid_Su
     InitArray_Hid_SupportedInputEvent(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < value->numElems; ++i) {
+        for (size_t i = 0; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Hid_SupportedInputEvent(value, 1);
             HAL_Decode_Hid_SupportedInputEvent(elem->children[i], &value->elems[j]);
         }
@@ -161,13 +174,12 @@ static void HAL_Decode_Array_Hid_SupportedInputEvent(Element* elem, Array_Hid_Su
 
 
 
-
 static AJ_Status GetSupportedEvents(void *context, const char *objPath, Array_Hid_SupportedInputEvent *out)
 {
     AJ_Status result = AJ_OK;
     Array_Hid_SupportedInputEvent value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.Input.Hid", "SupportedEvents");
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.Input.Hid", "SupportedEvents");
 
     if (elem) {
         HAL_Decode_Array_Hid_SupportedInputEvent(elem, &value);

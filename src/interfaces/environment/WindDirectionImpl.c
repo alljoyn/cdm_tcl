@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/environment/WindDirectionInterface.h>
 #include <ajtcl/cdm/interfaces/environment/WindDirectionModel.h>
 
@@ -84,10 +98,25 @@ static AJ_Status WindDirection_GetHorizontalDirection(AJ_BusAttachment* busAttac
     return model->GetHorizontalDirection(model, objPath, out);
 }
 
-
-
-static AJ_Status WindDirection_SetHorizontalDirection(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t value)
+static AJ_Status clampHorizontalDirection(WindDirectionModel* model, const char* objPath, uint16_t value, uint16_t *out)
 {
+
+    uint16_t minValue = 0;
+
+    uint16_t maxValue;
+    if (model->GetHorizontalMax(model, objPath, &maxValue) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    uint16_t stepValue = 0;
+
+    *out = clamp_uint16(value, minValue, maxValue, stepValue);
+    return AJ_OK;
+}
+
+static AJ_Status WindDirection_SetHorizontalDirection(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t *value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -100,8 +129,13 @@ static AJ_Status WindDirection_SetHorizontalDirection(AJ_BusAttachment* busAttac
         return AJ_ERR_NULL;
     }
 
+    status = clampHorizontalDirection(model, objPath, *value, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetHorizontalDirection(model, objPath, value);
+    status = model->SetHorizontalDirection(model, objPath, *value);
+    return status;
 }
 
 
@@ -140,7 +174,7 @@ AJ_Status Cdm_WindDirection_EmitHorizontalMaxChanged(AJ_BusAttachment *bus, cons
 
 
 
-static AJ_Status WindDirection_GetHorizontalAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, WindDirection_AutoMode* out)
+static AJ_Status WindDirection_GetHorizontalAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -158,10 +192,26 @@ static AJ_Status WindDirection_GetHorizontalAutoMode(AJ_BusAttachment* busAttach
     return model->GetHorizontalAutoMode(model, objPath, out);
 }
 
-
-
-static AJ_Status WindDirection_SetHorizontalAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, WindDirection_AutoMode value)
+static AJ_Status ValidateHorizontalAutoMode(WindDirectionModel* model, const char* objPath, WindDirection_AutoMode value)
 {
+
+    switch (value)
+    {
+        case WINDDIRECTION_AUTO_MODE_OFF:
+        case WINDDIRECTION_AUTO_MODE_ON:
+            break;
+        case WINDDIRECTION_AUTO_MODE_NOT_SUPPORTED:
+        default:
+            return AJ_ERR_INVALID;
+    }
+
+    return AJ_OK;
+}
+
+static AJ_Status WindDirection_SetHorizontalAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -174,13 +224,18 @@ static AJ_Status WindDirection_SetHorizontalAutoMode(AJ_BusAttachment* busAttach
         return AJ_ERR_NULL;
     }
 
+    status = ValidateHorizontalAutoMode(model, objPath, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetHorizontalAutoMode(model, objPath, value);
+    status = model->SetHorizontalAutoMode(model, objPath, value);
+    return status;
 }
 
 
 
-AJ_Status Cdm_WindDirection_EmitHorizontalAutoModeChanged(AJ_BusAttachment *bus, const char *objPath, WindDirection_AutoMode newValue)
+AJ_Status Cdm_WindDirection_EmitHorizontalAutoModeChanged(AJ_BusAttachment *bus, const char *objPath, uint8_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "HorizontalAutoMode", "y", newValue);
 }
@@ -205,10 +260,25 @@ static AJ_Status WindDirection_GetVerticalDirection(AJ_BusAttachment* busAttachm
     return model->GetVerticalDirection(model, objPath, out);
 }
 
-
-
-static AJ_Status WindDirection_SetVerticalDirection(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t value)
+static AJ_Status clampVerticalDirection(WindDirectionModel* model, const char* objPath, uint16_t value, uint16_t *out)
 {
+
+    uint16_t minValue = 0;
+
+    uint16_t maxValue;
+    if (model->GetVerticalMax(model, objPath, &maxValue) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    uint16_t stepValue = 0;
+
+    *out = clamp_uint16(value, minValue, maxValue, stepValue);
+    return AJ_OK;
+}
+
+static AJ_Status WindDirection_SetVerticalDirection(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t *value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -221,8 +291,13 @@ static AJ_Status WindDirection_SetVerticalDirection(AJ_BusAttachment* busAttachm
         return AJ_ERR_NULL;
     }
 
+    status = clampVerticalDirection(model, objPath, *value, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetVerticalDirection(model, objPath, value);
+    status = model->SetVerticalDirection(model, objPath, *value);
+    return status;
 }
 
 
@@ -261,7 +336,7 @@ AJ_Status Cdm_WindDirection_EmitVerticalMaxChanged(AJ_BusAttachment *bus, const 
 
 
 
-static AJ_Status WindDirection_GetVerticalAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, WindDirection_AutoMode* out)
+static AJ_Status WindDirection_GetVerticalAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -279,10 +354,26 @@ static AJ_Status WindDirection_GetVerticalAutoMode(AJ_BusAttachment* busAttachme
     return model->GetVerticalAutoMode(model, objPath, out);
 }
 
-
-
-static AJ_Status WindDirection_SetVerticalAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, WindDirection_AutoMode value)
+static AJ_Status ValidateVerticalAutoMode(WindDirectionModel* model, const char* objPath, WindDirection_AutoMode value)
 {
+
+    switch (value)
+    {
+        case WINDDIRECTION_AUTO_MODE_OFF:
+        case WINDDIRECTION_AUTO_MODE_ON:
+            break;
+        case WINDDIRECTION_AUTO_MODE_NOT_SUPPORTED:
+        default:
+            return AJ_ERR_INVALID;
+    }
+
+    return AJ_OK;
+}
+
+static AJ_Status WindDirection_SetVerticalAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -295,13 +386,18 @@ static AJ_Status WindDirection_SetVerticalAutoMode(AJ_BusAttachment* busAttachme
         return AJ_ERR_NULL;
     }
 
+    status = ValidateVerticalAutoMode(model, objPath, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetVerticalAutoMode(model, objPath, value);
+    status = model->SetVerticalAutoMode(model, objPath, value);
+    return status;
 }
 
 
 
-AJ_Status Cdm_WindDirection_EmitVerticalAutoModeChanged(AJ_BusAttachment *bus, const char *objPath, WindDirection_AutoMode newValue)
+AJ_Status Cdm_WindDirection_EmitVerticalAutoModeChanged(AJ_BusAttachment *bus, const char *objPath, uint8_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "VerticalAutoMode", "y", newValue);
 }
@@ -309,9 +405,9 @@ AJ_Status Cdm_WindDirection_EmitVerticalAutoModeChanged(AJ_BusAttachment *bus, c
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status WindDirection_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -324,6 +420,7 @@ static AJ_Status WindDirection_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
         case WINDDIRECTION_PROP_HORIZONTAL_DIRECTION:
         {
             uint16_t horizontal_direction;
+            memset(&horizontal_direction, 0, sizeof(uint16_t));
             status = WindDirection_GetHorizontalDirection(busAttachment, objPath, &horizontal_direction);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", horizontal_direction);
@@ -338,6 +435,7 @@ static AJ_Status WindDirection_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
         case WINDDIRECTION_PROP_HORIZONTAL_MAX:
         {
             uint16_t horizontal_max;
+            memset(&horizontal_max, 0, sizeof(uint16_t));
             status = WindDirection_GetHorizontalMax(busAttachment, objPath, &horizontal_max);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", horizontal_max);
@@ -351,7 +449,8 @@ static AJ_Status WindDirection_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
 
         case WINDDIRECTION_PROP_HORIZONTAL_AUTO_MODE:
         {
-            WindDirection_AutoMode horizontal_auto_mode;
+            uint8_t horizontal_auto_mode;
+            memset(&horizontal_auto_mode, 0, sizeof(uint8_t));
             status = WindDirection_GetHorizontalAutoMode(busAttachment, objPath, &horizontal_auto_mode);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", horizontal_auto_mode);
@@ -366,6 +465,7 @@ static AJ_Status WindDirection_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
         case WINDDIRECTION_PROP_VERTICAL_DIRECTION:
         {
             uint16_t vertical_direction;
+            memset(&vertical_direction, 0, sizeof(uint16_t));
             status = WindDirection_GetVerticalDirection(busAttachment, objPath, &vertical_direction);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", vertical_direction);
@@ -380,6 +480,7 @@ static AJ_Status WindDirection_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
         case WINDDIRECTION_PROP_VERTICAL_MAX:
         {
             uint16_t vertical_max;
+            memset(&vertical_max, 0, sizeof(uint16_t));
             status = WindDirection_GetVerticalMax(busAttachment, objPath, &vertical_max);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", vertical_max);
@@ -393,7 +494,8 @@ static AJ_Status WindDirection_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
 
         case WINDDIRECTION_PROP_VERTICAL_AUTO_MODE:
         {
-            WindDirection_AutoMode vertical_auto_mode;
+            uint8_t vertical_auto_mode;
+            memset(&vertical_auto_mode, 0, sizeof(uint8_t));
             status = WindDirection_GetVerticalAutoMode(busAttachment, objPath, &vertical_auto_mode);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", vertical_auto_mode);
@@ -411,7 +513,7 @@ static AJ_Status WindDirection_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
 
 
 
-static AJ_Status WindDirection_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status WindDirection_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -425,9 +527,9 @@ static AJ_Status WindDirection_OnSetProperty(AJ_BusAttachment* busAttachment, AJ
             uint16_t horizontal_direction;
             status = AJ_UnmarshalArgs(msg, "q", &horizontal_direction);
             if (status == AJ_OK) {
-                status = WindDirection_SetHorizontalDirection(busAttachment, objPath, horizontal_direction);
-                if (status == AJ_OK) {
-                    status= Cdm_WindDirection_EmitHorizontalDirectionChanged(busAttachment, objPath, horizontal_direction);
+                status = WindDirection_SetHorizontalDirection(busAttachment, objPath, &horizontal_direction);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_WindDirection_EmitHorizontalDirectionChanged(busAttachment, objPath, horizontal_direction);
                 }
             }
             break;
@@ -439,8 +541,8 @@ static AJ_Status WindDirection_OnSetProperty(AJ_BusAttachment* busAttachment, AJ
             status = AJ_UnmarshalArgs(msg, "y", &horizontal_auto_mode);
             if (status == AJ_OK) {
                 status = WindDirection_SetHorizontalAutoMode(busAttachment, objPath, (WindDirection_AutoMode)(int)horizontal_auto_mode);
-                if (status == AJ_OK) {
-                    status= Cdm_WindDirection_EmitHorizontalAutoModeChanged(busAttachment, objPath, horizontal_auto_mode);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_WindDirection_EmitHorizontalAutoModeChanged(busAttachment, objPath, horizontal_auto_mode);
                 }
             }
             break;
@@ -451,9 +553,9 @@ static AJ_Status WindDirection_OnSetProperty(AJ_BusAttachment* busAttachment, AJ
             uint16_t vertical_direction;
             status = AJ_UnmarshalArgs(msg, "q", &vertical_direction);
             if (status == AJ_OK) {
-                status = WindDirection_SetVerticalDirection(busAttachment, objPath, vertical_direction);
-                if (status == AJ_OK) {
-                    status= Cdm_WindDirection_EmitVerticalDirectionChanged(busAttachment, objPath, vertical_direction);
+                status = WindDirection_SetVerticalDirection(busAttachment, objPath, &vertical_direction);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_WindDirection_EmitVerticalDirectionChanged(busAttachment, objPath, vertical_direction);
                 }
             }
             break;
@@ -465,8 +567,8 @@ static AJ_Status WindDirection_OnSetProperty(AJ_BusAttachment* busAttachment, AJ
             status = AJ_UnmarshalArgs(msg, "y", &vertical_auto_mode);
             if (status == AJ_OK) {
                 status = WindDirection_SetVerticalAutoMode(busAttachment, objPath, (WindDirection_AutoMode)(int)vertical_auto_mode);
-                if (status == AJ_OK) {
-                    status= Cdm_WindDirection_EmitVerticalAutoModeChanged(busAttachment, objPath, vertical_auto_mode);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_WindDirection_EmitVerticalAutoModeChanged(busAttachment, objPath, vertical_auto_mode);
                 }
             }
             break;

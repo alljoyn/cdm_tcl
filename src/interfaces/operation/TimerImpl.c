@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/TimerInterface.h>
 #include <ajtcl/cdm/interfaces/operation/TimerModel.h>
 
@@ -223,9 +237,9 @@ static AJ_Status Cdm_Timer_CallSetTargetTimeToStop(AJ_BusAttachment* busAttachme
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status Timer_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -238,6 +252,7 @@ static AJ_Status Timer_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
         case TIMER_PROP_REFERENCE_TIMER:
         {
             int32_t reference_timer;
+            memset(&reference_timer, 0, sizeof(int32_t));
             status = Timer_GetReferenceTimer(busAttachment, objPath, &reference_timer);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "i", reference_timer);
@@ -252,6 +267,7 @@ static AJ_Status Timer_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
         case TIMER_PROP_TARGET_TIME_TO_START:
         {
             int32_t target_time_to_start;
+            memset(&target_time_to_start, 0, sizeof(int32_t));
             status = Timer_GetTargetTimeToStart(busAttachment, objPath, &target_time_to_start);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "i", target_time_to_start);
@@ -266,6 +282,7 @@ static AJ_Status Timer_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
         case TIMER_PROP_TARGET_TIME_TO_STOP:
         {
             int32_t target_time_to_stop;
+            memset(&target_time_to_stop, 0, sizeof(int32_t));
             status = Timer_GetTargetTimeToStop(busAttachment, objPath, &target_time_to_stop);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "i", target_time_to_stop);
@@ -280,6 +297,7 @@ static AJ_Status Timer_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
         case TIMER_PROP_ESTIMATED_TIME_TO_END:
         {
             int32_t estimated_time_to_end;
+            memset(&estimated_time_to_end, 0, sizeof(int32_t));
             status = Timer_GetEstimatedTimeToEnd(busAttachment, objPath, &estimated_time_to_end);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "i", estimated_time_to_end);
@@ -294,6 +312,7 @@ static AJ_Status Timer_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
         case TIMER_PROP_RUNNING_TIME:
         {
             int32_t running_time;
+            memset(&running_time, 0, sizeof(int32_t));
             status = Timer_GetRunningTime(busAttachment, objPath, &running_time);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "i", running_time);
@@ -308,6 +327,7 @@ static AJ_Status Timer_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
         case TIMER_PROP_TARGET_DURATION:
         {
             int32_t target_duration;
+            memset(&target_duration, 0, sizeof(int32_t));
             status = Timer_GetTargetDuration(busAttachment, objPath, &target_duration);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "i", target_duration);
@@ -325,7 +345,7 @@ static AJ_Status Timer_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message
 
 
 
-static AJ_Status Timer_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status Timer_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -348,6 +368,7 @@ static AJ_Status Timer_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Messa
 
     case TIMER_METHOD_SET_TARGET_TIME_TO_START:
     {
+        AJ_Message reply;
         int32_t target_time_to_start;
         status = AJ_UnmarshalArgs(msg, "i", &target_time_to_start);
 
@@ -357,9 +378,7 @@ static AJ_Status Timer_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Messa
 
         status = Cdm_Timer_CallSetTargetTimeToStart(busAttachment, objPath, target_time_to_start);
 
-        AJ_Message reply;
         AJ_MarshalReplyMsg(msg, &reply);
-
         if (status == AJ_OK) {
             status = AJ_DeliverMsg(&reply);
         }
@@ -369,6 +388,7 @@ static AJ_Status Timer_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Messa
 
     case TIMER_METHOD_SET_TARGET_TIME_TO_STOP:
     {
+        AJ_Message reply;
         int32_t target_time_to_stop;
         status = AJ_UnmarshalArgs(msg, "i", &target_time_to_stop);
 
@@ -378,9 +398,7 @@ static AJ_Status Timer_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Messa
 
         status = Cdm_Timer_CallSetTargetTimeToStop(busAttachment, objPath, target_time_to_stop);
 
-        AJ_Message reply;
         AJ_MarshalReplyMsg(msg, &reply);
-
         if (status == AJ_OK) {
             status = AJ_DeliverMsg(&reply);
         }

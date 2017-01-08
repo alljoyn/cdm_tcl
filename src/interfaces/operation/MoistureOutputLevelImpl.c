@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/MoistureOutputLevelInterface.h>
 #include <ajtcl/cdm/interfaces/operation/MoistureOutputLevelModel.h>
 
@@ -81,10 +95,25 @@ static AJ_Status MoistureOutputLevel_GetMoistureOutputLevel(AJ_BusAttachment* bu
     return model->GetMoistureOutputLevel(model, objPath, out);
 }
 
-
-
-static AJ_Status MoistureOutputLevel_SetMoistureOutputLevel(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t value)
+static AJ_Status clampMoistureOutputLevel(MoistureOutputLevelModel* model, const char* objPath, uint8_t value, uint8_t *out)
 {
+
+    uint8_t minValue = 0;
+
+    uint8_t maxValue;
+    if (model->GetMaxMoistureOutputLevel(model, objPath, &maxValue) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    uint8_t stepValue = 0;
+
+    *out = clamp_uint8(value, minValue, maxValue, stepValue);
+    return AJ_OK;
+}
+
+static AJ_Status MoistureOutputLevel_SetMoistureOutputLevel(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t *value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -97,8 +126,13 @@ static AJ_Status MoistureOutputLevel_SetMoistureOutputLevel(AJ_BusAttachment* bu
         return AJ_ERR_NULL;
     }
 
+    status = clampMoistureOutputLevel(model, objPath, *value, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetMoistureOutputLevel(model, objPath, value);
+    status = model->SetMoistureOutputLevel(model, objPath, *value);
+    return status;
 }
 
 
@@ -137,7 +171,7 @@ AJ_Status Cdm_MoistureOutputLevel_EmitMaxMoistureOutputLevelChanged(AJ_BusAttach
 
 
 
-static AJ_Status MoistureOutputLevel_GetAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, MoistureOutputLevel_AutoMode* out)
+static AJ_Status MoistureOutputLevel_GetAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -155,10 +189,26 @@ static AJ_Status MoistureOutputLevel_GetAutoMode(AJ_BusAttachment* busAttachment
     return model->GetAutoMode(model, objPath, out);
 }
 
-
-
-static AJ_Status MoistureOutputLevel_SetAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, MoistureOutputLevel_AutoMode value)
+static AJ_Status ValidateAutoMode(MoistureOutputLevelModel* model, const char* objPath, MoistureOutputLevel_AutoMode value)
 {
+
+    switch (value)
+    {
+        case MOISTUREOUTPUTLEVEL_AUTO_MODE_OFF:
+        case MOISTUREOUTPUTLEVEL_AUTO_MODE_ON:
+            break;
+        case MOISTUREOUTPUTLEVEL_AUTO_MODE_NOT_SUPPORTED:
+        default:
+            return AJ_ERR_INVALID;
+    }
+
+    return AJ_OK;
+}
+
+static AJ_Status MoistureOutputLevel_SetAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -171,13 +221,18 @@ static AJ_Status MoistureOutputLevel_SetAutoMode(AJ_BusAttachment* busAttachment
         return AJ_ERR_NULL;
     }
 
+    status = ValidateAutoMode(model, objPath, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetAutoMode(model, objPath, value);
+    status = model->SetAutoMode(model, objPath, value);
+    return status;
 }
 
 
 
-AJ_Status Cdm_MoistureOutputLevel_EmitAutoModeChanged(AJ_BusAttachment *bus, const char *objPath, MoistureOutputLevel_AutoMode newValue)
+AJ_Status Cdm_MoistureOutputLevel_EmitAutoModeChanged(AJ_BusAttachment *bus, const char *objPath, uint8_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "AutoMode", "y", newValue);
 }
@@ -185,9 +240,9 @@ AJ_Status Cdm_MoistureOutputLevel_EmitAutoModeChanged(AJ_BusAttachment *bus, con
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status MoistureOutputLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -200,6 +255,7 @@ static AJ_Status MoistureOutputLevel_OnGetProperty(AJ_BusAttachment* busAttachme
         case MOISTUREOUTPUTLEVEL_PROP_MOISTURE_OUTPUT_LEVEL:
         {
             uint8_t moisture_output_level;
+            memset(&moisture_output_level, 0, sizeof(uint8_t));
             status = MoistureOutputLevel_GetMoistureOutputLevel(busAttachment, objPath, &moisture_output_level);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", moisture_output_level);
@@ -214,6 +270,7 @@ static AJ_Status MoistureOutputLevel_OnGetProperty(AJ_BusAttachment* busAttachme
         case MOISTUREOUTPUTLEVEL_PROP_MAX_MOISTURE_OUTPUT_LEVEL:
         {
             uint8_t max_moisture_output_level;
+            memset(&max_moisture_output_level, 0, sizeof(uint8_t));
             status = MoistureOutputLevel_GetMaxMoistureOutputLevel(busAttachment, objPath, &max_moisture_output_level);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", max_moisture_output_level);
@@ -227,7 +284,8 @@ static AJ_Status MoistureOutputLevel_OnGetProperty(AJ_BusAttachment* busAttachme
 
         case MOISTUREOUTPUTLEVEL_PROP_AUTO_MODE:
         {
-            MoistureOutputLevel_AutoMode auto_mode;
+            uint8_t auto_mode;
+            memset(&auto_mode, 0, sizeof(uint8_t));
             status = MoistureOutputLevel_GetAutoMode(busAttachment, objPath, &auto_mode);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", auto_mode);
@@ -245,7 +303,7 @@ static AJ_Status MoistureOutputLevel_OnGetProperty(AJ_BusAttachment* busAttachme
 
 
 
-static AJ_Status MoistureOutputLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status MoistureOutputLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -259,9 +317,9 @@ static AJ_Status MoistureOutputLevel_OnSetProperty(AJ_BusAttachment* busAttachme
             uint8_t moisture_output_level;
             status = AJ_UnmarshalArgs(msg, "y", &moisture_output_level);
             if (status == AJ_OK) {
-                status = MoistureOutputLevel_SetMoistureOutputLevel(busAttachment, objPath, moisture_output_level);
-                if (status == AJ_OK) {
-                    status= Cdm_MoistureOutputLevel_EmitMoistureOutputLevelChanged(busAttachment, objPath, moisture_output_level);
+                status = MoistureOutputLevel_SetMoistureOutputLevel(busAttachment, objPath, &moisture_output_level);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_MoistureOutputLevel_EmitMoistureOutputLevelChanged(busAttachment, objPath, moisture_output_level);
                 }
             }
             break;
@@ -273,8 +331,8 @@ static AJ_Status MoistureOutputLevel_OnSetProperty(AJ_BusAttachment* busAttachme
             status = AJ_UnmarshalArgs(msg, "y", &auto_mode);
             if (status == AJ_OK) {
                 status = MoistureOutputLevel_SetAutoMode(busAttachment, objPath, (MoistureOutputLevel_AutoMode)(int)auto_mode);
-                if (status == AJ_OK) {
-                    status= Cdm_MoistureOutputLevel_EmitAutoModeChanged(busAttachment, objPath, auto_mode);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_MoistureOutputLevel_EmitAutoModeChanged(busAttachment, objPath, auto_mode);
                 }
             }
             break;

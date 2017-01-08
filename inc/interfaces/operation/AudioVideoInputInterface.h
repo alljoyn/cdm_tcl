@@ -1,21 +1,36 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #ifndef AUDIOVIDEOINPUTINTERFACE_H_
 #define AUDIOVIDEOINPUTINTERFACE_H_
+
+#include <stdint.h>
 
 #include <ajtcl/aj_status.h>
 #include <ajtcl/aj_bus.h>
@@ -57,7 +72,7 @@ typedef enum {
 
 
 typedef struct {
-    AudioVideoInput_SourceType* elems;
+    uint16_t* elems;
     size_t numElems;
 } Array_AudioVideoInput_SourceType;
 
@@ -91,7 +106,7 @@ typedef enum {
 
 
 typedef struct {
-    AudioVideoInput_SignalPresence* elems;
+    uint8_t* elems;
     size_t numElems;
 } Array_AudioVideoInput_SignalPresence;
 
@@ -120,8 +135,8 @@ extern size_t ExtendArray_AudioVideoInput_SignalPresence(Array_AudioVideoInput_S
 
 typedef struct {
     uint16_t id;
-    AudioVideoInput_SourceType sourceType;
-    AudioVideoInput_SignalPresence signalPresence;
+    uint16_t sourceType;
+    uint8_t signalPresence;
     uint16_t portNumber;
     char const* friendlyName;
 } AudioVideoInput_InputSource;
@@ -167,7 +182,7 @@ extern const InterfaceHandler intfHandlerOperationAudioVideoInput;
  * @param[in] newValue new value of input source id
  * @return ER_OK on success
  */
-AJ_Status Cdm_AudioVideoInput_EmitInputSourceIdChanged(AJ_BusAttachment *bus, const char *objPath, AudioVideoInput_SourceType newValue);
+AJ_Status Cdm_AudioVideoInput_EmitInputSourceIdChanged(AJ_BusAttachment *bus, const char *objPath, uint16_t newValue);
 
 /**
  * Emits a changed signal for the SupportedInputSources property

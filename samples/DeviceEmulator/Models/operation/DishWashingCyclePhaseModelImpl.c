@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -53,9 +66,9 @@ static void HAL_Decode_DishWashingCyclePhase_CyclePhaseDescriptor(Element* elem,
 static void HAL_Decode_DishWashingCyclePhase_CyclePhaseDescriptor(Element* elem, DishWashingCyclePhase_CyclePhaseDescriptor* value)
 {
     if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
-        value->phase = HAL_Decode_UInt(elem->children[0]);
-        value->name = HAL_Decode_String(elem->children[1]);
-        value->description = HAL_Decode_String(elem->children[2]);
+        value->phase = HAL_Decode_UInt(elem->children[0]->children[0]);
+        value->name = HAL_Decode_String(elem->children[1]->children[0]);
+        value->description = HAL_Decode_String(elem->children[2]->children[0]);
     }
 }
 
@@ -80,7 +93,7 @@ static void HAL_Decode_Array_DishWashingCyclePhase_CyclePhaseDescriptor(Element*
     InitArray_DishWashingCyclePhase_CyclePhaseDescriptor(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < value->numElems; ++i) {
+        for (size_t i = 0; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_DishWashingCyclePhase_CyclePhaseDescriptor(value, 1);
             HAL_Decode_DishWashingCyclePhase_CyclePhaseDescriptor(elem->children[i], &value->elems[j]);
         }
@@ -116,13 +129,12 @@ static Array_DishWashingCyclePhase_CyclePhaseDescriptor* getPhases(void)
 }
 
 
-
 static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
     uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.DishWashingCyclePhase", "CyclePhase");
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.DishWashingCyclePhase", "CyclePhase");
 
     if (elem) {
         value = HAL_Decode_UInt(elem);
@@ -133,13 +145,12 @@ static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
     return result;
 }
 
-
 static AJ_Status GetSupportedCyclePhases(void *context, const char *objPath, Array_uint8 *out)
 {
     AJ_Status result = AJ_OK;
     Array_uint8 value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.DishWashingCyclePhase", "SupportedCyclePhases");
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.DishWashingCyclePhase", "SupportedCyclePhases");
 
     if (elem) {
         HAL_Decode_Array_uint8(elem, &value);

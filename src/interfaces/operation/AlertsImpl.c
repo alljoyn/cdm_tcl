@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/AlertsInterface.h>
 #include <ajtcl/cdm/interfaces/operation/AlertsModel.h>
 
@@ -52,7 +66,7 @@ void InitArray_Alerts_AlertRecord(Array_Alerts_AlertRecord* value, size_t numEle
 }
 
 
-// Note: this only allows fields that are char*, not any other kind of pointer
+/* Note: this only allows fields that are char*, not any other kind of pointer */
 void CopyArray_Alerts_AlertRecord(Array_Alerts_AlertRecord* value, Array_Alerts_AlertRecord* copy)
 {
     if (value->elems) {
@@ -101,7 +115,7 @@ void InitArray_Alerts_AlertCodesDescriptor(Array_Alerts_AlertCodesDescriptor* va
 }
 
 
-// Note: this only allows fields that are char*, not any other kind of pointer
+/* Note: this only allows fields that are char*, not any other kind of pointer */
 void CopyArray_Alerts_AlertCodesDescriptor(Array_Alerts_AlertCodesDescriptor* value, Array_Alerts_AlertCodesDescriptor* copy)
 {
     if (value->elems) {
@@ -258,9 +272,9 @@ static AJ_Status Cdm_Alerts_CallAcknowledgeAllAlerts(AJ_BusAttachment* busAttach
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status Alerts_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -273,9 +287,20 @@ static AJ_Status Alerts_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Messag
         case ALERTS_PROP_ALERTS:
         {
             Array_Alerts_AlertRecord alerts;
+            memset(&alerts, 0, sizeof(Array_Alerts_AlertRecord));
             status = Alerts_GetAlerts(busAttachment, objPath, &alerts);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "a(yqb)", alerts.elems, alerts.numElems);
+                AJ_Arg array;
+                int i=0;
+                status |= AJ_MarshalContainer(replyMsg, &array, AJ_ARG_ARRAY);
+                for (; i<alerts.numElems; ++i)
+                {
+                    AJ_Arg strc;
+                    status |= AJ_MarshalContainer(replyMsg, &strc, AJ_ARG_STRUCT);
+                    AJ_MarshalArgs(replyMsg, "yqb", alerts.elems[i].severity, alerts.elems[i].alertCode, alerts.elems[i].needAcknowledgement);
+                    AJ_MarshalCloseContainer(replyMsg, &strc);
+                }
+                AJ_MarshalCloseContainer(replyMsg, &array);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -290,7 +315,7 @@ static AJ_Status Alerts_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Messag
 
 
 
-static AJ_Status Alerts_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status Alerts_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -313,6 +338,7 @@ static AJ_Status Alerts_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Mess
 
     case ALERTS_METHOD_GET_ALERT_CODES_DESCRIPTION:
     {
+        AJ_Message reply;
         char const* language_tag;
         status = AJ_UnmarshalArgs(msg, "s", &language_tag);
 
@@ -320,14 +346,23 @@ static AJ_Status Alerts_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Mess
             return status;
         }
         Array_Alerts_AlertCodesDescriptor description;
+        memset(&description, 0, sizeof(Array_Alerts_AlertCodesDescriptor));
 
         status = Cdm_Alerts_CallGetAlertCodesDescription(busAttachment, objPath, language_tag, &description);
 
-        AJ_Message reply;
         AJ_MarshalReplyMsg(msg, &reply);
-
         if (status == AJ_OK) {
-            status |= AJ_MarshalArgs(&reply, "a(qs)", description.elems, description.numElems);
+            AJ_Arg array;
+            int i=0;
+            status |= AJ_MarshalContainer(&reply, &array, AJ_ARG_ARRAY);
+            for (; i<description.numElems; ++i)
+            {
+                AJ_Arg strc;
+                status |= AJ_MarshalContainer(&reply, &strc, AJ_ARG_STRUCT);
+                AJ_MarshalArgs(&reply, "qs", description.elems[i].alertCode, description.elems[i].description);
+                AJ_MarshalCloseContainer(&reply, &strc);
+            }
+            AJ_MarshalCloseContainer(&reply, &array);
             if (status == AJ_OK) {
                 status = AJ_DeliverMsg(&reply);
             }
@@ -339,6 +374,7 @@ static AJ_Status Alerts_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Mess
 
     case ALERTS_METHOD_ACKNOWLEDGE_ALERT:
     {
+        AJ_Message reply;
         uint16_t alert_code;
         status = AJ_UnmarshalArgs(msg, "q", &alert_code);
 
@@ -348,9 +384,7 @@ static AJ_Status Alerts_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Mess
 
         status = Cdm_Alerts_CallAcknowledgeAlert(busAttachment, objPath, alert_code);
 
-        AJ_Message reply;
         AJ_MarshalReplyMsg(msg, &reply);
-
         if (status == AJ_OK) {
             status = AJ_DeliverMsg(&reply);
         }
@@ -360,12 +394,11 @@ static AJ_Status Alerts_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Mess
 
     case ALERTS_METHOD_ACKNOWLEDGE_ALL_ALERTS:
     {
+        AJ_Message reply;
 
         status = Cdm_Alerts_CallAcknowledgeAllAlerts(busAttachment, objPath);
 
-        AJ_Message reply;
         AJ_MarshalReplyMsg(msg, &reply);
-
         if (status == AJ_OK) {
             status = AJ_DeliverMsg(&reply);
         }

@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/environment/CurrentAirQualityLevelInterface.h>
 #include <ajtcl/cdm/interfaces/environment/CurrentAirQualityLevelModel.h>
 
@@ -63,7 +77,7 @@ size_t ExtendArray_CurrentAirQualityLevel_ContaminantType(Array_CurrentAirQualit
 
 
 
-static AJ_Status CurrentAirQualityLevel_GetContaminantType(AJ_BusAttachment* busAttachment, const char* objPath, CurrentAirQualityLevel_ContaminantType* out)
+static AJ_Status CurrentAirQualityLevel_GetContaminantType(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -83,7 +97,7 @@ static AJ_Status CurrentAirQualityLevel_GetContaminantType(AJ_BusAttachment* bus
 
 
 
-AJ_Status Cdm_CurrentAirQualityLevel_EmitContaminantTypeChanged(AJ_BusAttachment *bus, const char *objPath, CurrentAirQualityLevel_ContaminantType newValue)
+AJ_Status Cdm_CurrentAirQualityLevel_EmitContaminantTypeChanged(AJ_BusAttachment *bus, const char *objPath, uint8_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "ContaminantType", "y", newValue);
 }
@@ -145,9 +159,9 @@ AJ_Status Cdm_CurrentAirQualityLevel_EmitMaxLevelChanged(AJ_BusAttachment *bus, 
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status CurrentAirQualityLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -159,7 +173,8 @@ static AJ_Status CurrentAirQualityLevel_OnGetProperty(AJ_BusAttachment* busAttac
 
         case CURRENTAIRQUALITYLEVEL_PROP_CONTAMINANT_TYPE:
         {
-            CurrentAirQualityLevel_ContaminantType contaminant_type;
+            uint8_t contaminant_type;
+            memset(&contaminant_type, 0, sizeof(uint8_t));
             status = CurrentAirQualityLevel_GetContaminantType(busAttachment, objPath, &contaminant_type);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", contaminant_type);
@@ -174,6 +189,7 @@ static AJ_Status CurrentAirQualityLevel_OnGetProperty(AJ_BusAttachment* busAttac
         case CURRENTAIRQUALITYLEVEL_PROP_CURRENT_LEVEL:
         {
             uint8_t current_level;
+            memset(&current_level, 0, sizeof(uint8_t));
             status = CurrentAirQualityLevel_GetCurrentLevel(busAttachment, objPath, &current_level);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", current_level);
@@ -188,6 +204,7 @@ static AJ_Status CurrentAirQualityLevel_OnGetProperty(AJ_BusAttachment* busAttac
         case CURRENTAIRQUALITYLEVEL_PROP_MAX_LEVEL:
         {
             uint8_t max_level;
+            memset(&max_level, 0, sizeof(uint8_t));
             status = CurrentAirQualityLevel_GetMaxLevel(busAttachment, objPath, &max_level);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", max_level);
@@ -205,7 +222,7 @@ static AJ_Status CurrentAirQualityLevel_OnGetProperty(AJ_BusAttachment* busAttac
 
 
 
-static AJ_Status CurrentAirQualityLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status CurrentAirQualityLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 

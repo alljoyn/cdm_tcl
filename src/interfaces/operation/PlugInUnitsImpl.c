@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/PlugInUnitsInterface.h>
 #include <ajtcl/cdm/interfaces/operation/PlugInUnitsModel.h>
 
@@ -50,7 +64,7 @@ void InitArray_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugInInfo* value, size_
 }
 
 
-// Note: this only allows fields that are char*, not any other kind of pointer
+/* Note: this only allows fields that are char*, not any other kind of pointer */
 void CopyArray_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugInInfo* value, Array_PlugInUnits_PlugInInfo* copy)
 {
     if (value->elems) {
@@ -126,9 +140,9 @@ AJ_Status Cdm_PlugInUnits_EmitPlugInUnitsChanged(AJ_BusAttachment *bus, const ch
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status PlugInUnits_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -141,9 +155,20 @@ static AJ_Status PlugInUnits_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
         case PLUGINUNITS_PROP_PLUG_IN_UNITS:
         {
             Array_PlugInUnits_PlugInInfo plug_in_units;
+            memset(&plug_in_units, 0, sizeof(Array_PlugInUnits_PlugInInfo));
             status = PlugInUnits_GetPlugInUnits(busAttachment, objPath, &plug_in_units);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "a(oub)", plug_in_units.elems, plug_in_units.numElems);
+                AJ_Arg array;
+                int i=0;
+                status |= AJ_MarshalContainer(replyMsg, &array, AJ_ARG_ARRAY);
+                for (; i<plug_in_units.numElems; ++i)
+                {
+                    AJ_Arg strc;
+                    status |= AJ_MarshalContainer(replyMsg, &strc, AJ_ARG_STRUCT);
+                    AJ_MarshalArgs(replyMsg, "oub", plug_in_units.elems[i].objectPath, plug_in_units.elems[i].deviceId, plug_in_units.elems[i].pluggedIn);
+                    AJ_MarshalCloseContainer(replyMsg, &strc);
+                }
+                AJ_MarshalCloseContainer(replyMsg, &array);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -158,7 +183,7 @@ static AJ_Status PlugInUnits_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
 
 
 
-static AJ_Status PlugInUnits_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status PlugInUnits_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 

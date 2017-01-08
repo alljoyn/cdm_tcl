@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/ColorTemperatureInterface.h>
 #include <ajtcl/cdm/interfaces/operation/ColorTemperatureModel.h>
 
@@ -56,10 +70,27 @@ static AJ_Status ColorTemperature_GetTemperature(AJ_BusAttachment* busAttachment
     return model->GetTemperature(model, objPath, out);
 }
 
-
-
-static AJ_Status ColorTemperature_SetTemperature(AJ_BusAttachment* busAttachment, const char* objPath, double value)
+static AJ_Status clampTemperature(ColorTemperatureModel* model, const char* objPath, double value, double *out)
 {
+
+    double minValue;
+    if (model->GetMinTemperature(model, objPath, &minValue) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    double maxValue;
+    if (model->GetMaxTemperature(model, objPath, &maxValue) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    double stepValue = 0;
+
+    *out = clamp_double(value, minValue, maxValue, stepValue);
+    return AJ_OK;
+}
+
+static AJ_Status ColorTemperature_SetTemperature(AJ_BusAttachment* busAttachment, const char* objPath, double *value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -72,8 +103,13 @@ static AJ_Status ColorTemperature_SetTemperature(AJ_BusAttachment* busAttachment
         return AJ_ERR_NULL;
     }
 
+    status = clampTemperature(model, objPath, *value, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetTemperature(model, objPath, value);
+    status = model->SetTemperature(model, objPath, *value);
+    return status;
 }
 
 
@@ -126,9 +162,9 @@ static AJ_Status ColorTemperature_GetMaxTemperature(AJ_BusAttachment* busAttachm
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status ColorTemperature_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -141,6 +177,7 @@ static AJ_Status ColorTemperature_OnGetProperty(AJ_BusAttachment* busAttachment,
         case COLORTEMPERATURE_PROP_TEMPERATURE:
         {
             double temperature;
+            memset(&temperature, 0, sizeof(double));
             status = ColorTemperature_GetTemperature(busAttachment, objPath, &temperature);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "d", temperature);
@@ -155,6 +192,7 @@ static AJ_Status ColorTemperature_OnGetProperty(AJ_BusAttachment* busAttachment,
         case COLORTEMPERATURE_PROP_MIN_TEMPERATURE:
         {
             double min_temperature;
+            memset(&min_temperature, 0, sizeof(double));
             status = ColorTemperature_GetMinTemperature(busAttachment, objPath, &min_temperature);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "d", min_temperature);
@@ -169,6 +207,7 @@ static AJ_Status ColorTemperature_OnGetProperty(AJ_BusAttachment* busAttachment,
         case COLORTEMPERATURE_PROP_MAX_TEMPERATURE:
         {
             double max_temperature;
+            memset(&max_temperature, 0, sizeof(double));
             status = ColorTemperature_GetMaxTemperature(busAttachment, objPath, &max_temperature);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "d", max_temperature);
@@ -186,7 +225,7 @@ static AJ_Status ColorTemperature_OnGetProperty(AJ_BusAttachment* busAttachment,
 
 
 
-static AJ_Status ColorTemperature_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status ColorTemperature_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -200,9 +239,9 @@ static AJ_Status ColorTemperature_OnSetProperty(AJ_BusAttachment* busAttachment,
             double temperature;
             status = AJ_UnmarshalArgs(msg, "d", &temperature);
             if (status == AJ_OK) {
-                status = ColorTemperature_SetTemperature(busAttachment, objPath, temperature);
-                if (status == AJ_OK) {
-                    status= Cdm_ColorTemperature_EmitTemperatureChanged(busAttachment, objPath, temperature);
+                status = ColorTemperature_SetTemperature(busAttachment, objPath, &temperature);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_ColorTemperature_EmitTemperatureChanged(busAttachment, objPath, temperature);
                 }
             }
             break;

@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/HeatingZoneInterface.h>
 #include <ajtcl/cdm/interfaces/operation/HeatingZoneModel.h>
 
@@ -120,9 +134,9 @@ AJ_Status Cdm_HeatingZone_EmitHeatingLevelsChanged(AJ_BusAttachment *bus, const 
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status HeatingZone_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -135,6 +149,7 @@ static AJ_Status HeatingZone_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
         case HEATINGZONE_PROP_NUMBER_OF_HEATING_ZONES:
         {
             uint8_t number_of_heating_zones;
+            memset(&number_of_heating_zones, 0, sizeof(uint8_t));
             status = HeatingZone_GetNumberOfHeatingZones(busAttachment, objPath, &number_of_heating_zones);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", number_of_heating_zones);
@@ -149,9 +164,10 @@ static AJ_Status HeatingZone_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
         case HEATINGZONE_PROP_MAX_HEATING_LEVELS:
         {
             Array_uint8 max_heating_levels;
+            memset(&max_heating_levels, 0, sizeof(Array_uint8));
             status = HeatingZone_GetMaxHeatingLevels(busAttachment, objPath, &max_heating_levels);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "ay", max_heating_levels);
+                status = AJ_MarshalArgs(replyMsg, "ay", max_heating_levels.elems, sizeof(uint8_t) * max_heating_levels.numElems);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -163,9 +179,10 @@ static AJ_Status HeatingZone_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
         case HEATINGZONE_PROP_HEATING_LEVELS:
         {
             Array_uint8 heating_levels;
+            memset(&heating_levels, 0, sizeof(Array_uint8));
             status = HeatingZone_GetHeatingLevels(busAttachment, objPath, &heating_levels);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "ay", heating_levels);
+                status = AJ_MarshalArgs(replyMsg, "ay", heating_levels.elems, sizeof(uint8_t) * heating_levels.numElems);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -180,7 +197,7 @@ static AJ_Status HeatingZone_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
 
 
 
-static AJ_Status HeatingZone_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status HeatingZone_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 

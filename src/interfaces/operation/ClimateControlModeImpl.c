@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/ClimateControlModeInterface.h>
 #include <ajtcl/cdm/interfaces/operation/ClimateControlModeModel.h>
 
@@ -88,7 +102,7 @@ size_t ExtendArray_ClimateControlMode_OperationalState(Array_ClimateControlMode_
 
 
 
-static AJ_Status ClimateControlMode_GetMode(AJ_BusAttachment* busAttachment, const char* objPath, ClimateControlMode_Mode* out)
+static AJ_Status ClimateControlMode_GetMode(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -106,10 +120,37 @@ static AJ_Status ClimateControlMode_GetMode(AJ_BusAttachment* busAttachment, con
     return model->GetMode(model, objPath, out);
 }
 
-
-
-static AJ_Status ClimateControlMode_SetMode(AJ_BusAttachment* busAttachment, const char* objPath, ClimateControlMode_Mode value)
+static AJ_Status ValidateMode(ClimateControlModeModel* model, const char* objPath, ClimateControlMode_Mode value)
 {
+
+    switch (value)
+    {
+        case CLIMATECONTROLMODE_MODE_OFF:
+        case CLIMATECONTROLMODE_MODE_HEAT:
+        case CLIMATECONTROLMODE_MODE_COOL:
+        case CLIMATECONTROLMODE_MODE_AUTO:
+        case CLIMATECONTROLMODE_MODE_AUXILIARY_HEAT:
+        case CLIMATECONTROLMODE_MODE_DRY:
+        case CLIMATECONTROLMODE_MODE_CONTINUOUS_DRY:
+            break;
+        default:
+            return AJ_ERR_INVALID;
+    }
+
+    Array_ClimateControlMode_Mode validValues;
+    if (model->GetSupportedModes(model, objPath, &validValues) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    AJ_Status status = (valueIn_Array_ClimateControlMode_Mode(value, &validValues) == 1) ? AJ_OK : AJ_ERR_NO_MATCH;
+
+    FreeArray_ClimateControlMode_Mode(&validValues);
+    return status;
+}
+
+static AJ_Status ClimateControlMode_SetMode(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -122,13 +163,18 @@ static AJ_Status ClimateControlMode_SetMode(AJ_BusAttachment* busAttachment, con
         return AJ_ERR_NULL;
     }
 
+    status = ValidateMode(model, objPath, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetMode(model, objPath, value);
+    status = model->SetMode(model, objPath, value);
+    return status;
 }
 
 
 
-AJ_Status Cdm_ClimateControlMode_EmitModeChanged(AJ_BusAttachment *bus, const char *objPath, ClimateControlMode_Mode newValue)
+AJ_Status Cdm_ClimateControlMode_EmitModeChanged(AJ_BusAttachment *bus, const char *objPath, uint16_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "Mode", "q", newValue);
 }
@@ -162,7 +208,7 @@ AJ_Status Cdm_ClimateControlMode_EmitSupportedModesChanged(AJ_BusAttachment *bus
 
 
 
-static AJ_Status ClimateControlMode_GetOperationalState(AJ_BusAttachment* busAttachment, const char* objPath, ClimateControlMode_OperationalState* out)
+static AJ_Status ClimateControlMode_GetOperationalState(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -182,7 +228,7 @@ static AJ_Status ClimateControlMode_GetOperationalState(AJ_BusAttachment* busAtt
 
 
 
-AJ_Status Cdm_ClimateControlMode_EmitOperationalStateChanged(AJ_BusAttachment *bus, const char *objPath, ClimateControlMode_OperationalState newValue)
+AJ_Status Cdm_ClimateControlMode_EmitOperationalStateChanged(AJ_BusAttachment *bus, const char *objPath, uint16_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "OperationalState", "q", newValue);
 }
@@ -190,9 +236,9 @@ AJ_Status Cdm_ClimateControlMode_EmitOperationalStateChanged(AJ_BusAttachment *b
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status ClimateControlMode_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -204,7 +250,8 @@ static AJ_Status ClimateControlMode_OnGetProperty(AJ_BusAttachment* busAttachmen
 
         case CLIMATECONTROLMODE_PROP_MODE:
         {
-            ClimateControlMode_Mode mode;
+            uint16_t mode;
+            memset(&mode, 0, sizeof(uint16_t));
             status = ClimateControlMode_GetMode(busAttachment, objPath, &mode);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", mode);
@@ -219,9 +266,10 @@ static AJ_Status ClimateControlMode_OnGetProperty(AJ_BusAttachment* busAttachmen
         case CLIMATECONTROLMODE_PROP_SUPPORTED_MODES:
         {
             Array_ClimateControlMode_Mode supported_modes;
+            memset(&supported_modes, 0, sizeof(Array_ClimateControlMode_Mode));
             status = ClimateControlMode_GetSupportedModes(busAttachment, objPath, &supported_modes);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "aq", supported_modes.elems, supported_modes.numElems);
+                status = AJ_MarshalArgs(replyMsg, "aq", supported_modes.elems, sizeof(uint16_t) * supported_modes.numElems);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -232,7 +280,8 @@ static AJ_Status ClimateControlMode_OnGetProperty(AJ_BusAttachment* busAttachmen
 
         case CLIMATECONTROLMODE_PROP_OPERATIONAL_STATE:
         {
-            ClimateControlMode_OperationalState operational_state;
+            uint16_t operational_state;
+            memset(&operational_state, 0, sizeof(uint16_t));
             status = ClimateControlMode_GetOperationalState(busAttachment, objPath, &operational_state);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", operational_state);
@@ -250,7 +299,7 @@ static AJ_Status ClimateControlMode_OnGetProperty(AJ_BusAttachment* busAttachmen
 
 
 
-static AJ_Status ClimateControlMode_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status ClimateControlMode_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -265,8 +314,8 @@ static AJ_Status ClimateControlMode_OnSetProperty(AJ_BusAttachment* busAttachmen
             status = AJ_UnmarshalArgs(msg, "q", &mode);
             if (status == AJ_OK) {
                 status = ClimateControlMode_SetMode(busAttachment, objPath, (ClimateControlMode_Mode)(int)mode);
-                if (status == AJ_OK) {
-                    status= Cdm_ClimateControlMode_EmitModeChanged(busAttachment, objPath, mode);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_ClimateControlMode_EmitModeChanged(busAttachment, objPath, mode);
                 }
             }
             break;

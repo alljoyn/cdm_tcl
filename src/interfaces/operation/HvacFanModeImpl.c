@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/HvacFanModeInterface.h>
 #include <ajtcl/cdm/interfaces/operation/HvacFanModeModel.h>
 
@@ -62,7 +76,7 @@ size_t ExtendArray_HvacFanMode_Mode(Array_HvacFanMode_Mode* value, size_t numEle
 
 
 
-static AJ_Status HvacFanMode_GetMode(AJ_BusAttachment* busAttachment, const char* objPath, HvacFanMode_Mode* out)
+static AJ_Status HvacFanMode_GetMode(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -80,10 +94,26 @@ static AJ_Status HvacFanMode_GetMode(AJ_BusAttachment* busAttachment, const char
     return model->GetMode(model, objPath, out);
 }
 
-
-
-static AJ_Status HvacFanMode_SetMode(AJ_BusAttachment* busAttachment, const char* objPath, HvacFanMode_Mode value)
+static AJ_Status ValidateMode(HvacFanModeModel* model, const char* objPath, HvacFanMode_Mode value)
 {
+
+    switch (value)
+    {
+        case HVACFANMODE_MODE_AUTO:
+        case HVACFANMODE_MODE_CIRCULATION:
+        case HVACFANMODE_MODE_CONTINUOUS:
+            break;
+        default:
+            return AJ_ERR_INVALID;
+    }
+
+    return AJ_OK;
+}
+
+static AJ_Status HvacFanMode_SetMode(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -96,13 +126,18 @@ static AJ_Status HvacFanMode_SetMode(AJ_BusAttachment* busAttachment, const char
         return AJ_ERR_NULL;
     }
 
+    status = ValidateMode(model, objPath, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetMode(model, objPath, value);
+    status = model->SetMode(model, objPath, value);
+    return status;
 }
 
 
 
-AJ_Status Cdm_HvacFanMode_EmitModeChanged(AJ_BusAttachment *bus, const char *objPath, HvacFanMode_Mode newValue)
+AJ_Status Cdm_HvacFanMode_EmitModeChanged(AJ_BusAttachment *bus, const char *objPath, uint16_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "Mode", "q", newValue);
 }
@@ -137,9 +172,9 @@ AJ_Status Cdm_HvacFanMode_EmitSupportedModesChanged(AJ_BusAttachment *bus, const
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status HvacFanMode_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -151,7 +186,8 @@ static AJ_Status HvacFanMode_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
 
         case HVACFANMODE_PROP_MODE:
         {
-            HvacFanMode_Mode mode;
+            uint16_t mode;
+            memset(&mode, 0, sizeof(uint16_t));
             status = HvacFanMode_GetMode(busAttachment, objPath, &mode);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", mode);
@@ -166,9 +202,10 @@ static AJ_Status HvacFanMode_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
         case HVACFANMODE_PROP_SUPPORTED_MODES:
         {
             Array_HvacFanMode_Mode supported_modes;
+            memset(&supported_modes, 0, sizeof(Array_HvacFanMode_Mode));
             status = HvacFanMode_GetSupportedModes(busAttachment, objPath, &supported_modes);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "aq", supported_modes.elems, supported_modes.numElems);
+                status = AJ_MarshalArgs(replyMsg, "aq", supported_modes.elems, sizeof(uint16_t) * supported_modes.numElems);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -183,7 +220,7 @@ static AJ_Status HvacFanMode_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
 
 
 
-static AJ_Status HvacFanMode_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status HvacFanMode_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -198,8 +235,8 @@ static AJ_Status HvacFanMode_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_M
             status = AJ_UnmarshalArgs(msg, "q", &mode);
             if (status == AJ_OK) {
                 status = HvacFanMode_SetMode(busAttachment, objPath, (HvacFanMode_Mode)(int)mode);
-                if (status == AJ_OK) {
-                    status= Cdm_HvacFanMode_EmitModeChanged(busAttachment, objPath, mode);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_HvacFanMode_EmitModeChanged(busAttachment, objPath, mode);
                 }
             }
             break;

@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/environment/WaterLevelInterface.h>
 #include <ajtcl/cdm/interfaces/environment/WaterLevelModel.h>
 
@@ -63,7 +77,7 @@ size_t ExtendArray_WaterLevel_SupplySource(Array_WaterLevel_SupplySource* value,
 
 
 
-static AJ_Status WaterLevel_GetSupplySource(AJ_BusAttachment* busAttachment, const char* objPath, WaterLevel_SupplySource* out)
+static AJ_Status WaterLevel_GetSupplySource(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -83,7 +97,7 @@ static AJ_Status WaterLevel_GetSupplySource(AJ_BusAttachment* busAttachment, con
 
 
 
-AJ_Status Cdm_WaterLevel_EmitSupplySourceChanged(AJ_BusAttachment *bus, const char *objPath, WaterLevel_SupplySource newValue)
+AJ_Status Cdm_WaterLevel_EmitSupplySourceChanged(AJ_BusAttachment *bus, const char *objPath, uint8_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "SupplySource", "y", newValue);
 }
@@ -145,9 +159,9 @@ AJ_Status Cdm_WaterLevel_EmitMaxLevelChanged(AJ_BusAttachment *bus, const char *
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status WaterLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -159,7 +173,8 @@ static AJ_Status WaterLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Me
 
         case WATERLEVEL_PROP_SUPPLY_SOURCE:
         {
-            WaterLevel_SupplySource supply_source;
+            uint8_t supply_source;
+            memset(&supply_source, 0, sizeof(uint8_t));
             status = WaterLevel_GetSupplySource(busAttachment, objPath, &supply_source);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", supply_source);
@@ -174,6 +189,7 @@ static AJ_Status WaterLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Me
         case WATERLEVEL_PROP_CURRENT_LEVEL:
         {
             uint8_t current_level;
+            memset(&current_level, 0, sizeof(uint8_t));
             status = WaterLevel_GetCurrentLevel(busAttachment, objPath, &current_level);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", current_level);
@@ -188,6 +204,7 @@ static AJ_Status WaterLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Me
         case WATERLEVEL_PROP_MAX_LEVEL:
         {
             uint8_t max_level;
+            memset(&max_level, 0, sizeof(uint8_t));
             status = WaterLevel_GetMaxLevel(busAttachment, objPath, &max_level);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", max_level);
@@ -205,7 +222,7 @@ static AJ_Status WaterLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Me
 
 
 
-static AJ_Status WaterLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status WaterLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 

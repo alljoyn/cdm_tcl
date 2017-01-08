@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/FanSpeedLevelInterface.h>
 #include <ajtcl/cdm/interfaces/operation/FanSpeedLevelModel.h>
 
@@ -81,10 +95,25 @@ static AJ_Status FanSpeedLevel_GetFanSpeedLevel(AJ_BusAttachment* busAttachment,
     return model->GetFanSpeedLevel(model, objPath, out);
 }
 
-
-
-static AJ_Status FanSpeedLevel_SetFanSpeedLevel(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t value)
+static AJ_Status clampFanSpeedLevel(FanSpeedLevelModel* model, const char* objPath, uint8_t value, uint8_t *out)
 {
+
+    uint8_t minValue = 1;
+
+    uint8_t maxValue;
+    if (model->GetMaxFanSpeedLevel(model, objPath, &maxValue) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    uint8_t stepValue = 0;
+
+    *out = clamp_uint8(value, minValue, maxValue, stepValue);
+    return AJ_OK;
+}
+
+static AJ_Status FanSpeedLevel_SetFanSpeedLevel(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t *value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -97,8 +126,13 @@ static AJ_Status FanSpeedLevel_SetFanSpeedLevel(AJ_BusAttachment* busAttachment,
         return AJ_ERR_NULL;
     }
 
+    status = clampFanSpeedLevel(model, objPath, *value, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetFanSpeedLevel(model, objPath, value);
+    status = model->SetFanSpeedLevel(model, objPath, *value);
+    return status;
 }
 
 
@@ -130,7 +164,7 @@ static AJ_Status FanSpeedLevel_GetMaxFanSpeedLevel(AJ_BusAttachment* busAttachme
 
 
 
-static AJ_Status FanSpeedLevel_GetAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, FanSpeedLevel_AutoMode* out)
+static AJ_Status FanSpeedLevel_GetAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -148,10 +182,26 @@ static AJ_Status FanSpeedLevel_GetAutoMode(AJ_BusAttachment* busAttachment, cons
     return model->GetAutoMode(model, objPath, out);
 }
 
-
-
-static AJ_Status FanSpeedLevel_SetAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, FanSpeedLevel_AutoMode value)
+static AJ_Status ValidateAutoMode(FanSpeedLevelModel* model, const char* objPath, FanSpeedLevel_AutoMode value)
 {
+
+    switch (value)
+    {
+        case FANSPEEDLEVEL_AUTO_MODE_OFF:
+        case FANSPEEDLEVEL_AUTO_MODE_ON:
+        case FANSPEEDLEVEL_AUTO_MODE_NOT_SUPPORTED:
+            break;
+        default:
+            return AJ_ERR_INVALID;
+    }
+
+    return AJ_OK;
+}
+
+static AJ_Status FanSpeedLevel_SetAutoMode(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -164,13 +214,18 @@ static AJ_Status FanSpeedLevel_SetAutoMode(AJ_BusAttachment* busAttachment, cons
         return AJ_ERR_NULL;
     }
 
+    status = ValidateAutoMode(model, objPath, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetAutoMode(model, objPath, value);
+    status = model->SetAutoMode(model, objPath, value);
+    return status;
 }
 
 
 
-AJ_Status Cdm_FanSpeedLevel_EmitAutoModeChanged(AJ_BusAttachment *bus, const char *objPath, FanSpeedLevel_AutoMode newValue)
+AJ_Status Cdm_FanSpeedLevel_EmitAutoModeChanged(AJ_BusAttachment *bus, const char *objPath, uint8_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "AutoMode", "y", newValue);
 }
@@ -178,9 +233,9 @@ AJ_Status Cdm_FanSpeedLevel_EmitAutoModeChanged(AJ_BusAttachment *bus, const cha
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status FanSpeedLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -193,6 +248,7 @@ static AJ_Status FanSpeedLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
         case FANSPEEDLEVEL_PROP_FAN_SPEED_LEVEL:
         {
             uint8_t fan_speed_level;
+            memset(&fan_speed_level, 0, sizeof(uint8_t));
             status = FanSpeedLevel_GetFanSpeedLevel(busAttachment, objPath, &fan_speed_level);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", fan_speed_level);
@@ -207,6 +263,7 @@ static AJ_Status FanSpeedLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
         case FANSPEEDLEVEL_PROP_MAX_FAN_SPEED_LEVEL:
         {
             uint8_t max_fan_speed_level;
+            memset(&max_fan_speed_level, 0, sizeof(uint8_t));
             status = FanSpeedLevel_GetMaxFanSpeedLevel(busAttachment, objPath, &max_fan_speed_level);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", max_fan_speed_level);
@@ -220,7 +277,8 @@ static AJ_Status FanSpeedLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
 
         case FANSPEEDLEVEL_PROP_AUTO_MODE:
         {
-            FanSpeedLevel_AutoMode auto_mode;
+            uint8_t auto_mode;
+            memset(&auto_mode, 0, sizeof(uint8_t));
             status = FanSpeedLevel_GetAutoMode(busAttachment, objPath, &auto_mode);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", auto_mode);
@@ -238,7 +296,7 @@ static AJ_Status FanSpeedLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ
 
 
 
-static AJ_Status FanSpeedLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status FanSpeedLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -252,9 +310,9 @@ static AJ_Status FanSpeedLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ
             uint8_t fan_speed_level;
             status = AJ_UnmarshalArgs(msg, "y", &fan_speed_level);
             if (status == AJ_OK) {
-                status = FanSpeedLevel_SetFanSpeedLevel(busAttachment, objPath, fan_speed_level);
-                if (status == AJ_OK) {
-                    status= Cdm_FanSpeedLevel_EmitFanSpeedLevelChanged(busAttachment, objPath, fan_speed_level);
+                status = FanSpeedLevel_SetFanSpeedLevel(busAttachment, objPath, &fan_speed_level);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_FanSpeedLevel_EmitFanSpeedLevelChanged(busAttachment, objPath, fan_speed_level);
                 }
             }
             break;
@@ -266,8 +324,8 @@ static AJ_Status FanSpeedLevel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ
             status = AJ_UnmarshalArgs(msg, "y", &auto_mode);
             if (status == AJ_OK) {
                 status = FanSpeedLevel_SetAutoMode(busAttachment, objPath, (FanSpeedLevel_AutoMode)(int)auto_mode);
-                if (status == AJ_OK) {
-                    status= Cdm_FanSpeedLevel_EmitAutoModeChanged(busAttachment, objPath, auto_mode);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_FanSpeedLevel_EmitAutoModeChanged(busAttachment, objPath, auto_mode);
                 }
             }
             break;

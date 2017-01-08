@@ -27,16 +27,27 @@
  *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
-#ifndef ALLJOYN_BRIGHTNESS_MODELIMPL_H
-#define ALLJOYN_BRIGHTNESS_MODELIMPL_H
+#ifndef ALLJOYN_CDMINTERFACEVALIDATION_H
+#define ALLJOYN_CDMINTERFACEVALIDATION_H
 
-#include <stdio.h>
+#include <stdint.h>
+#include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/operation/AudioVideoInputInterface.h>
+#include <ajtcl/cdm/interfaces/operation/ChannelInterface.h>
+#include <ajtcl/cdm/interfaces/operation/ClimateControlModeInterface.h>
 
-#include <ajtcl/cdm/interfaces/operation/BrightnessModel.h>
-#include <ajtcl/cdm/interfaces/operation/BrightnessInterface.h>
+#define MK_CLAMP(TYPE, NAME) TYPE clamp_##NAME(TYPE value, TYPE min, TYPE max, TYPE step);
 
-BrightnessModel *GetBrightnessModel(void);
+MK_CLAMP(double, double)
+MK_CLAMP(uint8_t, uint8)
+MK_CLAMP(uint16_t, uint16)
 
-/* REVISIT delete this */
+#define MK_VALUEIN_ARRAY(TYPE, NAME) int valueIn_Array_##NAME(TYPE value, Array_##NAME *values);
 
-#endif /* ALLJOYN_BRIGHTNESS_MODELIMPL_H */
+MK_VALUEIN_ARRAY(uint8_t, uint8)
+MK_VALUEIN_ARRAY(uint16_t, AudioVideoInput_InputSource)
+MK_VALUEIN_ARRAY(char*, Channel_ChannelInfoRecord)
+MK_VALUEIN_ARRAY(ClimateControlMode_Mode, ClimateControlMode_Mode)
+
+
+#endif /* ALLJOYN_CDMINTERFACEVALIDATION_H */

@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/ChannelInterface.h>
 #include <ajtcl/cdm/interfaces/operation/ChannelModel.h>
 
@@ -55,7 +69,7 @@ void InitArray_Channel_ChannelInfoRecord(Array_Channel_ChannelInfoRecord* value,
 }
 
 
-// Note: this only allows fields that are char*, not any other kind of pointer
+/* Note: this only allows fields that are char*, not any other kind of pointer */
 void CopyArray_Channel_ChannelInfoRecord(Array_Channel_ChannelInfoRecord* value, Array_Channel_ChannelInfoRecord* copy)
 {
     if (value->elems) {
@@ -109,10 +123,10 @@ static AJ_Status Channel_GetChannelId(AJ_BusAttachment* busAttachment, const cha
     return model->GetChannelId(model, objPath, out);
 }
 
-
-
 static AJ_Status Channel_SetChannelId(AJ_BusAttachment* busAttachment, const char* objPath, char const* value)
 {
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -125,8 +139,21 @@ static AJ_Status Channel_SetChannelId(AJ_BusAttachment* busAttachment, const cha
         return AJ_ERR_NULL;
     }
 
+        uint16_t numChannels;
+        if (model->GetTotalNumberOfChannels(model, objPath, &numChannels) != AJ_OK)
+            return AJ_ERR_FAILURE;
+
+        Array_Channel_ChannelInfoRecord availableChannels;
+        if (model->MethodGetChannelList(model, objPath,0, numChannels, &availableChannels) != AJ_OK)
+            return AJ_ERR_FAILURE;
+
+        if (!valueIn_Array_Channel_ChannelInfoRecord(value, &availableChannels))
+            return AJ_ERR_INVALID;
+
+        FreeArray_Channel_ChannelInfoRecord(&availableChannels);
     model->busAttachment = busAttachment;
-    return model->SetChannelId(model, objPath, value);
+    status = model->SetChannelId(model, objPath, value);
+    return status;
 }
 
 
@@ -185,9 +212,9 @@ static AJ_Status Cdm_Channel_CallGetChannelList(AJ_BusAttachment* busAttachment,
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status Channel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -200,6 +227,7 @@ static AJ_Status Channel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Messa
         case CHANNEL_PROP_CHANNEL_ID:
         {
             char const* channel_id;
+            memset(&channel_id, 0, sizeof(char const*));
             status = Channel_GetChannelId(busAttachment, objPath, &channel_id);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "s", channel_id);
@@ -214,6 +242,7 @@ static AJ_Status Channel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Messa
         case CHANNEL_PROP_TOTAL_NUMBER_OF_CHANNELS:
         {
             uint16_t total_number_of_channels;
+            memset(&total_number_of_channels, 0, sizeof(uint16_t));
             status = Channel_GetTotalNumberOfChannels(busAttachment, objPath, &total_number_of_channels);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", total_number_of_channels);
@@ -231,7 +260,7 @@ static AJ_Status Channel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Messa
 
 
 
-static AJ_Status Channel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status Channel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -246,8 +275,8 @@ static AJ_Status Channel_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Messa
             status = AJ_UnmarshalArgs(msg, "s", &channel_id);
             if (status == AJ_OK) {
                 status = Channel_SetChannelId(busAttachment, objPath, channel_id);
-                if (status == AJ_OK) {
-                    status= Cdm_Channel_EmitChannelIdChanged(busAttachment, objPath, channel_id);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_Channel_EmitChannelIdChanged(busAttachment, objPath, channel_id);
                 }
             }
             break;
@@ -267,6 +296,7 @@ static AJ_Status Channel_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Mes
 
     case CHANNEL_METHOD_GET_CHANNEL_LIST:
     {
+        AJ_Message reply;
         uint16_t starting_record;
         status = AJ_UnmarshalArgs(msg, "q", &starting_record);
 
@@ -280,14 +310,23 @@ static AJ_Status Channel_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Mes
             return status;
         }
         Array_Channel_ChannelInfoRecord list_of_channel_info_records;
+        memset(&list_of_channel_info_records, 0, sizeof(Array_Channel_ChannelInfoRecord));
 
         status = Cdm_Channel_CallGetChannelList(busAttachment, objPath, starting_record, num_records, &list_of_channel_info_records);
 
-        AJ_Message reply;
         AJ_MarshalReplyMsg(msg, &reply);
-
         if (status == AJ_OK) {
-            status |= AJ_MarshalArgs(&reply, "a(sss)", list_of_channel_info_records.elems, list_of_channel_info_records.numElems);
+            AJ_Arg array;
+            int i=0;
+            status |= AJ_MarshalContainer(&reply, &array, AJ_ARG_ARRAY);
+            for (; i<list_of_channel_info_records.numElems; ++i)
+            {
+                AJ_Arg strc;
+                status |= AJ_MarshalContainer(&reply, &strc, AJ_ARG_STRUCT);
+                AJ_MarshalArgs(&reply, "sss", list_of_channel_info_records.elems[i].channelID, list_of_channel_info_records.elems[i].channelNumber, list_of_channel_info_records.elems[i].channelName);
+                AJ_MarshalCloseContainer(&reply, &strc);
+            }
+            AJ_MarshalCloseContainer(&reply, &array);
             if (status == AJ_OK) {
                 status = AJ_DeliverMsg(&reply);
             }

@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -31,7 +44,7 @@ static Element* HAL_Encode_Alerts_AlertRecord(Alerts_AlertRecord value, Element*
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "severity");
-        BSXML_AddChild(field, HAL_Encode_Int(value.severity, field));
+        BSXML_AddChild(field, HAL_Encode_UInt(value.severity, field));
     }
     {
         Element* field = BSXML_NewElement("field", struc);
@@ -53,9 +66,9 @@ static void HAL_Decode_Alerts_AlertRecord(Element* elem, Alerts_AlertRecord* val
 static void HAL_Decode_Alerts_AlertRecord(Element* elem, Alerts_AlertRecord* value)
 {
     if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
-        value->severity = HAL_Decode_Int(elem->children[0]);
-        value->alertCode = HAL_Decode_UInt(elem->children[1]);
-        value->needAcknowledgement = HAL_Decode_Bool(elem->children[2]);
+        value->severity = HAL_Decode_UInt(elem->children[0]->children[0]);
+        value->alertCode = HAL_Decode_UInt(elem->children[1]->children[0]);
+        value->needAcknowledgement = HAL_Decode_Bool(elem->children[2]->children[0]);
     }
 }
 
@@ -80,7 +93,7 @@ static void HAL_Decode_Array_Alerts_AlertRecord(Element* elem, Array_Alerts_Aler
     InitArray_Alerts_AlertRecord(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < value->numElems; ++i) {
+        for (size_t i = 0; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Alerts_AlertRecord(value, 1);
             HAL_Decode_Alerts_AlertRecord(elem->children[i], &value->elems[j]);
         }
@@ -114,8 +127,8 @@ static void HAL_Decode_Alerts_AlertCodesDescriptor(Element* elem, Alerts_AlertCo
 static void HAL_Decode_Alerts_AlertCodesDescriptor(Element* elem, Alerts_AlertCodesDescriptor* value)
 {
     if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 2) {
-        value->alertCode = HAL_Decode_UInt(elem->children[0]);
-        value->description = HAL_Decode_String(elem->children[1]);
+        value->alertCode = HAL_Decode_UInt(elem->children[0]->children[0]);
+        value->description = HAL_Decode_String(elem->children[1]->children[0]);
     }
 }
 
@@ -140,7 +153,7 @@ static void HAL_Decode_Array_Alerts_AlertCodesDescriptor(Element* elem, Array_Al
     InitArray_Alerts_AlertCodesDescriptor(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < value->numElems; ++i) {
+        for (size_t i = 0; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Alerts_AlertCodesDescriptor(value, 1);
             HAL_Decode_Alerts_AlertCodesDescriptor(elem->children[i], &value->elems[j]);
         }
@@ -152,16 +165,16 @@ static Element* HAL_Encode_Alerts_Severity(Alerts_Severity value, Element* paren
 
 static Element* HAL_Encode_Alerts_Severity(Alerts_Severity value, Element* parent)
 {
-    return HAL_Encode_Int(value, parent);
+    return HAL_Encode_UInt(value, parent);
 }
 
 
 
-static void HAL_Decode_Alerts_Severity(Element* elem, Alerts_Severity* value) UNUSED_OK;
+static void HAL_Decode_Alerts_Severity(Element* elem, uint8_t *value) UNUSED_OK;
 
-static void HAL_Decode_Alerts_Severity(Element* elem, Alerts_Severity* value)
+static void HAL_Decode_Alerts_Severity(Element* elem, uint8_t *value)
 {
-    *value = (Alerts_Severity)(int)HAL_Decode_Int(elem);
+    *value = (uint8_t)HAL_Decode_UInt(elem);
 }
 
 
@@ -172,7 +185,7 @@ static Element* HAL_Encode_Array_Alerts_Severity(Array_Alerts_Severity value, El
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_Int(value.elems[i], array));
+        BSXML_AddChild(array, HAL_Encode_UInt(value.elems[i], array));
     }
     return array;
 }
@@ -185,14 +198,12 @@ static void HAL_Decode_Array_Alerts_Severity(Element* elem, Array_Alerts_Severit
     InitArray_Alerts_Severity(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < value->numElems; ++i) {
+        for (size_t i = 0; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Alerts_Severity(value, 1);
-            value->elems[j] = (Alerts_Severity)(int)HAL_Decode_Int(elem->children[i]);
+            value->elems[j] = (uint8_t)HAL_Decode_UInt(elem->children[i]);
         }
     }
 }
-
-static const char* BusPath = "/cdm/emulated";
 
 static Array_Alerts_AlertCodesDescriptor* getAlertCodesDescriptor(void)
 {
@@ -228,13 +239,12 @@ static void CopyAlerts_AlertCodesDescriptor(Alerts_AlertCodesDescriptor* value, 
 }
 
 
-
 static AJ_Status GetAlerts(void *context, const char *objPath, Array_Alerts_AlertRecord *out)
 {
     AJ_Status result = AJ_OK;
     Array_Alerts_AlertRecord value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.Alerts", "Alerts");
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.Alerts", "Alerts");
 
     if (elem) {
         HAL_Decode_Array_Alerts_AlertRecord(elem, &value);

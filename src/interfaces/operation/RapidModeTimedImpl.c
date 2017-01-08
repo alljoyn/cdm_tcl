@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/RapidModeTimedInterface.h>
 #include <ajtcl/cdm/interfaces/operation/RapidModeTimedModel.h>
 
@@ -55,10 +69,25 @@ static AJ_Status RapidModeTimed_GetRapidModeMinutesRemaining(AJ_BusAttachment* b
     return model->GetRapidModeMinutesRemaining(model, objPath, out);
 }
 
-
-
-static AJ_Status RapidModeTimed_SetRapidModeMinutesRemaining(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t value)
+static AJ_Status clampRapidModeMinutesRemaining(RapidModeTimedModel* model, const char* objPath, uint16_t value, uint16_t *out)
 {
+
+    uint16_t minValue = 0;
+
+    uint16_t maxValue;
+    if (model->GetMaxSetMinutes(model, objPath, &maxValue) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    uint16_t stepValue = 0;
+
+    *out = clamp_uint16(value, minValue, maxValue, stepValue);
+    return AJ_OK;
+}
+
+static AJ_Status RapidModeTimed_SetRapidModeMinutesRemaining(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t *value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -71,8 +100,13 @@ static AJ_Status RapidModeTimed_SetRapidModeMinutesRemaining(AJ_BusAttachment* b
         return AJ_ERR_NULL;
     }
 
+    status = clampRapidModeMinutesRemaining(model, objPath, *value, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetRapidModeMinutesRemaining(model, objPath, value);
+    status = model->SetRapidModeMinutesRemaining(model, objPath, *value);
+    return status;
 }
 
 
@@ -105,9 +139,9 @@ static AJ_Status RapidModeTimed_GetMaxSetMinutes(AJ_BusAttachment* busAttachment
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status RapidModeTimed_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -120,6 +154,7 @@ static AJ_Status RapidModeTimed_OnGetProperty(AJ_BusAttachment* busAttachment, A
         case RAPIDMODETIMED_PROP_RAPID_MODE_MINUTES_REMAINING:
         {
             uint16_t rapid_mode_minutes_remaining;
+            memset(&rapid_mode_minutes_remaining, 0, sizeof(uint16_t));
             status = RapidModeTimed_GetRapidModeMinutesRemaining(busAttachment, objPath, &rapid_mode_minutes_remaining);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", rapid_mode_minutes_remaining);
@@ -134,6 +169,7 @@ static AJ_Status RapidModeTimed_OnGetProperty(AJ_BusAttachment* busAttachment, A
         case RAPIDMODETIMED_PROP_MAX_SET_MINUTES:
         {
             uint16_t max_set_minutes;
+            memset(&max_set_minutes, 0, sizeof(uint16_t));
             status = RapidModeTimed_GetMaxSetMinutes(busAttachment, objPath, &max_set_minutes);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", max_set_minutes);
@@ -151,7 +187,7 @@ static AJ_Status RapidModeTimed_OnGetProperty(AJ_BusAttachment* busAttachment, A
 
 
 
-static AJ_Status RapidModeTimed_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status RapidModeTimed_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -165,9 +201,9 @@ static AJ_Status RapidModeTimed_OnSetProperty(AJ_BusAttachment* busAttachment, A
             uint16_t rapid_mode_minutes_remaining;
             status = AJ_UnmarshalArgs(msg, "q", &rapid_mode_minutes_remaining);
             if (status == AJ_OK) {
-                status = RapidModeTimed_SetRapidModeMinutesRemaining(busAttachment, objPath, rapid_mode_minutes_remaining);
-                if (status == AJ_OK) {
-                    status= Cdm_RapidModeTimed_EmitRapidModeMinutesRemainingChanged(busAttachment, objPath, rapid_mode_minutes_remaining);
+                status = RapidModeTimed_SetRapidModeMinutesRemaining(busAttachment, objPath, &rapid_mode_minutes_remaining);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_RapidModeTimed_EmitRapidModeMinutesRemainingChanged(busAttachment, objPath, rapid_mode_minutes_remaining);
                 }
             }
             break;

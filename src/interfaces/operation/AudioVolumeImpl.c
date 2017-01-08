@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/AudioVolumeInterface.h>
 #include <ajtcl/cdm/interfaces/operation/AudioVolumeModel.h>
 
@@ -56,10 +70,25 @@ static AJ_Status AudioVolume_GetVolume(AJ_BusAttachment* busAttachment, const ch
     return model->GetVolume(model, objPath, out);
 }
 
-
-
-static AJ_Status AudioVolume_SetVolume(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t value)
+static AJ_Status clampVolume(AudioVolumeModel* model, const char* objPath, uint8_t value, uint8_t *out)
 {
+
+    uint8_t minValue = 0;
+
+    uint8_t maxValue;
+    if (model->GetMaxVolume(model, objPath, &maxValue) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    uint8_t stepValue = 0;
+
+    *out = clamp_uint8(value, minValue, maxValue, stepValue);
+    return AJ_OK;
+}
+
+static AJ_Status AudioVolume_SetVolume(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t *value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -72,8 +101,13 @@ static AJ_Status AudioVolume_SetVolume(AJ_BusAttachment* busAttachment, const ch
         return AJ_ERR_NULL;
     }
 
+    status = clampVolume(model, objPath, *value, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetVolume(model, objPath, value);
+    status = model->SetVolume(model, objPath, *value);
+    return status;
 }
 
 
@@ -130,10 +164,10 @@ static AJ_Status AudioVolume_GetMute(AJ_BusAttachment* busAttachment, const char
     return model->GetMute(model, objPath, out);
 }
 
-
-
 static AJ_Status AudioVolume_SetMute(AJ_BusAttachment* busAttachment, const char* objPath, bool value)
 {
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -147,7 +181,8 @@ static AJ_Status AudioVolume_SetMute(AJ_BusAttachment* busAttachment, const char
     }
 
     model->busAttachment = busAttachment;
-    return model->SetMute(model, objPath, value);
+    status = model->SetMute(model, objPath, value);
+    return status;
 }
 
 
@@ -160,9 +195,9 @@ AJ_Status Cdm_AudioVolume_EmitMuteChanged(AJ_BusAttachment *bus, const char *obj
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status AudioVolume_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -175,6 +210,7 @@ static AJ_Status AudioVolume_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
         case AUDIOVOLUME_PROP_VOLUME:
         {
             uint8_t volume;
+            memset(&volume, 0, sizeof(uint8_t));
             status = AudioVolume_GetVolume(busAttachment, objPath, &volume);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", volume);
@@ -189,6 +225,7 @@ static AJ_Status AudioVolume_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
         case AUDIOVOLUME_PROP_MAX_VOLUME:
         {
             uint8_t max_volume;
+            memset(&max_volume, 0, sizeof(uint8_t));
             status = AudioVolume_GetMaxVolume(busAttachment, objPath, &max_volume);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", max_volume);
@@ -203,6 +240,7 @@ static AJ_Status AudioVolume_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
         case AUDIOVOLUME_PROP_MUTE:
         {
             bool mute;
+            memset(&mute, 0, sizeof(bool));
             status = AudioVolume_GetMute(busAttachment, objPath, &mute);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "b", mute);
@@ -220,7 +258,7 @@ static AJ_Status AudioVolume_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
 
 
 
-static AJ_Status AudioVolume_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status AudioVolume_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -234,9 +272,9 @@ static AJ_Status AudioVolume_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_M
             uint8_t volume;
             status = AJ_UnmarshalArgs(msg, "y", &volume);
             if (status == AJ_OK) {
-                status = AudioVolume_SetVolume(busAttachment, objPath, volume);
-                if (status == AJ_OK) {
-                    status= Cdm_AudioVolume_EmitVolumeChanged(busAttachment, objPath, volume);
+                status = AudioVolume_SetVolume(busAttachment, objPath, &volume);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_AudioVolume_EmitVolumeChanged(busAttachment, objPath, volume);
                 }
             }
             break;
@@ -248,8 +286,8 @@ static AJ_Status AudioVolume_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_M
             status = AJ_UnmarshalArgs(msg, "b", &mute);
             if (status == AJ_OK) {
                 status = AudioVolume_SetMute(busAttachment, objPath, mute);
-                if (status == AJ_OK) {
-                    status= Cdm_AudioVolume_EmitMuteChanged(busAttachment, objPath, mute);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_AudioVolume_EmitMuteChanged(busAttachment, objPath, mute);
                 }
             }
             break;

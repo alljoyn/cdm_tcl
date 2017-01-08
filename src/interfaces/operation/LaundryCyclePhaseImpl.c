@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/LaundryCyclePhaseInterface.h>
 #include <ajtcl/cdm/interfaces/operation/LaundryCyclePhaseModel.h>
 
@@ -53,7 +67,7 @@ void InitArray_LaundryCyclePhase_CyclePhaseDescriptor(Array_LaundryCyclePhase_Cy
 }
 
 
-// Note: this only allows fields that are char*, not any other kind of pointer
+/* Note: this only allows fields that are char*, not any other kind of pointer */
 void CopyArray_LaundryCyclePhase_CyclePhaseDescriptor(Array_LaundryCyclePhase_CyclePhaseDescriptor* value, Array_LaundryCyclePhase_CyclePhaseDescriptor* copy)
 {
     if (value->elems) {
@@ -163,9 +177,9 @@ static AJ_Status Cdm_LaundryCyclePhase_CallGetVendorPhasesDescription(AJ_BusAtta
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status LaundryCyclePhase_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -178,6 +192,7 @@ static AJ_Status LaundryCyclePhase_OnGetProperty(AJ_BusAttachment* busAttachment
         case LAUNDRYCYCLEPHASE_PROP_CYCLE_PHASE:
         {
             uint8_t cycle_phase;
+            memset(&cycle_phase, 0, sizeof(uint8_t));
             status = LaundryCyclePhase_GetCyclePhase(busAttachment, objPath, &cycle_phase);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "y", cycle_phase);
@@ -192,9 +207,10 @@ static AJ_Status LaundryCyclePhase_OnGetProperty(AJ_BusAttachment* busAttachment
         case LAUNDRYCYCLEPHASE_PROP_SUPPORTED_CYCLE_PHASES:
         {
             Array_uint8 supported_cycle_phases;
+            memset(&supported_cycle_phases, 0, sizeof(Array_uint8));
             status = LaundryCyclePhase_GetSupportedCyclePhases(busAttachment, objPath, &supported_cycle_phases);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "ay", supported_cycle_phases);
+                status = AJ_MarshalArgs(replyMsg, "ay", supported_cycle_phases.elems, sizeof(uint8_t) * supported_cycle_phases.numElems);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -209,7 +225,7 @@ static AJ_Status LaundryCyclePhase_OnGetProperty(AJ_BusAttachment* busAttachment
 
 
 
-static AJ_Status LaundryCyclePhase_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status LaundryCyclePhase_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -232,6 +248,7 @@ static AJ_Status LaundryCyclePhase_OnMethodHandler(AJ_BusAttachment* busAttachme
 
     case LAUNDRYCYCLEPHASE_METHOD_GET_VENDOR_PHASES_DESCRIPTION:
     {
+        AJ_Message reply;
         char const* language_tag;
         status = AJ_UnmarshalArgs(msg, "s", &language_tag);
 
@@ -239,14 +256,23 @@ static AJ_Status LaundryCyclePhase_OnMethodHandler(AJ_BusAttachment* busAttachme
             return status;
         }
         Array_LaundryCyclePhase_CyclePhaseDescriptor phases_description;
+        memset(&phases_description, 0, sizeof(Array_LaundryCyclePhase_CyclePhaseDescriptor));
 
         status = Cdm_LaundryCyclePhase_CallGetVendorPhasesDescription(busAttachment, objPath, language_tag, &phases_description);
 
-        AJ_Message reply;
         AJ_MarshalReplyMsg(msg, &reply);
-
         if (status == AJ_OK) {
-            status |= AJ_MarshalArgs(&reply, "a(yss)", phases_description.elems, phases_description.numElems);
+            AJ_Arg array;
+            int i=0;
+            status |= AJ_MarshalContainer(&reply, &array, AJ_ARG_ARRAY);
+            for (; i<phases_description.numElems; ++i)
+            {
+                AJ_Arg strc;
+                status |= AJ_MarshalContainer(&reply, &strc, AJ_ARG_STRUCT);
+                AJ_MarshalArgs(&reply, "yss", phases_description.elems[i].phase, phases_description.elems[i].name, phases_description.elems[i].description);
+                AJ_MarshalCloseContainer(&reply, &strc);
+            }
+            AJ_MarshalCloseContainer(&reply, &array);
             if (status == AJ_OK) {
                 status = AJ_DeliverMsg(&reply);
             }

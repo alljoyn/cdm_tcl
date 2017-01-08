@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/AudioVideoInputInterface.h>
 #include <ajtcl/cdm/interfaces/operation/AudioVideoInputModel.h>
 
@@ -53,7 +67,7 @@ void InitArray_AudioVideoInput_InputSource(Array_AudioVideoInput_InputSource* va
 }
 
 
-// Note: this only allows fields that are char*, not any other kind of pointer
+/* Note: this only allows fields that are char*, not any other kind of pointer */
 void CopyArray_AudioVideoInput_InputSource(Array_AudioVideoInput_InputSource* value, Array_AudioVideoInput_InputSource* copy)
 {
     if (value->elems) {
@@ -141,7 +155,7 @@ size_t ExtendArray_AudioVideoInput_SignalPresence(Array_AudioVideoInput_SignalPr
 
 
 
-static AJ_Status AudioVideoInput_GetInputSourceId(AJ_BusAttachment* busAttachment, const char* objPath, AudioVideoInput_SourceType* out)
+static AJ_Status AudioVideoInput_GetInputSourceId(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t* out)
 {
     if (!objPath || !out) {
         return AJ_ERR_INVALID;
@@ -159,10 +173,23 @@ static AJ_Status AudioVideoInput_GetInputSourceId(AJ_BusAttachment* busAttachmen
     return model->GetInputSourceId(model, objPath, out);
 }
 
-
-
-static AJ_Status AudioVideoInput_SetInputSourceId(AJ_BusAttachment* busAttachment, const char* objPath, AudioVideoInput_SourceType value)
+static AJ_Status ValidateInputSourceId(AudioVideoInputModel* model, const char* objPath, uint16_t value)
 {
+
+    Array_AudioVideoInput_InputSource validValues;
+    if (model->GetSupportedInputSources(model, objPath, &validValues) != AJ_OK)
+        return AJ_ERR_FAILURE;
+
+    AJ_Status status = (valueIn_Array_AudioVideoInput_InputSource(value, &validValues) == 1) ? AJ_OK : AJ_ERR_NO_MATCH;
+
+    FreeArray_AudioVideoInput_InputSource(&validValues);
+    return status;
+}
+
+static AJ_Status AudioVideoInput_SetInputSourceId(AJ_BusAttachment* busAttachment, const char* objPath, uint16_t value)
+{
+    AJ_Status status;
+
     if (!objPath) {
         return AJ_ERR_INVALID;
     }
@@ -175,13 +202,18 @@ static AJ_Status AudioVideoInput_SetInputSourceId(AJ_BusAttachment* busAttachmen
         return AJ_ERR_NULL;
     }
 
+    status = ValidateInputSourceId(model, objPath, value);
+    if (status != AJ_OK)
+        return status;
+
     model->busAttachment = busAttachment;
-    return model->SetInputSourceId(model, objPath, value);
+    status = model->SetInputSourceId(model, objPath, value);
+    return status;
 }
 
 
 
-AJ_Status Cdm_AudioVideoInput_EmitInputSourceIdChanged(AJ_BusAttachment *bus, const char *objPath, AudioVideoInput_SourceType newValue)
+AJ_Status Cdm_AudioVideoInput_EmitInputSourceIdChanged(AJ_BusAttachment *bus, const char *objPath, uint16_t newValue)
 {
     return EmitPropertyChanged(bus, objPath, INTERFACE_NAME, "InputSourceId", "q", newValue);
 }
@@ -230,9 +262,9 @@ AJ_Status Cdm_AudioVideoInput_EmitSupportedInputSourcesChanged(AJ_BusAttachment 
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status AudioVideoInput_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -244,7 +276,8 @@ static AJ_Status AudioVideoInput_OnGetProperty(AJ_BusAttachment* busAttachment, 
 
         case AUDIOVIDEOINPUT_PROP_INPUT_SOURCE_ID:
         {
-            AudioVideoInput_SourceType input_source_id;
+            uint16_t input_source_id;
+            memset(&input_source_id, 0, sizeof(uint16_t));
             status = AudioVideoInput_GetInputSourceId(busAttachment, objPath, &input_source_id);
             if (status == AJ_OK) {
                 status = AJ_MarshalArgs(replyMsg, "q", input_source_id);
@@ -259,9 +292,20 @@ static AJ_Status AudioVideoInput_OnGetProperty(AJ_BusAttachment* busAttachment, 
         case AUDIOVIDEOINPUT_PROP_SUPPORTED_INPUT_SOURCES:
         {
             Array_AudioVideoInput_InputSource supported_input_sources;
+            memset(&supported_input_sources, 0, sizeof(Array_AudioVideoInput_InputSource));
             status = AudioVideoInput_GetSupportedInputSources(busAttachment, objPath, &supported_input_sources);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "a(qqyqs)", supported_input_sources.elems, supported_input_sources.numElems);
+                AJ_Arg array;
+                int i=0;
+                status |= AJ_MarshalContainer(replyMsg, &array, AJ_ARG_ARRAY);
+                for (; i<supported_input_sources.numElems; ++i)
+                {
+                    AJ_Arg strc;
+                    status |= AJ_MarshalContainer(replyMsg, &strc, AJ_ARG_STRUCT);
+                    AJ_MarshalArgs(replyMsg, "qqyqs", supported_input_sources.elems[i].id, supported_input_sources.elems[i].sourceType, supported_input_sources.elems[i].signalPresence, supported_input_sources.elems[i].portNumber, supported_input_sources.elems[i].friendlyName);
+                    AJ_MarshalCloseContainer(replyMsg, &strc);
+                }
+                AJ_MarshalCloseContainer(replyMsg, &array);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -276,7 +320,7 @@ static AJ_Status AudioVideoInput_OnGetProperty(AJ_BusAttachment* busAttachment, 
 
 
 
-static AJ_Status AudioVideoInput_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status AudioVideoInput_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -290,9 +334,9 @@ static AJ_Status AudioVideoInput_OnSetProperty(AJ_BusAttachment* busAttachment, 
             uint16_t input_source_id;
             status = AJ_UnmarshalArgs(msg, "q", &input_source_id);
             if (status == AJ_OK) {
-                status = AudioVideoInput_SetInputSourceId(busAttachment, objPath, (AudioVideoInput_SourceType)(int)input_source_id);
-                if (status == AJ_OK) {
-                    status= Cdm_AudioVideoInput_EmitInputSourceIdChanged(busAttachment, objPath, input_source_id);
+                status = AudioVideoInput_SetInputSourceId(busAttachment, objPath, input_source_id);
+                if (status == AJ_OK && emitOnSet) {
+                    status = Cdm_AudioVideoInput_EmitInputSourceIdChanged(busAttachment, objPath, input_source_id);
                 }
             }
             break;

@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdio.h>
@@ -53,9 +66,9 @@ static void HAL_Decode_Channel_ChannelInfoRecord(Element* elem, Channel_ChannelI
 static void HAL_Decode_Channel_ChannelInfoRecord(Element* elem, Channel_ChannelInfoRecord* value)
 {
     if (strcmp(elem->name, "struct") == 0 && elem->numChildren == 3) {
-        value->channelID = HAL_Decode_String(elem->children[0]);
-        value->channelNumber = HAL_Decode_String(elem->children[1]);
-        value->channelName = HAL_Decode_String(elem->children[2]);
+        value->channelID = HAL_Decode_String(elem->children[0]->children[0]);
+        value->channelNumber = HAL_Decode_String(elem->children[1]->children[0]);
+        value->channelName = HAL_Decode_String(elem->children[2]->children[0]);
     }
 }
 
@@ -80,14 +93,12 @@ static void HAL_Decode_Array_Channel_ChannelInfoRecord(Element* elem, Array_Chan
     InitArray_Channel_ChannelInfoRecord(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < value->numElems; ++i) {
+        for (size_t i = 0; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Channel_ChannelInfoRecord(value, 1);
             HAL_Decode_Channel_ChannelInfoRecord(elem->children[i], &value->elems[j]);
         }
     }
 }
-
-static const char* BusPath = "/cdm/emulated";
 
 static Array_Channel_ChannelInfoRecord* getChannels(void)
 {
@@ -111,8 +122,6 @@ static Array_Channel_ChannelInfoRecord* getChannels(void)
     return &s_channels;
 }
 
-
-
 static void CopyChannel_ChannelInfoRecord(Channel_ChannelInfoRecord* value, Channel_ChannelInfoRecord* copy)
 {
     copy->channelID = strdup(value->channelID);
@@ -121,13 +130,12 @@ static void CopyChannel_ChannelInfoRecord(Channel_ChannelInfoRecord* value, Chan
 }
 
 
-
 static AJ_Status GetChannelId(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
     char const* value = "";
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.Channel", "ChannelId");
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.Channel", "ChannelId");
 
     if (elem) {
         value = HAL_Decode_String(elem);
@@ -146,19 +154,18 @@ static AJ_Status SetChannelId(void *context, const char *objPath, char const* in
     char const* value = input;
 
     Element* elem = HAL_Encode_String(value, NULL);
-    HAL_WritePropertyElem("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.Channel", "ChannelId", elem);
+    HAL_WritePropertyElem(objPath, "org.alljoyn.SmartSpaces.Operation.Channel", "ChannelId", elem);
     BSXML_FreeElement(elem);
 
     return result;
 }
-
 
 static AJ_Status GetTotalNumberOfChannels(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
     uint64_t value = {0};
 
-    Element* elem = HAL_ReadProperty("/cdm/emulated", "org.alljoyn.SmartSpaces.Operation.Channel", "TotalNumberOfChannels");
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.Channel", "TotalNumberOfChannels");
 
     if (elem) {
         value = HAL_Decode_UInt(elem);

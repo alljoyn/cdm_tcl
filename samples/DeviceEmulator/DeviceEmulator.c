@@ -1,21 +1,39 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
+
+#include <signal.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
+#include <unistd.h>
 
 #include <ajtcl/aj_status.h>
 #include <ajtcl/cdm/utils/CDM_System.h>
@@ -24,14 +42,9 @@
 
 #include <ajtcl/cdm/CdmControllee.h>
 
-#include <ajtcl/cdm/interfaces/operation/OnOffStatusInterface.h>
-
 #include "DeviceConfig.h"
 #include "InterfaceFactory.h"
 #include "../Utils/HAL.h"
-
-#include "Models/operation/OnOffStatusModelImpl.h"
-
 
 /**
  * Security authentication suites.
@@ -42,7 +55,18 @@ static const uint32_t suites[4] = { AUTH_SUITE_ECDHE_ECDSA, AUTH_SUITE_ECDHE_SPE
 
 static const char ecspeke_password[] = "1234";
 static const char psk_password[] = "faaa0af3dd3f1e0379da046a3ab6ca44";
-static const char* objPath = "/cdm/emulated";
+
+static void* irq_handler()
+{
+    int i = 0;
+    while(1)
+    {
+        char buf[100];
+        fgets(buf, 99, stdin);
+        fprintf(stdout, "%d %s\n", i, buf);
+        ++i;
+    }
+}
 
 static void CreateInterfaces(DEM_Config* config)
 {
@@ -51,32 +75,67 @@ static void CreateInterfaces(DEM_Config* config)
 
         for (int j = 0; j < obj->numInterfaces; ++j) {
             DEM_Interface* iface = &obj->interfaces[j];
-            fprintf(stdout, "Creating interface %s\n", iface->name);
-            createInterface(objPath, iface->name);
+            createInterface(obj->objectPath, iface->name);
 
             /* Set some initial property values. */
             for (int k = 0; k < iface->numProperties; ++k) {
                 DEM_Property* prop = &iface->properties[k];
                 if (prop->initialState) {
-                    HAL_WritePropertyXml(objPath, iface->name, prop->name, prop->initialState, !prop->defaultOnly);
+                    HAL_WritePropertyXml(obj->objectPath, iface->name, prop->name, prop->initialState, !prop->defaultOnly);
                 }
             }
         }
     }
 }
 
+static int ArgExists(int argc, char **argv, const char *arg)
+{
+    for (int i=0; i<argc; ++i)
+    {
+        if (strcmp(arg, argv[i]) == 0)
+        {
+            return i;
+        }
+    }
 
+    return 0;
+}
+
+static void FindArgValue(int argc, char **argv, const char *arg, const char *defValue, char **out)
+{
+    int index = ArgExists(argc, argv, arg);
+    *out = (index != 0 && index + 1 < argc) ? argv[index + 1] : (char*)defValue;
+}
 
 int main(int argc, char *argv[])
 {
     int retVal = 0;
     AJ_Status status;
 
-    HAL_DefaultInit();
+    char *certsDir;
+    char *stateDir;
+    bool emitOnSet;
 
     CDM_AboutIconParams iconParams;
     CDM_RoutingNodeParams routingNodeParams;
     CDM_BusAttachment bus;
+
+    DEM_Config *config;
+    CDM_AboutDataBuf aboutData;
+
+    pthread_t irq;
+
+    if (pthread_create(&irq, NULL, &irq_handler, NULL) != 0)
+    {
+        fprintf(stdout, "Error setting up IRQ\n");
+        return 1;
+    }
+
+    FindArgValue(argc, argv, "--state-dir", "emulated_device_state", &stateDir);
+    FindArgValue(argc, argv, "--certs-dir", "device_emulator_certs", &certsDir);
+    emitOnSet = (ArgExists(argc, argv, "--emit-on-set") > 0);
+
+    HAL_Init(stateDir, "");
 
     if (argc < 2)
     {
@@ -88,17 +147,17 @@ int main(int argc, char *argv[])
     Cdm_EnableSPEKE(ecspeke_password);
     Cdm_EnablePSK(psk_password);
 
-    DEM_Config *config = DEM_CreateConfig(argv[1]);
+    config = DEM_CreateConfig(argv[1]);
 
     if (!config) {
         fprintf(stderr, "Invalid XML file\n");
         return 1;
     }
 
-    const CDM_AboutDataBuf aboutData = CDM_CreateAboutDataFromXml(config->aboutData);
+    aboutData = CDM_CreateAboutDataFromXml(config->aboutData);
 
     CDM_SetDefaultAboutIconParams(&iconParams);
-    status = CDM_SystemInit(&iconParams);
+    status = CDM_SystemInit(&iconParams, emitOnSet);
     if (status != AJ_OK)
     {
         fprintf(stderr, "SystemInit failed: %s\n", AJ_StatusText(status));
@@ -108,26 +167,31 @@ int main(int argc, char *argv[])
 
     CreateInterfaces(config);
 
-    bus.isConnected = 0;
-    CDM_SetDefaultRoutingNodeParams(&routingNodeParams);
-    status = CDM_SystemConnect(&routingNodeParams, &bus);
-    if (status != AJ_OK || bus.isConnected == 0)
-    {
-        fprintf(stderr, "SystemConnect failed: %s\n", AJ_StatusText(status));
-        retVal = 1;
-        goto CLEANUP;
+    while(1) {
+        bus.isConnected = 0;
+        CDM_SetDefaultRoutingNodeParams(&routingNodeParams);
+        status = CDM_SystemConnect(&routingNodeParams, &bus);
+        if (status!=AJ_OK || bus.isConnected==0) {
+            fprintf(stderr, "SystemConnect failed: %s\n", AJ_StatusText(status));
+            retVal = 1;
+            goto CLEANUP;
+        }
+
+        status = Cdm_EnableSecurity(&bus.bus, NULL);
+        if (status!=AJ_OK) {
+            fprintf(stderr, "Cdm_EnableSecurity failed: %s\n", AJ_StatusText(status));
+            retVal = 1;
+            goto SHUTDOWN;
+        }
+
+        status = Cdm_MessageLoop(&bus);
+
+        status = Cdm_HandleMessageLoopExit(status, &bus, &routingNodeParams);
+        if (status != AJ_OK) {
+            retVal = 1;
+            goto SHUTDOWN;
+        }
     }
-
-    status = Cdm_EnableSecurity(&bus.bus, NULL);
-    if (status != AJ_OK)
-    {
-        fprintf(stderr, "Cdm_EnableSecurity failed: %s\n", AJ_StatusText(status));
-        retVal = 1;
-        goto SHUTDOWN;
-    }
-
-    status = Cdm_MessageLoop(&bus);
-
 
 SHUTDOWN:
     CDM_SystemStop();

@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -20,6 +33,7 @@
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/input/HidInterface.h>
 #include <ajtcl/cdm/interfaces/input/HidModel.h>
 
@@ -50,7 +64,7 @@ void InitArray_Hid_InputEvent(Array_Hid_InputEvent* value, size_t numElems)
 }
 
 
-// Note: this only allows fields that are char*, not any other kind of pointer
+/* Note: this only allows fields that are char*, not any other kind of pointer */
 void CopyArray_Hid_InputEvent(Array_Hid_InputEvent* value, Array_Hid_InputEvent* copy)
 {
     if (value->elems) {
@@ -100,7 +114,7 @@ void InitArray_Hid_SupportedInputEvent(Array_Hid_SupportedInputEvent* value, siz
 }
 
 
-// Note: this only allows fields that are char*, not any other kind of pointer
+/* Note: this only allows fields that are char*, not any other kind of pointer */
 void CopyArray_Hid_SupportedInputEvent(Array_Hid_SupportedInputEvent* value, Array_Hid_SupportedInputEvent* copy)
 {
     if (value->elems) {
@@ -197,9 +211,9 @@ static AJ_Status Cdm_Hid_CallInjectEvents(AJ_BusAttachment* busAttachment, const
 
 
 
-//
-// Handler functions
-//
+/*
+   Handler functions
+*/
 static AJ_Status Hid_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* replyMsg, const char* objPath, uint8_t memberIndex)
 {
     AJ_Status status = AJ_ERR_INVALID;
@@ -212,9 +226,20 @@ static AJ_Status Hid_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* 
         case HID_PROP_SUPPORTED_EVENTS:
         {
             Array_Hid_SupportedInputEvent supported_events;
+            memset(&supported_events, 0, sizeof(Array_Hid_SupportedInputEvent));
             status = Hid_GetSupportedEvents(busAttachment, objPath, &supported_events);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "a(qqii)", supported_events.elems, supported_events.numElems);
+                AJ_Arg array;
+                int i=0;
+                status |= AJ_MarshalContainer(replyMsg, &array, AJ_ARG_ARRAY);
+                for (; i<supported_events.numElems; ++i)
+                {
+                    AJ_Arg strc;
+                    status |= AJ_MarshalContainer(replyMsg, &strc, AJ_ARG_STRUCT);
+                    AJ_MarshalArgs(replyMsg, "qqii", supported_events.elems[i].type, supported_events.elems[i].code, supported_events.elems[i].min, supported_events.elems[i].max);
+                    AJ_MarshalCloseContainer(replyMsg, &strc);
+                }
+                AJ_MarshalCloseContainer(replyMsg, &array);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
@@ -229,7 +254,7 @@ static AJ_Status Hid_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* 
 
 
 
-static AJ_Status Hid_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex)
+static AJ_Status Hid_OnSetProperty(AJ_BusAttachment* busAttachment, AJ_Message* msg, const char* objPath, uint8_t memberIndex, bool emitOnSet)
 {
     AJ_Status status = AJ_ERR_INVALID;
 
@@ -252,6 +277,7 @@ static AJ_Status Hid_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message
 
     case HID_METHOD_INJECT_EVENTS:
     {
+        AJ_Message reply;
         Array_Hid_InputEvent input_events;
         status = AJ_UnmarshalArgs(msg, "a(qqi)", &input_events);
 
@@ -261,9 +287,7 @@ static AJ_Status Hid_OnMethodHandler(AJ_BusAttachment* busAttachment, AJ_Message
 
         status = Cdm_Hid_CallInjectEvents(busAttachment, objPath, input_events);
 
-        AJ_Message reply;
         AJ_MarshalReplyMsg(msg, &reply);
-
         if (status == AJ_OK) {
             status = AJ_DeliverMsg(&reply);
         }

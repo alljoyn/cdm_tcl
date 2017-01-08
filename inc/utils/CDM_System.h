@@ -1,17 +1,30 @@
 /******************************************************************************
- * Copyright AllSeen Alliance. All rights reserved.
+ * Copyright (c) 2016 Open Connectivity Foundation (OCF) and AllJoyn Open
+ *    Source Project (AJOSP) Contributors and others.
  *
- *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
- *    copyright notice and this permission notice appear in all copies.
+ *    SPDX-License-Identifier: Apache-2.0
  *
- *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- *    WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- *    MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- *    ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- *    WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- *    ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- *    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *    All rights reserved. This program and the accompanying materials are
+ *    made available under the terms of the Apache License, Version 2.0
+ *    which accompanies this distribution, and is available at
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Copyright 2016 Open Connectivity Foundation and Contributors to
+ *    AllSeen Alliance. All rights reserved.
+ *
+ *    Permission to use, copy, modify, and/or distribute this software for
+ *    any purpose with or without fee is hereby granted, provided that the
+ *    above copyright notice and this permission notice appear in all
+ *    copies.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+ *     WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+ *     WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+ *     AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ *     DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ *     PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ *     TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
 #ifndef ALLJOYN_CDM_SYSTEM_H
@@ -19,6 +32,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include <ajtcl/aj_status.h>
 #include <ajtcl/aj_bus.h>
@@ -48,14 +62,16 @@ typedef struct {
 typedef AJ_Status (*AppUpdateHandler)(AJ_BusAttachment* busAttachment);
 typedef AJSVC_ServiceStatus (*MessageProcessor)(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Status* status);
 typedef AJ_Status (*SessionAcceptedHandler) (uint16_t port, uint32_t sessionId, const char* joiner);
+typedef AJ_Status (*AppDisconnectedHandler) (AJ_BusAttachment* busAttachment, uint8_t restart);
 
 void CDM_SetDefaultAboutIconParams(CDM_AboutIconParams *params);
 void CDM_SetDefaultRoutingNodeParams(CDM_RoutingNodeParams *params);
 
-AJ_Status CDM_SystemInit(CDM_AboutIconParams *iconParams);
+AJ_Status CDM_SystemInit(CDM_AboutIconParams *iconParams, bool emitChangedOnSetProprty);
 AJ_Status CDM_SystemConnect(CDM_RoutingNodeParams *routingNodeParams, CDM_BusAttachment *busAttachment);
 
 AJ_Status Cdm_MessageLoop(CDM_BusAttachment *busAttachment);
+AJ_Status Cdm_HandleMessageLoopExit(AJ_Status loopExitStatus, CDM_BusAttachment *busAttachment, CDM_RoutingNodeParams *routingNodeParams);
 
 void CDM_SystemStop(void);
 
