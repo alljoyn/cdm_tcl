@@ -170,7 +170,7 @@ AJ_Status Cdm_Start(void);
  * Returns whether CDM was initialised to emit changed signals when a property value is changed
  * @return bool a true value is used to indicate CDM will emit a changed signal when OnSetProperty is called
  */
-bool Cdm_EmitSignalOnPropertySet();
+bool Cdm_EmitSignalOnPropertySet(void);
 
 /**
  * Function used to process CDM messages.

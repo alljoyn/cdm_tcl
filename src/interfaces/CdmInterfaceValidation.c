@@ -95,7 +95,7 @@ int valueIn_Array_AudioVideoInput_InputSource(uint16_t value, Array_AudioVideoIn
     return 0;
 }
 
-int valueIn_Array_Channel_ChannelInfoRecord(char *value, Array_Channel_ChannelInfoRecord *values)
+int valueIn_Array_Channel_ChannelInfoRecord(char const* value, Array_Channel_ChannelInfoRecord *values)
 {
     size_t i=0;
     if (values == NULL)
@@ -104,6 +104,20 @@ int valueIn_Array_Channel_ChannelInfoRecord(char *value, Array_Channel_ChannelIn
     for(; i < values->numElems; ++i)
     {
         if (strcmp(value, values->elems[i].channelID) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+int valueIn_Array_string(char const* value, Array_string *values)
+{
+    size_t i=0;
+    if (values == NULL)
+        return 0;
+
+    for(; i < values->numElems; ++i)
+    {
+        if (strcmp(value, values->elems[i]) == 0)
             return 1;
     }
     return 0;

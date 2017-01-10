@@ -115,7 +115,13 @@ extern PropertyStoreConfigEntry propertyStoreRuntimeValues[AJSVC_PROPERTY_STORE_
 
 #define AJ_PROPERTIES_NV_ID_END   (AJ_PROPERTIES_NV_ID_BEGIN + (int)AJSVC_PROPERTY_STORE_NUMBER_OF_RUNTIME_KEYS * (int)AJSVC_PROPERTY_STORE_NUMBER_OF_LANGUAGES - 1)
 
-AJ_Status PropertyStore_Init();
+AJ_Status PropertyStore_Init(void);
+
+uint8_t AJSVC_PropertyStore_GetNumberOfLanguages(void);
+int8_t AJSVC_PropertyStore_GetCurrentDefaultLanguageIndex(void);
+AJ_Status AJSVC_PropertyStore_LoadAll(void);
+AJ_Status AJSVC_PropertyStore_SaveAll(void);
+AJ_Status AJSVC_PropertyStore_ResetAll(void);
 
 /**
  * DeviceType

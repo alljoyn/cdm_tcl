@@ -45,8 +45,9 @@ MK_CLAMP(uint16_t, uint16)
 #define MK_VALUEIN_ARRAY(TYPE, NAME) int valueIn_Array_##NAME(TYPE value, Array_##NAME *values);
 
 MK_VALUEIN_ARRAY(uint8_t, uint8)
+MK_VALUEIN_ARRAY(const char*, string)
 MK_VALUEIN_ARRAY(uint16_t, AudioVideoInput_InputSource)
-MK_VALUEIN_ARRAY(char*, Channel_ChannelInfoRecord)
+MK_VALUEIN_ARRAY(char const*, Channel_ChannelInfoRecord)
 MK_VALUEIN_ARRAY(ClimateControlMode_Mode, ClimateControlMode_Mode)
 
 

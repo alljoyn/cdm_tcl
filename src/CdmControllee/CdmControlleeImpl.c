@@ -53,7 +53,7 @@ AJ_Status Cdm_Init(bool emitSignalOnSetProperty)
     return status;
 }
 
-bool Cdm_EmitSignalOnPropertySet()
+bool Cdm_EmitSignalOnPropertySet(void)
 {
     return gEmitSignalOnSetProperty;
 }

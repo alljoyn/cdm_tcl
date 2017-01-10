@@ -267,7 +267,7 @@ AJ_Status Cdm_HandleMessageLoopExit(AJ_Status loopExitStatus, CDM_BusAttachment 
         AJ_Status status;
         uint8_t forcedDisconnnect = (uint8_t)(loopExitStatus!=AJ_ERR_READ);
         uint8_t rebootRequired = (uint8_t)(loopExitStatus==AJ_ERR_RESTART_APP);
-        appDisconnectedHandler(&busAttachment, forcedDisconnnect);
+        appDisconnectedHandler(&busAttachment->bus, forcedDisconnnect);
         status = AJSVC_RoutingNodeDisconnect(
             &busAttachment->bus,
             forcedDisconnnect,
