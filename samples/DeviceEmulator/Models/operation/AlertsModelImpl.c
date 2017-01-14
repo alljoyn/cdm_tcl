@@ -44,17 +44,17 @@ static Element* HAL_Encode_Alerts_AlertRecord(Alerts_AlertRecord value, Element*
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "severity");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.severity, field));
+        HAL_Encode_UInt(value.severity, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "alertCode");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.alertCode, field));
+        HAL_Encode_UInt(value.alertCode, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "needAcknowledgement");
-        BSXML_AddChild(field, HAL_Encode_Bool(value.needAcknowledgement, field));
+        HAL_Encode_Bool(value.needAcknowledgement, field);
     }
     return struc;
 }
@@ -80,7 +80,7 @@ static Element* HAL_Encode_Array_Alerts_AlertRecord(Array_Alerts_AlertRecord val
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_Alerts_AlertRecord(value.elems[i], array));
+        HAL_Encode_Alerts_AlertRecord(value.elems[i], array);
     }
     return array;
 }
@@ -110,12 +110,12 @@ static Element* HAL_Encode_Alerts_AlertCodesDescriptor(Alerts_AlertCodesDescript
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "alertCode");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.alertCode, field));
+        HAL_Encode_UInt(value.alertCode, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "description");
-        BSXML_AddChild(field, HAL_Encode_String(value.description, field));
+        HAL_Encode_String(value.description, field);
     }
     return struc;
 }
@@ -140,7 +140,7 @@ static Element* HAL_Encode_Array_Alerts_AlertCodesDescriptor(Array_Alerts_AlertC
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_Alerts_AlertCodesDescriptor(value.elems[i], array));
+        HAL_Encode_Alerts_AlertCodesDescriptor(value.elems[i], array);
     }
     return array;
 }
@@ -185,7 +185,7 @@ static Element* HAL_Encode_Array_Alerts_Severity(Array_Alerts_Severity value, El
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_UInt(value.elems[i], array));
+        HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
 }
@@ -239,6 +239,15 @@ static void CopyAlerts_AlertCodesDescriptor(Alerts_AlertCodesDescriptor* value, 
 }
 
 
+static AJ_Status WriteAlerts(const char *objPath, const Array_Alerts_AlertRecord* alerts)
+{
+    Element* elem = HAL_Encode_Array_Alerts_AlertRecord(*alerts, NULL);
+    bool ok = HAL_WritePropertyElem(objPath, "org.alljoyn.SmartSpaces.Operation.Alerts", "Alerts", elem);
+    BSXML_FreeElement(elem);
+    return ok? AJ_OK : AJ_ERR_FAILURE;
+}
+
+
 static AJ_Status GetAlerts(void *context, const char *objPath, Array_Alerts_AlertRecord *out)
 {
     AJ_Status result = AJ_OK;
@@ -269,16 +278,66 @@ static AJ_Status MethodGetAlertCodesDescription(void *context, const char *objPa
 
 static AJ_Status MethodAcknowledgeAlert(void *context, const char *objPath, uint16_t alertCode)
 {
-    // TODO
-    return AJ_ERR_FAILURE;
+    AJ_Status status;
+    Array_Alerts_AlertRecord alerts;
+    Array_Alerts_AlertRecord newAlerts;
+    int found = 0;
+    int i;
+
+    status = GetAlerts(context, objPath, &alerts);
+    if (status != AJ_OK) {
+        return status;
+    }
+
+    /* Check that the given alert is in the array.  */
+    for (i = 0; i < alerts.numElems; ++i) {
+        if (alerts.elems[i].alertCode == alertCode) {
+            found = 1;
+        }
+    }
+
+    if (found) {
+        InitArray_Alerts_AlertRecord(&newAlerts, 0);
+
+        for (i = 0; i < alerts.numElems; ++i) {
+            if (alerts.elems[i].alertCode != alertCode) {
+                size_t ix = ExtendArray_Alerts_AlertRecord(&newAlerts, 1);
+                newAlerts.elems[ix] = alerts.elems[i];
+            }
+        }
+
+        status = WriteAlerts(objPath, &newAlerts);
+
+        if (status == AJ_OK && Cdm_EmitSignalOnPropertySet())
+        {
+            AlertsModel* model = (AlertsModel*)context;
+            status = Cdm_Alerts_EmitAlertsChanged(model->busAttachment, objPath, newAlerts);
+        }
+
+        FreeArray_Alerts_AlertRecord(&newAlerts);
+    }
+
+    FreeArray_Alerts_AlertRecord(&alerts);
+    return status;
 }
 
 
 
 static AJ_Status MethodAcknowledgeAllAlerts(void *context, const char *objPath)
 {
-    // TODO
-    return AJ_ERR_FAILURE;
+    AJ_Status status;
+    Array_Alerts_AlertRecord newAlerts;
+
+    InitArray_Alerts_AlertRecord(&newAlerts, 0);
+
+    status = WriteAlerts(objPath, &newAlerts);
+
+    if (status == AJ_OK && Cdm_EmitSignalOnPropertySet()) {
+        AlertsModel* model = (AlertsModel*)context;
+        status = Cdm_Alerts_EmitAlertsChanged(model->busAttachment, objPath, newAlerts);
+    }
+
+    return status;
 }
 
 

@@ -44,17 +44,17 @@ static Element* HAL_Encode_Hid_InputEvent(Hid_InputEvent value, Element* parent)
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "type");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.type, field));
+        HAL_Encode_UInt(value.type, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "code");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.code, field));
+        HAL_Encode_UInt(value.code, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "value");
-        BSXML_AddChild(field, HAL_Encode_Int(value.value, field));
+        HAL_Encode_Int(value.value, field);
     }
     return struc;
 }
@@ -80,7 +80,7 @@ static Element* HAL_Encode_Array_Hid_InputEvent(Array_Hid_InputEvent value, Elem
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_Hid_InputEvent(value.elems[i], array));
+        HAL_Encode_Hid_InputEvent(value.elems[i], array);
     }
     return array;
 }
@@ -110,22 +110,22 @@ static Element* HAL_Encode_Hid_SupportedInputEvent(Hid_SupportedInputEvent value
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "type");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.type, field));
+        HAL_Encode_UInt(value.type, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "code");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.code, field));
+        HAL_Encode_UInt(value.code, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "min");
-        BSXML_AddChild(field, HAL_Encode_Int(value.min, field));
+        HAL_Encode_Int(value.min, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "max");
-        BSXML_AddChild(field, HAL_Encode_Int(value.max, field));
+        HAL_Encode_Int(value.max, field);
     }
     return struc;
 }
@@ -152,7 +152,7 @@ static Element* HAL_Encode_Array_Hid_SupportedInputEvent(Array_Hid_SupportedInpu
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_Hid_SupportedInputEvent(value.elems[i], array));
+        HAL_Encode_Hid_SupportedInputEvent(value.elems[i], array);
     }
     return array;
 }

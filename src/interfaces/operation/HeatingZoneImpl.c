@@ -171,7 +171,7 @@ static AJ_Status HeatingZone_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_uint8(&max_heating_levels);
             }
             break;
         }
@@ -186,7 +186,7 @@ static AJ_Status HeatingZone_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_uint8(&heating_levels);
             }
             break;
         }

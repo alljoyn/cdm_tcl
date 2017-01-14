@@ -44,17 +44,17 @@ static Element* HAL_Encode_OvenCyclePhase_CyclePhaseDescriptor(OvenCyclePhase_Cy
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "phase");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.phase, field));
+        HAL_Encode_UInt(value.phase, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "name");
-        BSXML_AddChild(field, HAL_Encode_String(value.name, field));
+        HAL_Encode_String(value.name, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "description");
-        BSXML_AddChild(field, HAL_Encode_String(value.description, field));
+        HAL_Encode_String(value.description, field);
     }
     return struc;
 }
@@ -80,7 +80,7 @@ static Element* HAL_Encode_Array_OvenCyclePhase_CyclePhaseDescriptor(Array_OvenC
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_OvenCyclePhase_CyclePhaseDescriptor(value.elems[i], array));
+        HAL_Encode_OvenCyclePhase_CyclePhaseDescriptor(value.elems[i], array);
     }
     return array;
 }
@@ -100,6 +100,27 @@ static void HAL_Decode_Array_OvenCyclePhase_CyclePhaseDescriptor(Element* elem, 
     }
 }
 
+static Array_OvenCyclePhase_CyclePhaseDescriptor* getPhases(void)
+{
+    static Array_OvenCyclePhase_CyclePhaseDescriptor s_phases;
+
+    if (!s_phases.elems) {
+        InitArray_OvenCyclePhase_CyclePhaseDescriptor(&s_phases, 0);
+        size_t i = 0;
+
+        i = ExtendArray_OvenCyclePhase_CyclePhaseDescriptor(&s_phases, 1);
+        s_phases.elems[i].phase = 1;
+        s_phases.elems[i].name = strdup("seek");
+        s_phases.elems[i].description = strdup("Seek some dirt");
+
+        i = ExtendArray_OvenCyclePhase_CyclePhaseDescriptor(&s_phases, 1);
+        s_phases.elems[i].phase = 2;
+        s_phases.elems[i].name = strdup("suck");
+        s_phases.elems[i].description = strdup("Such it up");
+    }
+
+    return &s_phases;
+}
 
 
 static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
@@ -140,8 +161,9 @@ static AJ_Status GetSupportedCyclePhases(void *context, const char *objPath, Arr
 
 static AJ_Status MethodGetVendorPhasesDescription(void *context, const char *objPath, char const* languageTag, Array_OvenCyclePhase_CyclePhaseDescriptor* phasesDescription)
 {
-    // TODO
-    return AJ_ERR_FAILURE;
+    Array_OvenCyclePhase_CyclePhaseDescriptor* phases = getPhases();
+    CopyArray_OvenCyclePhase_CyclePhaseDescriptor(phases, phasesDescription);
+    return AJ_OK;
 }
 
 

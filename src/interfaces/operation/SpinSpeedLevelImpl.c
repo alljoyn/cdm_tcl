@@ -236,7 +236,7 @@ static AJ_Status SpinSpeedLevel_OnGetProperty(AJ_BusAttachment* busAttachment, A
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_uint8(&selectable_levels);
             }
             break;
         }

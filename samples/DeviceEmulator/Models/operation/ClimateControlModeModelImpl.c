@@ -59,7 +59,7 @@ static Element* HAL_Encode_Array_ClimateControlMode_Mode(Array_ClimateControlMod
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_UInt(value.elems[i], array));
+        HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
 }
@@ -104,7 +104,7 @@ static Element* HAL_Encode_Array_ClimateControlMode_OperationalState(Array_Clima
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_UInt(value.elems[i], array));
+        HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
 }

@@ -174,7 +174,7 @@ static AJ_Status TemperatureDisplay_OnGetProperty(AJ_BusAttachment* busAttachmen
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_uint8(&supported_display_temperature_units);
             }
             break;
         }

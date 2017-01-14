@@ -59,7 +59,7 @@ static Element* HAL_Encode_Array_HvacFanMode_Mode(Array_HvacFanMode_Mode value, 
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_UInt(value.elems[i], array));
+        HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
 }

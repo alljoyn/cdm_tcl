@@ -302,10 +302,10 @@ static AJ_Status AudioVideoInput_OnGetProperty(AJ_BusAttachment* busAttachment, 
                 {
                     AJ_Arg strc;
                     status |= AJ_MarshalContainer(replyMsg, &strc, AJ_ARG_STRUCT);
-                    AJ_MarshalArgs(replyMsg, "qqyqs", supported_input_sources.elems[i].id, supported_input_sources.elems[i].sourceType, supported_input_sources.elems[i].signalPresence, supported_input_sources.elems[i].portNumber, supported_input_sources.elems[i].friendlyName);
-                    AJ_MarshalCloseContainer(replyMsg, &strc);
+                    status |= AJ_MarshalArgs(replyMsg, "qqyqs", supported_input_sources.elems[i].id, supported_input_sources.elems[i].sourceType, supported_input_sources.elems[i].signalPresence, supported_input_sources.elems[i].portNumber, supported_input_sources.elems[i].friendlyName);
+                    status |= AJ_MarshalCloseContainer(replyMsg, &strc);
                 }
-                AJ_MarshalCloseContainer(replyMsg, &array);
+                status |= AJ_MarshalCloseContainer(replyMsg, &array);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }

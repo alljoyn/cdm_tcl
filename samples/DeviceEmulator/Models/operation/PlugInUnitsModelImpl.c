@@ -44,17 +44,17 @@ static Element* HAL_Encode_PlugInUnits_PlugInInfo(PlugInUnits_PlugInInfo value, 
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "objectPath");
-        BSXML_AddChild(field, HAL_Encode_String(value.objectPath, field));
+        HAL_Encode_String(value.objectPath, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "deviceId");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.deviceId, field));
+        HAL_Encode_UInt(value.deviceId, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "pluggedIn");
-        BSXML_AddChild(field, HAL_Encode_Bool(value.pluggedIn, field));
+        HAL_Encode_Bool(value.pluggedIn, field);
     }
     return struc;
 }
@@ -80,7 +80,7 @@ static Element* HAL_Encode_Array_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugIn
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_PlugInUnits_PlugInInfo(value.elems[i], array));
+        HAL_Encode_PlugInUnits_PlugInInfo(value.elems[i], array);
     }
     return array;
 }

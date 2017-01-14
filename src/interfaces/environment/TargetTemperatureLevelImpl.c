@@ -224,7 +224,7 @@ static AJ_Status TargetTemperatureLevel_OnGetProperty(AJ_BusAttachment* busAttac
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_uint8(&selectable_temperature_levels);
             }
             break;
         }

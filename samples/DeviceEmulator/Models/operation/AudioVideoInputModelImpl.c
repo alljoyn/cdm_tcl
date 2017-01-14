@@ -44,27 +44,27 @@ static Element* HAL_Encode_AudioVideoInput_InputSource(AudioVideoInput_InputSour
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "id");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.id, field));
+        HAL_Encode_UInt(value.id, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "sourceType");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.sourceType, field));
+        HAL_Encode_UInt(value.sourceType, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "signalPresence");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.signalPresence, field));
+        HAL_Encode_UInt(value.signalPresence, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "portNumber");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.portNumber, field));
+        HAL_Encode_UInt(value.portNumber, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "friendlyName");
-        BSXML_AddChild(field, HAL_Encode_String(value.friendlyName, field));
+        HAL_Encode_String(value.friendlyName, field);
     }
     return struc;
 }
@@ -92,7 +92,7 @@ static Element* HAL_Encode_Array_AudioVideoInput_InputSource(Array_AudioVideoInp
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_AudioVideoInput_InputSource(value.elems[i], array));
+        HAL_Encode_AudioVideoInput_InputSource(value.elems[i], array);
     }
     return array;
 }
@@ -137,7 +137,7 @@ static Element* HAL_Encode_Array_AudioVideoInput_SourceType(Array_AudioVideoInpu
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_UInt(value.elems[i], array));
+        HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
 }
@@ -182,7 +182,7 @@ static Element* HAL_Encode_Array_AudioVideoInput_SignalPresence(Array_AudioVideo
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_UInt(value.elems[i], array));
+        HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
 }

@@ -170,11 +170,18 @@ static AJ_Status LanguageDisplay_OnGetProperty(AJ_BusAttachment* busAttachment, 
             memset(&supported_display_languages, 0, sizeof(Array_string));
             status = LanguageDisplay_GetSupportedDisplayLanguages(busAttachment, objPath, &supported_display_languages);
             if (status == AJ_OK) {
-                status = AJ_MarshalArgs(replyMsg, "as", supported_display_languages.elems, sizeof(char const*) * supported_display_languages.numElems);
+                AJ_Arg array;
+                int i=0;
+                status |= AJ_MarshalContainer(replyMsg, &array, AJ_ARG_ARRAY);
+                for (; i<supported_display_languages.numElems; ++i)
+                {
+                    status |= AJ_MarshalArgs(replyMsg, "s", supported_display_languages.elems[i]);
+                }
+                status |= AJ_MarshalCloseContainer(replyMsg, &array);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_string(&supported_display_languages);
             }
             break;
         }

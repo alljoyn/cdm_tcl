@@ -44,17 +44,17 @@ static Element* HAL_Encode_Channel_ChannelInfoRecord(Channel_ChannelInfoRecord v
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "channelID");
-        BSXML_AddChild(field, HAL_Encode_String(value.channelID, field));
+        HAL_Encode_String(value.channelID, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "channelNumber");
-        BSXML_AddChild(field, HAL_Encode_String(value.channelNumber, field));
+        HAL_Encode_String(value.channelNumber, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "channelName");
-        BSXML_AddChild(field, HAL_Encode_String(value.channelName, field));
+        HAL_Encode_String(value.channelName, field);
     }
     return struc;
 }
@@ -80,7 +80,7 @@ static Element* HAL_Encode_Array_Channel_ChannelInfoRecord(Array_Channel_Channel
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_Channel_ChannelInfoRecord(value.elems[i], array));
+        HAL_Encode_Channel_ChannelInfoRecord(value.elems[i], array);
     }
     return array;
 }

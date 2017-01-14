@@ -236,10 +236,10 @@ static AJ_Status Hid_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Message* 
                 {
                     AJ_Arg strc;
                     status |= AJ_MarshalContainer(replyMsg, &strc, AJ_ARG_STRUCT);
-                    AJ_MarshalArgs(replyMsg, "qqii", supported_events.elems[i].type, supported_events.elems[i].code, supported_events.elems[i].min, supported_events.elems[i].max);
-                    AJ_MarshalCloseContainer(replyMsg, &strc);
+                    status |= AJ_MarshalArgs(replyMsg, "qqii", supported_events.elems[i].type, supported_events.elems[i].code, supported_events.elems[i].min, supported_events.elems[i].max);
+                    status |= AJ_MarshalCloseContainer(replyMsg, &strc);
                 }
-                AJ_MarshalCloseContainer(replyMsg, &array);
+                status |= AJ_MarshalCloseContainer(replyMsg, &array);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }

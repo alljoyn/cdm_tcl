@@ -214,7 +214,7 @@ static AJ_Status OvenCyclePhase_OnGetProperty(AJ_BusAttachment* busAttachment, A
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_uint8(&supported_cycle_phases);
             }
             break;
         }

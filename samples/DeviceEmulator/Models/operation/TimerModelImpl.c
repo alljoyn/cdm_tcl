@@ -140,6 +140,13 @@ static AJ_Status MethodSetTargetTimeToStart(void *context, const char *objPath, 
     Element* elem = HAL_Encode_Int(targetTimeToStart, NULL);
     HAL_WritePropertyElem(objPath, "org.alljoyn.SmartSpaces.Operation.Timer", "SetTargetTimeToStart", elem);
     BSXML_FreeElement(elem);
+
+    if (Cdm_EmitSignalOnPropertySet())
+    {
+        TimerModel* model = (TimerModel*)context;
+        Cdm_Timer_EmitTargetTimeToStartChanged(model->busAttachment, objPath, targetTimeToStart);
+    }
+
     return AJ_OK;
 }
 
@@ -150,6 +157,13 @@ static AJ_Status MethodSetTargetTimeToStop(void *context, const char *objPath, i
     Element* elem = HAL_Encode_Int(targetTimeToStop, NULL);
     HAL_WritePropertyElem(objPath, "org.alljoyn.SmartSpaces.Operation.Timer", "SetTargetTimeToStop", elem);
     BSXML_FreeElement(elem);
+
+    if (Cdm_EmitSignalOnPropertySet())
+    {
+        TimerModel* model = (TimerModel*)context;
+        Cdm_Timer_EmitTargetTimeToStopChanged(model->busAttachment, objPath, targetTimeToStop);
+    }
+
     return AJ_OK;
 }
 

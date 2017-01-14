@@ -85,7 +85,7 @@ static AJ_Status ValidateTargetValue(TargetHumidityModel* model, const char* obj
     return status;
 }
 
-static AJ_Status TargetHumidity_SetTargetValue(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t value)
+static AJ_Status TargetHumidity_SetTargetValue(AJ_BusAttachment* busAttachment, const char* objPath, uint8_t *value)
 {
     AJ_Status status;
 
@@ -113,7 +113,7 @@ static AJ_Status TargetHumidity_SetTargetValue(AJ_BusAttachment* busAttachment, 
 
     if (minValue == maxValue)
     {
-        status = ValidateTargetValue(model, objPath, value);
+        status = ValidateTargetValue(model, objPath, *value);
         if (status != AJ_OK)
             return status;
     }
@@ -124,11 +124,11 @@ static AJ_Status TargetHumidity_SetTargetValue(AJ_BusAttachment* busAttachment, 
         if (status != AJ_OK)
             return status;
 
-        value = clamp_uint8(value, minValue, maxValue, stepValue);
+        *value = clamp_uint8(*value, minValue, maxValue, stepValue);
     }
 
     model->busAttachment = busAttachment;
-    status = model->SetTargetValue(model, objPath, value);
+    status = model->SetTargetValue(model, objPath, *value);
     return status;
 }
 
@@ -332,7 +332,7 @@ static AJ_Status TargetHumidity_OnGetProperty(AJ_BusAttachment* busAttachment, A
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_uint8(&selectable_humidity_levels);
             }
             break;
         }
@@ -357,7 +357,7 @@ static AJ_Status TargetHumidity_OnSetProperty(AJ_BusAttachment* busAttachment, A
             uint8_t target_value;
             status = AJ_UnmarshalArgs(msg, "y", &target_value);
             if (status == AJ_OK) {
-                status = TargetHumidity_SetTargetValue(busAttachment, objPath, target_value);
+                status = TargetHumidity_SetTargetValue(busAttachment, objPath, &target_value);
                 if (status == AJ_OK && emitOnSet) {
                     status = Cdm_TargetHumidity_EmitTargetValueChanged(busAttachment, objPath, target_value);
                 }

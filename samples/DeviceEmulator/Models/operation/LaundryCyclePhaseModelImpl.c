@@ -44,17 +44,17 @@ static Element* HAL_Encode_LaundryCyclePhase_CyclePhaseDescriptor(LaundryCyclePh
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "phase");
-        BSXML_AddChild(field, HAL_Encode_UInt(value.phase, field));
+        HAL_Encode_UInt(value.phase, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "name");
-        BSXML_AddChild(field, HAL_Encode_String(value.name, field));
+        HAL_Encode_String(value.name, field);
     }
     {
         Element* field = BSXML_NewElement("field", struc);
         BSXML_AddAttribute(field, "name", "description");
-        BSXML_AddChild(field, HAL_Encode_String(value.description, field));
+        HAL_Encode_String(value.description, field);
     }
     return struc;
 }
@@ -80,7 +80,7 @@ static Element* HAL_Encode_Array_LaundryCyclePhase_CyclePhaseDescriptor(Array_La
 {
     Element* array = BSXML_NewElement("array", parent);
     for (size_t i = 0; i < value.numElems; ++i) {
-        BSXML_AddChild(array, HAL_Encode_LaundryCyclePhase_CyclePhaseDescriptor(value.elems[i], array));
+        HAL_Encode_LaundryCyclePhase_CyclePhaseDescriptor(value.elems[i], array);
     }
     return array;
 }

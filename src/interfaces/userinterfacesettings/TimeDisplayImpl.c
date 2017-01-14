@@ -174,7 +174,7 @@ static AJ_Status TimeDisplay_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_uint8(&supported_display_time_formats);
             }
             break;
         }

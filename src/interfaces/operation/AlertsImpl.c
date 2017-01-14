@@ -297,10 +297,10 @@ static AJ_Status Alerts_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Messag
                 {
                     AJ_Arg strc;
                     status |= AJ_MarshalContainer(replyMsg, &strc, AJ_ARG_STRUCT);
-                    AJ_MarshalArgs(replyMsg, "yqb", alerts.elems[i].severity, alerts.elems[i].alertCode, alerts.elems[i].needAcknowledgement);
-                    AJ_MarshalCloseContainer(replyMsg, &strc);
+                    status |= AJ_MarshalArgs(replyMsg, "yqb", alerts.elems[i].severity, alerts.elems[i].alertCode, alerts.elems[i].needAcknowledgement);
+                    status |= AJ_MarshalCloseContainer(replyMsg, &strc);
                 }
-                AJ_MarshalCloseContainer(replyMsg, &array);
+                status |= AJ_MarshalCloseContainer(replyMsg, &array);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }

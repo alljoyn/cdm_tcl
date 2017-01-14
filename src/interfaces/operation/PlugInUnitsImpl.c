@@ -165,10 +165,10 @@ static AJ_Status PlugInUnits_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_M
                 {
                     AJ_Arg strc;
                     status |= AJ_MarshalContainer(replyMsg, &strc, AJ_ARG_STRUCT);
-                    AJ_MarshalArgs(replyMsg, "oub", plug_in_units.elems[i].objectPath, plug_in_units.elems[i].deviceId, plug_in_units.elems[i].pluggedIn);
-                    AJ_MarshalCloseContainer(replyMsg, &strc);
+                    status |= AJ_MarshalArgs(replyMsg, "oub", plug_in_units.elems[i].objectPath, plug_in_units.elems[i].deviceId, plug_in_units.elems[i].pluggedIn);
+                    status |= AJ_MarshalCloseContainer(replyMsg, &strc);
                 }
-                AJ_MarshalCloseContainer(replyMsg, &array);
+                status |= AJ_MarshalCloseContainer(replyMsg, &array);
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }

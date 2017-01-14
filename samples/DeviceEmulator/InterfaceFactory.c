@@ -125,6 +125,14 @@
 #include "Models/environment/WaterLevelModelImpl.h"
 #include <ajtcl/cdm/interfaces/environment/WindDirectionModel.h>
 #include "Models/environment/WindDirectionModelImpl.h"
+#include <ajtcl/cdm/interfaces/userinterfacesettings/LanguageDisplayModel.h>
+#include "Models/userinterfacesettings/LanguageDisplayModelImpl.h"
+#include <ajtcl/cdm/interfaces/userinterfacesettings/TemperatureDisplayModel.h>
+#include "Models/userinterfacesettings/TemperatureDisplayModelImpl.h"
+#include <ajtcl/cdm/interfaces/userinterfacesettings/TimeDisplayModel.h>
+#include "Models/userinterfacesettings/TimeDisplayModelImpl.h"
+#include <ajtcl/cdm/interfaces/input/HidModel.h>
+#include "Models/input/HidModelImpl.h"
 
 AJ_Status createInterface(const char* objPath, const char* ifaceName)
 {
@@ -319,6 +327,22 @@ AJ_Status createInterface(const char* objPath, const char* ifaceName)
 
     if (strcmp(ifaceName, WIND_DIRECTION) == 0) {
         return Cdm_AddInterface(objPath, WIND_DIRECTION, intfDescEnvironmentWindDirection, &intfHandlerEnvironmentWindDirection, GetWindDirectionModel());
+    }
+
+    if (strcmp(ifaceName, LANGUAGE_DISPLAY) == 0) {
+        return Cdm_AddInterface(objPath, LANGUAGE_DISPLAY, intfDescUserinterfacesettingsLanguageDisplay, &intfHandlerUserinterfacesettingsLanguageDisplay, GetLanguageDisplayModel());
+    }
+
+    if (strcmp(ifaceName, TEMPERATURE_DISPLAY) == 0) {
+        return Cdm_AddInterface(objPath, TEMPERATURE_DISPLAY, intfDescUserinterfacesettingsTemperatureDisplay, &intfHandlerUserinterfacesettingsTemperatureDisplay, GetTemperatureDisplayModel());
+    }
+
+    if (strcmp(ifaceName, TIME_DISPLAY) == 0) {
+        return Cdm_AddInterface(objPath, TIME_DISPLAY, intfDescUserinterfacesettingsTimeDisplay, &intfHandlerUserinterfacesettingsTimeDisplay, GetTimeDisplayModel());
+    }
+
+    if (strcmp(ifaceName, HID) == 0) {
+        return Cdm_AddInterface(objPath, HID, intfDescInputHid, &intfHandlerInputHid, GetHidModel());
     }
     return AJ_ERR_INVALID;
 }

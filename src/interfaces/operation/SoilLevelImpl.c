@@ -243,7 +243,7 @@ static AJ_Status SoilLevel_OnGetProperty(AJ_BusAttachment* busAttachment, AJ_Mes
                 if (status == AJ_OK) {
                     status = AJ_DeliverMsg(replyMsg);
                 }
-                
+                FreeArray_uint8(&selectable_levels);
             }
             break;
         }
