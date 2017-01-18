@@ -204,6 +204,7 @@ static void HAL_Decode_Array_AudioVideoInput_SignalPresence(Element* elem, Array
 
 
 
+
 static AJ_Status GetInputSourceId(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -251,6 +252,39 @@ static AJ_Status GetSupportedInputSources(void *context, const char *objPath, Ar
     return result;
 }
 
+
+
+
+AJ_Status HandleAudioVideoInputCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.AudioVideoInput") == 0)
+    {
+        if (strcmp(cmd->property, "InputSourceId") == 0)
+        {
+            uint16_t value;
+            status = GetInputSourceId(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                AudioVideoInputModel* model = (AudioVideoInputModel*)context;
+                status = Cdm_AudioVideoInput_EmitInputSourceIdChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "SupportedInputSources") == 0)
+        {
+            Array_AudioVideoInput_InputSource value;
+            status = GetSupportedInputSources(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                AudioVideoInputModel* model = (AudioVideoInputModel*)context;
+                status = Cdm_AudioVideoInput_EmitSupportedInputSourcesChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_AudioVideoInput_InputSource(&value);
+        }
+    }
+    return status;
+}
 
 
 

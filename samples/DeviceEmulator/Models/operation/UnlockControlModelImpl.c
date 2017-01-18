@@ -34,6 +34,7 @@
 #include "UnlockControlModelImpl.h"
 #include "../../../Utils/HAL.h"
 
+
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/interfaces/operation/LockedStatusInterface.h>
 
@@ -56,6 +57,14 @@ static AJ_Status MethodUnlock(void *context, const char *objPath)
     }
 
     return AJ_OK;
+}
+
+
+
+AJ_Status HandleUnlockControlCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    return status;
 }
 
 

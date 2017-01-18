@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetIsClosed(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
@@ -52,6 +53,28 @@ static AJ_Status GetIsClosed(void *context, const char *objPath, bool *out)
     return result;
 }
 
+
+
+
+AJ_Status HandleClosedStatusCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.ClosedStatus") == 0)
+    {
+        if (strcmp(cmd->property, "IsClosed") == 0)
+        {
+            bool value;
+            status = GetIsClosed(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                ClosedStatusModel* model = (ClosedStatusModel*)context;
+                status = Cdm_ClosedStatus_EmitIsClosedChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

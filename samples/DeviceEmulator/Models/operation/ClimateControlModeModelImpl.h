@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/ClimateControlModeModel.h>
 #include <ajtcl/cdm/interfaces/operation/ClimateControlModeInterface.h>
+#include "../../../Utils/Command.h"
 
 ClimateControlModeModel *GetClimateControlModeModel(void);
+
+AJ_Status HandleClimateControlModeCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

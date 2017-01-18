@@ -100,27 +100,7 @@ static void HAL_Decode_Array_OvenCyclePhase_CyclePhaseDescriptor(Element* elem, 
     }
 }
 
-static Array_OvenCyclePhase_CyclePhaseDescriptor* getPhases(void)
-{
-    static Array_OvenCyclePhase_CyclePhaseDescriptor s_phases;
 
-    if (!s_phases.elems) {
-        InitArray_OvenCyclePhase_CyclePhaseDescriptor(&s_phases, 0);
-        size_t i = 0;
-
-        i = ExtendArray_OvenCyclePhase_CyclePhaseDescriptor(&s_phases, 1);
-        s_phases.elems[i].phase = 1;
-        s_phases.elems[i].name = strdup("seek");
-        s_phases.elems[i].description = strdup("Seek some dirt");
-
-        i = ExtendArray_OvenCyclePhase_CyclePhaseDescriptor(&s_phases, 1);
-        s_phases.elems[i].phase = 2;
-        s_phases.elems[i].name = strdup("suck");
-        s_phases.elems[i].description = strdup("Such it up");
-    }
-
-    return &s_phases;
-}
 
 
 static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
@@ -161,9 +141,48 @@ static AJ_Status GetSupportedCyclePhases(void *context, const char *objPath, Arr
 
 static AJ_Status MethodGetVendorPhasesDescription(void *context, const char *objPath, char const* languageTag, Array_OvenCyclePhase_CyclePhaseDescriptor* phasesDescription)
 {
-    Array_OvenCyclePhase_CyclePhaseDescriptor* phases = getPhases();
-    CopyArray_OvenCyclePhase_CyclePhaseDescriptor(phases, phasesDescription);
-    return AJ_OK;
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.OvenCyclePhase", "__PhaseDescription");
+
+    if (elem) {
+        HAL_Decode_Array_OvenCyclePhase_CyclePhaseDescriptor(elem, phasesDescription);
+        BSXML_FreeElement(elem);
+        return AJ_OK;
+    }
+
+    return AJ_ERR_FAILURE;
+}
+
+
+
+AJ_Status HandleOvenCyclePhaseCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.OvenCyclePhase") == 0)
+    {
+        if (strcmp(cmd->property, "CyclePhase") == 0)
+        {
+            uint8_t value;
+            status = GetCyclePhase(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                OvenCyclePhaseModel* model = (OvenCyclePhaseModel*)context;
+                status = Cdm_OvenCyclePhase_EmitCyclePhaseChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "SupportedCyclePhases") == 0)
+        {
+            Array_uint8 value;
+            status = GetSupportedCyclePhases(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                OvenCyclePhaseModel* model = (OvenCyclePhaseModel*)context;
+                status = Cdm_OvenCyclePhase_EmitSupportedCyclePhasesChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_uint8(&value);
+        }
+    }
+    return status;
 }
 
 

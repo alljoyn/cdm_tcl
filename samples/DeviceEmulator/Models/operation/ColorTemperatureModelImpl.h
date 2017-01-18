@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/ColorTemperatureModel.h>
 #include <ajtcl/cdm/interfaces/operation/ColorTemperatureInterface.h>
+#include "../../../Utils/Command.h"
 
 ColorTemperatureModel *GetColorTemperatureModel(void);
+
+AJ_Status HandleColorTemperatureCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

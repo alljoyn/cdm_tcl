@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/environment/TargetHumidityModel.h>
 #include <ajtcl/cdm/interfaces/environment/TargetHumidityInterface.h>
+#include "../../../Utils/Command.h"
 
 TargetHumidityModel *GetTargetHumidityModel(void);
+
+AJ_Status HandleTargetHumidityCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/FilterStatusModel.h>
 #include <ajtcl/cdm/interfaces/operation/FilterStatusInterface.h>
+#include "../../../Utils/Command.h"
 
 FilterStatusModel *GetFilterStatusModel(void);
+
+AJ_Status HandleFilterStatusCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

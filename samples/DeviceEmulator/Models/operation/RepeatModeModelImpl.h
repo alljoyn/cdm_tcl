@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/RepeatModeModel.h>
 #include <ajtcl/cdm/interfaces/operation/RepeatModeInterface.h>
+#include "../../../Utils/Command.h"
 
 RepeatModeModel *GetRepeatModeModel(void);
+
+AJ_Status HandleRepeatModeCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

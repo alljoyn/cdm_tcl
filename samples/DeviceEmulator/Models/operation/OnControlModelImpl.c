@@ -34,6 +34,7 @@
 #include "OnControlModelImpl.h"
 #include "../../../Utils/HAL.h"
 
+
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/interfaces/operation/OnOffStatusInterface.h>
 
@@ -57,6 +58,14 @@ static AJ_Status MethodSwitchOn(void *context, const char *objPath)
     }
 
     return AJ_OK;
+}
+
+
+
+AJ_Status HandleOnControlCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    return status;
 }
 
 

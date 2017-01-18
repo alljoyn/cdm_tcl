@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/PlugInUnitsModel.h>
 #include <ajtcl/cdm/interfaces/operation/PlugInUnitsInterface.h>
+#include "../../../Utils/Command.h"
 
 PlugInUnitsModel *GetPlugInUnitsModel(void);
+
+AJ_Status HandlePlugInUnitsCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 extern int Encoder_PlugInUnits_PlugInInfo(FILE* fp, void* value);

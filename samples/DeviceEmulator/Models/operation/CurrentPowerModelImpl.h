@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/CurrentPowerModel.h>
 #include <ajtcl/cdm/interfaces/operation/CurrentPowerInterface.h>
+#include "../../../Utils/Command.h"
 
 CurrentPowerModel *GetCurrentPowerModel(void);
+
+AJ_Status HandleCurrentPowerCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

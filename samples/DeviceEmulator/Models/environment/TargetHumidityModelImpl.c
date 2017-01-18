@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetTargetValue(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -131,6 +132,72 @@ static AJ_Status GetSelectableHumidityLevels(void *context, const char *objPath,
     return result;
 }
 
+
+
+
+AJ_Status HandleTargetHumidityCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Environment.TargetHumidity") == 0)
+    {
+        if (strcmp(cmd->property, "TargetValue") == 0)
+        {
+            uint8_t value;
+            status = GetTargetValue(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TargetHumidityModel* model = (TargetHumidityModel*)context;
+                status = Cdm_TargetHumidity_EmitTargetValueChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "MinValue") == 0)
+        {
+            uint8_t value;
+            status = GetMinValue(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TargetHumidityModel* model = (TargetHumidityModel*)context;
+                status = Cdm_TargetHumidity_EmitMinValueChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "MaxValue") == 0)
+        {
+            uint8_t value;
+            status = GetMaxValue(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TargetHumidityModel* model = (TargetHumidityModel*)context;
+                status = Cdm_TargetHumidity_EmitMaxValueChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "StepValue") == 0)
+        {
+            uint8_t value;
+            status = GetStepValue(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TargetHumidityModel* model = (TargetHumidityModel*)context;
+                status = Cdm_TargetHumidity_EmitStepValueChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "SelectableHumidityLevels") == 0)
+        {
+            Array_uint8 value;
+            status = GetSelectableHumidityLevels(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TargetHumidityModel* model = (TargetHumidityModel*)context;
+                status = Cdm_TargetHumidity_EmitSelectableHumidityLevelsChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_uint8(&value);
+        }
+    }
+    return status;
+}
 
 
 

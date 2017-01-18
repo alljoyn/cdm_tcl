@@ -34,6 +34,7 @@
 #include "LockControlModelImpl.h"
 #include "../../../Utils/HAL.h"
 
+
 #include <ajtcl/cdm/CdmControllee.h>
 #include <ajtcl/cdm/interfaces/operation/LockedStatusInterface.h>
 
@@ -53,6 +54,14 @@ static AJ_Status MethodLock(void *context, const char *objPath)
     Cdm_LockedStatus_EmitIsLockedChanged(model->busAttachment, objPath, value);
 
     return AJ_OK;
+}
+
+
+
+AJ_Status HandleLockControlCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    return status;
 }
 
 

@@ -100,27 +100,6 @@ static void HAL_Decode_Array_Channel_ChannelInfoRecord(Element* elem, Array_Chan
     }
 }
 
-static Array_Channel_ChannelInfoRecord* getChannels(void)
-{
-    static Array_Channel_ChannelInfoRecord s_channels;
-
-    if (!s_channels.elems) {
-        InitArray_Channel_ChannelInfoRecord(&s_channels, 0);
-        size_t i = 0;
-
-        i = ExtendArray_Channel_ChannelInfoRecord(&s_channels, 1);
-        s_channels.elems[i].channelID = strdup("a");
-        s_channels.elems[i].channelNumber = strdup("1");
-        s_channels.elems[i].channelName = strdup("Hobbit News");
-
-        i = ExtendArray_Channel_ChannelInfoRecord(&s_channels, 1);
-        s_channels.elems[i].channelID = strdup("b");
-        s_channels.elems[i].channelNumber = strdup("2");
-        s_channels.elems[i].channelName = strdup("Shire Shopping Network");
-    }
-
-    return &s_channels;
-}
 
 static void CopyChannel_ChannelInfoRecord(Channel_ChannelInfoRecord* value, Channel_ChannelInfoRecord* copy)
 {
@@ -133,13 +112,16 @@ static void CopyChannel_ChannelInfoRecord(Channel_ChannelInfoRecord* value, Chan
 static AJ_Status GetChannelId(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
-    char const* value = "";
+    char const* value = 0;
 
     Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.Channel", "ChannelId");
 
     if (elem) {
         value = HAL_Decode_String(elem);
         BSXML_FreeElement(elem);
+    }
+    else {
+        value = strdup("");
     }
 
     *out = value;
@@ -181,23 +163,67 @@ static AJ_Status GetTotalNumberOfChannels(void *context, const char *objPath, ui
 
 static AJ_Status MethodGetChannelList(void *context, const char *objPath, uint16_t startingRecord, uint16_t numRecords, Array_Channel_ChannelInfoRecord* listOfChannelInfoRecords)
 {
-    Array_Channel_ChannelInfoRecord* channels = getChannels();
+    AJ_Status status = AJ_OK;
+    Array_Channel_ChannelInfoRecord channels;
 
-    InitArray_Channel_ChannelInfoRecord(listOfChannelInfoRecords, 0);
+    InitArray_Channel_ChannelInfoRecord(&channels, 0);
 
-    if (startingRecord >= channels->numElems)
-    {
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.Channel", "__ChannelList");
+
+    if (elem) {
+        HAL_Decode_Array_Channel_ChannelInfoRecord(elem, &channels);
+        BSXML_FreeElement(elem);
+
+        InitArray_Channel_ChannelInfoRecord(listOfChannelInfoRecords, 0);
+
+        if (startingRecord < channels.numElems)
+        {
+            for (size_t i = startingRecord; i < startingRecord + numRecords && i < channels.numElems; ++i)
+            {
+                size_t j = ExtendArray_Channel_ChannelInfoRecord(listOfChannelInfoRecords, 1);
+                listOfChannelInfoRecords->elems[j] = channels.elems[i];
+                CopyChannel_ChannelInfoRecord(&channels.elems[i], &listOfChannelInfoRecords->elems[j]);
+            }
+        }
+    } else {
         return AJ_ERR_FAILURE;
     }
 
-    for (size_t i = startingRecord; i < startingRecord + numRecords && i < channels->numElems; ++i)
-    {
-        size_t j = ExtendArray_Channel_ChannelInfoRecord(listOfChannelInfoRecords, 1);
-        listOfChannelInfoRecords->elems[j] = channels->elems[i];
-        CopyChannel_ChannelInfoRecord(&channels->elems[i], &listOfChannelInfoRecords->elems[j]);
-    }
+    FreeArray_Channel_ChannelInfoRecord(&channels);
+    return status;
+}
 
-    return AJ_OK;
+
+
+AJ_Status HandleChannelCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.Channel") == 0)
+    {
+        if (strcmp(cmd->property, "ChannelId") == 0)
+        {
+            char const* value;
+            status = GetChannelId(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                ChannelModel* model = (ChannelModel*)context;
+                status = Cdm_Channel_EmitChannelIdChanged(model->busAttachment, cmd->objPath, value);
+            }
+            free((void*)value);
+        }
+        if (strcmp(cmd->property, "TotalNumberOfChannels") == 0)
+        {
+            uint16_t value;
+            status = GetTotalNumberOfChannels(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                ChannelModel* model = (ChannelModel*)context;
+                status = Cdm_Channel_EmitTotalNumberOfChannelsChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
 }
 
 

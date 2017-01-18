@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/ChannelModel.h>
 #include <ajtcl/cdm/interfaces/operation/ChannelInterface.h>
+#include "../../../Utils/Command.h"
 
 ChannelModel *GetChannelModel(void);
+
+AJ_Status HandleChannelCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 extern int Encoder_Channel_ChannelInfoRecord(FILE* fp, void* value);

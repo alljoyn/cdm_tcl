@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/SpinSpeedLevelModel.h>
 #include <ajtcl/cdm/interfaces/operation/SpinSpeedLevelInterface.h>
+#include "../../../Utils/Command.h"
 
 SpinSpeedLevelModel *GetSpinSpeedLevelModel(void);
+
+AJ_Status HandleSpinSpeedLevelCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

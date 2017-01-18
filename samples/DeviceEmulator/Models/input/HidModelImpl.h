@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/input/HidModel.h>
 #include <ajtcl/cdm/interfaces/input/HidInterface.h>
+#include "../../../Utils/Command.h"
 
 HidModel *GetHidModel(void);
+
+AJ_Status HandleHidCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 extern int Encoder_Hid_InputEvent(FILE* fp, void* value);

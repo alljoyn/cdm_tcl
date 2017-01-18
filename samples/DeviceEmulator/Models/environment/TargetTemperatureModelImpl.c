@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetTargetValue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
@@ -114,6 +115,61 @@ static AJ_Status GetStepValue(void *context, const char *objPath, double *out)
     return result;
 }
 
+
+
+
+AJ_Status HandleTargetTemperatureCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Environment.TargetTemperature") == 0)
+    {
+        if (strcmp(cmd->property, "TargetValue") == 0)
+        {
+            double value;
+            status = GetTargetValue(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TargetTemperatureModel* model = (TargetTemperatureModel*)context;
+                status = Cdm_TargetTemperature_EmitTargetValueChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "MinValue") == 0)
+        {
+            double value;
+            status = GetMinValue(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TargetTemperatureModel* model = (TargetTemperatureModel*)context;
+                status = Cdm_TargetTemperature_EmitMinValueChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "MaxValue") == 0)
+        {
+            double value;
+            status = GetMaxValue(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TargetTemperatureModel* model = (TargetTemperatureModel*)context;
+                status = Cdm_TargetTemperature_EmitMaxValueChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "StepValue") == 0)
+        {
+            double value;
+            status = GetStepValue(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TargetTemperatureModel* model = (TargetTemperatureModel*)context;
+                status = Cdm_TargetTemperature_EmitStepValueChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

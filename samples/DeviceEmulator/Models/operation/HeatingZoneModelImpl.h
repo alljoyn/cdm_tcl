@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/HeatingZoneModel.h>
 #include <ajtcl/cdm/interfaces/operation/HeatingZoneInterface.h>
+#include "../../../Utils/Command.h"
 
 HeatingZoneModel *GetHeatingZoneModel(void);
+
+AJ_Status HandleHeatingZoneCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

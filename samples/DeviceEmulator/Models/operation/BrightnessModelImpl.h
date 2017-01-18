@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/BrightnessModel.h>
 #include <ajtcl/cdm/interfaces/operation/BrightnessInterface.h>
+#include "../../../Utils/Command.h"
 
 BrightnessModel *GetBrightnessModel(void);
+
+AJ_Status HandleBrightnessCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/environment/WindDirectionModel.h>
 #include <ajtcl/cdm/interfaces/environment/WindDirectionInterface.h>
+#include "../../../Utils/Command.h"
 
 WindDirectionModel *GetWindDirectionModel(void);
+
+AJ_Status HandleWindDirectionCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

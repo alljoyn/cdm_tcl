@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/LaundryCyclePhaseModel.h>
 #include <ajtcl/cdm/interfaces/operation/LaundryCyclePhaseInterface.h>
+#include "../../../Utils/Command.h"
 
 LaundryCyclePhaseModel *GetLaundryCyclePhaseModel(void);
+
+AJ_Status HandleLaundryCyclePhaseCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 extern int Encoder_LaundryCyclePhase_CyclePhaseDescriptor(FILE* fp, void* value);

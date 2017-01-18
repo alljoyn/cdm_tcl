@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/environment/CurrentHumidityModel.h>
 #include <ajtcl/cdm/interfaces/environment/CurrentHumidityInterface.h>
+#include "../../../Utils/Command.h"
 
 CurrentHumidityModel *GetCurrentHumidityModel(void);
+
+AJ_Status HandleCurrentHumidityCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

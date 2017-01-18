@@ -174,6 +174,7 @@ static void HAL_Decode_Array_Hid_SupportedInputEvent(Element* elem, Array_Hid_Su
 
 
 
+
 static AJ_Status GetSupportedEvents(void *context, const char *objPath, Array_Hid_SupportedInputEvent *out)
 {
     AJ_Status result = AJ_OK;
@@ -198,6 +199,28 @@ static AJ_Status MethodInjectEvents(void *context, const char *objPath, Array_Hi
 {
     // TODO
     return AJ_ERR_FAILURE;
+}
+
+
+
+AJ_Status HandleHidCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.Input.Hid") == 0)
+    {
+        if (strcmp(cmd->property, "SupportedEvents") == 0)
+        {
+            Array_Hid_SupportedInputEvent value;
+            status = GetSupportedEvents(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                HidModel* model = (HidModel*)context;
+                status = Cdm_Hid_EmitSupportedEventsChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_Hid_SupportedInputEvent(&value);
+        }
+    }
+    return status;
 }
 
 

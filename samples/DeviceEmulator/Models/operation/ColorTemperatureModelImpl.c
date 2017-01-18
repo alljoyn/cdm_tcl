@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetTemperature(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
@@ -98,6 +99,28 @@ static AJ_Status GetMaxTemperature(void *context, const char *objPath, double *o
     return result;
 }
 
+
+
+
+AJ_Status HandleColorTemperatureCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.ColorTemperature") == 0)
+    {
+        if (strcmp(cmd->property, "Temperature") == 0)
+        {
+            double value;
+            status = GetTemperature(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                ColorTemperatureModel* model = (ColorTemperatureModel*)context;
+                status = Cdm_ColorTemperature_EmitTemperatureChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

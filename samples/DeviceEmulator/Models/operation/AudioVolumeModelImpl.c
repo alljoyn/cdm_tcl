@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetVolume(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -112,6 +113,50 @@ static AJ_Status SetMute(void *context, const char *objPath, bool input)
     return result;
 }
 
+
+
+
+AJ_Status HandleAudioVolumeCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.AudioVolume") == 0)
+    {
+        if (strcmp(cmd->property, "Volume") == 0)
+        {
+            uint8_t value;
+            status = GetVolume(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                AudioVolumeModel* model = (AudioVolumeModel*)context;
+                status = Cdm_AudioVolume_EmitVolumeChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "MaxVolume") == 0)
+        {
+            uint8_t value;
+            status = GetMaxVolume(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                AudioVolumeModel* model = (AudioVolumeModel*)context;
+                status = Cdm_AudioVolume_EmitMaxVolumeChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "Mute") == 0)
+        {
+            bool value;
+            status = GetMute(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                AudioVolumeModel* model = (AudioVolumeModel*)context;
+                status = Cdm_AudioVolume_EmitMuteChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

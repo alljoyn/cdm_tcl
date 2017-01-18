@@ -81,6 +81,7 @@ static void HAL_Decode_Array_CurrentAirQualityLevel_ContaminantType(Element* ele
 
 
 
+
 static AJ_Status GetContaminantType(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -129,6 +130,50 @@ static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
     return result;
 }
 
+
+
+
+AJ_Status HandleCurrentAirQualityLevelCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Environment.CurrentAirQualityLevel") == 0)
+    {
+        if (strcmp(cmd->property, "ContaminantType") == 0)
+        {
+            uint8_t value;
+            status = GetContaminantType(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                CurrentAirQualityLevelModel* model = (CurrentAirQualityLevelModel*)context;
+                status = Cdm_CurrentAirQualityLevel_EmitContaminantTypeChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "CurrentLevel") == 0)
+        {
+            uint8_t value;
+            status = GetCurrentLevel(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                CurrentAirQualityLevelModel* model = (CurrentAirQualityLevelModel*)context;
+                status = Cdm_CurrentAirQualityLevel_EmitCurrentLevelChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "MaxLevel") == 0)
+        {
+            uint8_t value;
+            status = GetMaxLevel(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                CurrentAirQualityLevelModel* model = (CurrentAirQualityLevelModel*)context;
+                status = Cdm_CurrentAirQualityLevel_EmitMaxLevelChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

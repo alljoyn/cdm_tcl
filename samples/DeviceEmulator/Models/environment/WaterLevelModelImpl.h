@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/environment/WaterLevelModel.h>
 #include <ajtcl/cdm/interfaces/environment/WaterLevelInterface.h>
+#include "../../../Utils/Command.h"
 
 WaterLevelModel *GetWaterLevelModel(void);
+
+AJ_Status HandleWaterLevelCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetRapidModeMinutesRemaining(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -82,6 +83,28 @@ static AJ_Status GetMaxSetMinutes(void *context, const char *objPath, uint16_t *
     return result;
 }
 
+
+
+
+AJ_Status HandleRapidModeTimedCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.RapidModeTimed") == 0)
+    {
+        if (strcmp(cmd->property, "RapidModeMinutesRemaining") == 0)
+        {
+            uint16_t value;
+            status = GetRapidModeMinutesRemaining(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                RapidModeTimedModel* model = (RapidModeTimedModel*)context;
+                status = Cdm_RapidModeTimed_EmitRapidModeMinutesRemainingChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

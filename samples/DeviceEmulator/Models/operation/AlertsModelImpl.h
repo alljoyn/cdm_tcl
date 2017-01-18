@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/AlertsModel.h>
 #include <ajtcl/cdm/interfaces/operation/AlertsInterface.h>
+#include "../../../Utils/Command.h"
 
 AlertsModel *GetAlertsModel(void);
+
+AJ_Status HandleAlertsCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 extern int Encoder_Alerts_AlertRecord(FILE* fp, void* value);

@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetMaxLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -99,6 +100,50 @@ static AJ_Status GetSelectableLevels(void *context, const char *objPath, Array_u
     return result;
 }
 
+
+
+
+AJ_Status HandleSoilLevelCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.SoilLevel") == 0)
+    {
+        if (strcmp(cmd->property, "MaxLevel") == 0)
+        {
+            uint8_t value;
+            status = GetMaxLevel(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                SoilLevelModel* model = (SoilLevelModel*)context;
+                status = Cdm_SoilLevel_EmitMaxLevelChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "TargetLevel") == 0)
+        {
+            uint8_t value;
+            status = GetTargetLevel(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                SoilLevelModel* model = (SoilLevelModel*)context;
+                status = Cdm_SoilLevel_EmitTargetLevelChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "SelectableLevels") == 0)
+        {
+            Array_uint8 value;
+            status = GetSelectableLevels(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                SoilLevelModel* model = (SoilLevelModel*)context;
+                status = Cdm_SoilLevel_EmitSelectableLevelsChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_uint8(&value);
+        }
+    }
+    return status;
+}
 
 
 

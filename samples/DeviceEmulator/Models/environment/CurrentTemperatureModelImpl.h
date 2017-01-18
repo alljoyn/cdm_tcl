@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/environment/CurrentTemperatureModel.h>
 #include <ajtcl/cdm/interfaces/environment/CurrentTemperatureInterface.h>
+#include "../../../Utils/Command.h"
 
 CurrentTemperatureModel *GetCurrentTemperatureModel(void);
+
+AJ_Status HandleCurrentTemperatureCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

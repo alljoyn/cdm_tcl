@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetIsControllable(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
@@ -52,6 +53,28 @@ static AJ_Status GetIsControllable(void *context, const char *objPath, bool *out
     return result;
 }
 
+
+
+
+AJ_Status HandleRemoteControllabilityCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.RemoteControllability") == 0)
+    {
+        if (strcmp(cmd->property, "IsControllable") == 0)
+        {
+            bool value;
+            status = GetIsControllable(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                RemoteControllabilityModel* model = (RemoteControllabilityModel*)context;
+                status = Cdm_RemoteControllability_EmitIsControllableChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

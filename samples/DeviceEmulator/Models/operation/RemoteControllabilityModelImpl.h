@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/RemoteControllabilityModel.h>
 #include <ajtcl/cdm/interfaces/operation/RemoteControllabilityInterface.h>
+#include "../../../Utils/Command.h"
 
 RemoteControllabilityModel *GetRemoteControllabilityModel(void);
+
+AJ_Status HandleRemoteControllabilityCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

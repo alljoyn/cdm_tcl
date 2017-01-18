@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/environment/TargetTemperatureModel.h>
 #include <ajtcl/cdm/interfaces/environment/TargetTemperatureInterface.h>
+#include "../../../Utils/Command.h"
 
 TargetTemperatureModel *GetTargetTemperatureModel(void);
+
+AJ_Status HandleTargetTemperatureCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

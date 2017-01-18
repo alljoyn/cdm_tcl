@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/environment/CurrentAirQualityLevelModel.h>
 #include <ajtcl/cdm/interfaces/environment/CurrentAirQualityLevelInterface.h>
+#include "../../../Utils/Command.h"
 
 CurrentAirQualityLevelModel *GetCurrentAirQualityLevelModel(void);
+
+AJ_Status HandleCurrentAirQualityLevelCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

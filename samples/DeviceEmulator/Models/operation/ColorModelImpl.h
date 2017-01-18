@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/ColorModel.h>
 #include <ajtcl/cdm/interfaces/operation/ColorInterface.h>
+#include "../../../Utils/Command.h"
 
 ColorModel *GetColorModel(void);
+
+AJ_Status HandleColorCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

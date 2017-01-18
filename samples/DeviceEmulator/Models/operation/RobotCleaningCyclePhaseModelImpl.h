@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/RobotCleaningCyclePhaseModel.h>
 #include <ajtcl/cdm/interfaces/operation/RobotCleaningCyclePhaseInterface.h>
+#include "../../../Utils/Command.h"
 
 RobotCleaningCyclePhaseModel *GetRobotCleaningCyclePhaseModel(void);
+
+AJ_Status HandleRobotCleaningCyclePhaseCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 extern int Encoder_RobotCleaningCyclePhase_CyclePhaseDescriptor(FILE* fp, void* value);

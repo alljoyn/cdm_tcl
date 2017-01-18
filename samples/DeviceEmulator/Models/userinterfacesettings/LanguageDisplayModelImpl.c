@@ -36,16 +36,20 @@
 
 
 
+
 static AJ_Status GetDisplayLanguage(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
-    char const* value = "";
+    char const* value = 0;
 
     Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.UserInterfaceSettings.LanguageDisplay", "DisplayLanguage");
 
     if (elem) {
         value = HAL_Decode_String(elem);
         BSXML_FreeElement(elem);
+    }
+    else {
+        value = strdup("");
     }
 
     *out = value;
@@ -83,6 +87,28 @@ static AJ_Status GetSupportedDisplayLanguages(void *context, const char *objPath
     return result;
 }
 
+
+
+
+AJ_Status HandleLanguageDisplayCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.UserInterfaceSettings.LanguageDisplay") == 0)
+    {
+        if (strcmp(cmd->property, "DisplayLanguage") == 0)
+        {
+            char const* value;
+            status = GetDisplayLanguage(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                LanguageDisplayModel* model = (LanguageDisplayModel*)context;
+                status = Cdm_LanguageDisplay_EmitDisplayLanguageChanged(model->busAttachment, cmd->objPath, value);
+            }
+            free((void*)value);
+        }
+    }
+    return status;
+}
 
 
 

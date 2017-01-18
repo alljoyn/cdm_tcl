@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/FanSpeedLevelModel.h>
 #include <ajtcl/cdm/interfaces/operation/FanSpeedLevelInterface.h>
+#include "../../../Utils/Command.h"
 
 FanSpeedLevelModel *GetFanSpeedLevelModel(void);
+
+AJ_Status HandleFanSpeedLevelCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

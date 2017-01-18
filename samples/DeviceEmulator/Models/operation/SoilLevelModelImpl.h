@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/SoilLevelModel.h>
 #include <ajtcl/cdm/interfaces/operation/SoilLevelInterface.h>
+#include "../../../Utils/Command.h"
 
 SoilLevelModel *GetSoilLevelModel(void);
+
+AJ_Status HandleSoilLevelCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

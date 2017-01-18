@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/AirRecirculationModeModel.h>
 #include <ajtcl/cdm/interfaces/operation/AirRecirculationModeInterface.h>
+#include "../../../Utils/Command.h"
 
 AirRecirculationModeModel *GetAirRecirculationModeModel(void);
+
+AJ_Status HandleAirRecirculationModeCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

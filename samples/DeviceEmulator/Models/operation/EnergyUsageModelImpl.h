@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/EnergyUsageModel.h>
 #include <ajtcl/cdm/interfaces/operation/EnergyUsageInterface.h>
+#include "../../../Utils/Command.h"
 
 EnergyUsageModel *GetEnergyUsageModel(void);
+
+AJ_Status HandleEnergyUsageCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

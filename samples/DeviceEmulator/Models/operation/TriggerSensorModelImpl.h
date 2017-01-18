@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/TriggerSensorModel.h>
 #include <ajtcl/cdm/interfaces/operation/TriggerSensorInterface.h>
+#include "../../../Utils/Command.h"
 
 TriggerSensorModel *GetTriggerSensorModel(void);
+
+AJ_Status HandleTriggerSensorCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

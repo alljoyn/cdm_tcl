@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetHue(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
@@ -96,6 +97,39 @@ static AJ_Status SetSaturation(void *context, const char *objPath, double input)
     return result;
 }
 
+
+
+
+AJ_Status HandleColorCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.Color") == 0)
+    {
+        if (strcmp(cmd->property, "Hue") == 0)
+        {
+            double value;
+            status = GetHue(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                ColorModel* model = (ColorModel*)context;
+                status = Cdm_Color_EmitHueChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "Saturation") == 0)
+        {
+            double value;
+            status = GetSaturation(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                ColorModel* model = (ColorModel*)context;
+                status = Cdm_Color_EmitSaturationChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

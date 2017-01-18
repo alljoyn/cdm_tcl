@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetDisplayTemperatureUnit(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -83,6 +84,28 @@ static AJ_Status GetSupportedDisplayTemperatureUnits(void *context, const char *
     return result;
 }
 
+
+
+
+AJ_Status HandleTemperatureDisplayCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.UserInterfaceSettings.TemperatureDisplay") == 0)
+    {
+        if (strcmp(cmd->property, "DisplayTemperatureUnit") == 0)
+        {
+            uint8_t value;
+            status = GetDisplayTemperatureUnit(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TemperatureDisplayModel* model = (TemperatureDisplayModel*)context;
+                status = Cdm_TemperatureDisplay_EmitDisplayTemperatureUnitChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

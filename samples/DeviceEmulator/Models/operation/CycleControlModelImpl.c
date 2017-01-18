@@ -126,6 +126,7 @@ static void HAL_Decode_Array_CycleControl_OperationalCommands(Element* elem, Arr
 
 
 
+
 static AJ_Status GetOperationalState(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -229,6 +230,28 @@ static AJ_Status MethodExecuteOperationalCommand(void *context, const char *objP
 
     return status;
 
+}
+
+
+
+AJ_Status HandleCycleControlCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.CycleControl") == 0)
+    {
+        if (strcmp(cmd->property, "OperationalState") == 0)
+        {
+            uint8_t value;
+            status = GetOperationalState(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                CycleControlModel* model = (CycleControlModel*)context;
+                status = Cdm_CycleControl_EmitOperationalStateChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
 }
 
 

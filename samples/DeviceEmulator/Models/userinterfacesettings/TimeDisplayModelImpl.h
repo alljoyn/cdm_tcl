@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/userinterfacesettings/TimeDisplayModel.h>
 #include <ajtcl/cdm/interfaces/userinterfacesettings/TimeDisplayInterface.h>
+#include "../../../Utils/Command.h"
 
 TimeDisplayModel *GetTimeDisplayModel(void);
+
+AJ_Status HandleTimeDisplayCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

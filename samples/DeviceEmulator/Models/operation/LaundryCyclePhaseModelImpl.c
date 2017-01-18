@@ -100,33 +100,7 @@ static void HAL_Decode_Array_LaundryCyclePhase_CyclePhaseDescriptor(Element* ele
     }
 }
 
-static Array_LaundryCyclePhase_CyclePhaseDescriptor* getPhases(void)
-{
-    static Array_LaundryCyclePhase_CyclePhaseDescriptor s_phases;
 
-    if (!s_phases.elems) {
-        InitArray_LaundryCyclePhase_CyclePhaseDescriptor(&s_phases, 0);
-        size_t i = 0;
-
-        i = ExtendArray_LaundryCyclePhase_CyclePhaseDescriptor(&s_phases, 1);
-        s_phases.elems[i].phase = 1;
-        s_phases.elems[i].name = strdup("fill");
-        s_phases.elems[i].description = strdup("Fill with water");
-
-        i = ExtendArray_LaundryCyclePhase_CyclePhaseDescriptor(&s_phases, 1);
-        s_phases.elems[i].phase = 2;
-        s_phases.elems[i].name = strdup("wash");
-        s_phases.elems[i].description = strdup("Wash the laundry");
-
-        i = ExtendArray_LaundryCyclePhase_CyclePhaseDescriptor(&s_phases, 1);
-        s_phases.elems[i].phase = 3;
-        s_phases.elems[i].name = strdup("dry");
-        s_phases.elems[i].description = strdup("Dry the laundry");
-
-    }
-
-    return &s_phases;
-}
 
 
 static AJ_Status GetCyclePhase(void *context, const char *objPath, uint8_t *out)
@@ -167,9 +141,48 @@ static AJ_Status GetSupportedCyclePhases(void *context, const char *objPath, Arr
 
 static AJ_Status MethodGetVendorPhasesDescription(void *context, const char *objPath, char const* languageTag, Array_LaundryCyclePhase_CyclePhaseDescriptor* phasesDescription)
 {
-    Array_LaundryCyclePhase_CyclePhaseDescriptor* phases = getPhases();
-    CopyArray_LaundryCyclePhase_CyclePhaseDescriptor(phases, phasesDescription);
-    return AJ_OK;
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.LaundryCyclePhase", "__PhaseDescription");
+
+    if (elem) {
+        HAL_Decode_Array_LaundryCyclePhase_CyclePhaseDescriptor(elem, phasesDescription);
+        BSXML_FreeElement(elem);
+        return AJ_OK;
+    }
+
+    return AJ_ERR_FAILURE;
+}
+
+
+
+AJ_Status HandleLaundryCyclePhaseCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.LaundryCyclePhase") == 0)
+    {
+        if (strcmp(cmd->property, "CyclePhase") == 0)
+        {
+            uint8_t value;
+            status = GetCyclePhase(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                LaundryCyclePhaseModel* model = (LaundryCyclePhaseModel*)context;
+                status = Cdm_LaundryCyclePhase_EmitCyclePhaseChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "SupportedCyclePhases") == 0)
+        {
+            Array_uint8 value;
+            status = GetSupportedCyclePhases(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                LaundryCyclePhaseModel* model = (LaundryCyclePhaseModel*)context;
+                status = Cdm_LaundryCyclePhase_EmitSupportedCyclePhasesChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_uint8(&value);
+        }
+    }
+    return status;
 }
 
 

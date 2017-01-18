@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/UnlockControlModel.h>
 #include <ajtcl/cdm/interfaces/operation/UnlockControlInterface.h>
+#include "../../../Utils/Command.h"
 
 UnlockControlModel *GetUnlockControlModel(void);
+
+AJ_Status HandleUnlockControlCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

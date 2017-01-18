@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/userinterfacesettings/LanguageDisplayModel.h>
 #include <ajtcl/cdm/interfaces/userinterfacesettings/LanguageDisplayInterface.h>
+#include "../../../Utils/Command.h"
 
 LanguageDisplayModel *GetLanguageDisplayModel(void);
+
+AJ_Status HandleLanguageDisplayCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

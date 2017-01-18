@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/userinterfacesettings/TemperatureDisplayModel.h>
 #include <ajtcl/cdm/interfaces/userinterfacesettings/TemperatureDisplayInterface.h>
+#include "../../../Utils/Command.h"
 
 TemperatureDisplayModel *GetTemperatureDisplayModel(void);
+
+AJ_Status HandleTemperatureDisplayCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

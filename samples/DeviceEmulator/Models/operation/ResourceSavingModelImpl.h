@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/ResourceSavingModel.h>
 #include <ajtcl/cdm/interfaces/operation/ResourceSavingInterface.h>
+#include "../../../Utils/Command.h"
 
 ResourceSavingModel *GetResourceSavingModel(void);
+
+AJ_Status HandleResourceSavingCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

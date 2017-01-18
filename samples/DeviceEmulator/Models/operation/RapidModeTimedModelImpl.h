@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/RapidModeTimedModel.h>
 #include <ajtcl/cdm/interfaces/operation/RapidModeTimedInterface.h>
+#include "../../../Utils/Command.h"
 
 RapidModeTimedModel *GetRapidModeTimedModel(void);
+
+AJ_Status HandleRapidModeTimedCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

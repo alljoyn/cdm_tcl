@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/OvenCyclePhaseModel.h>
 #include <ajtcl/cdm/interfaces/operation/OvenCyclePhaseInterface.h>
+#include "../../../Utils/Command.h"
 
 OvenCyclePhaseModel *GetOvenCyclePhaseModel(void);
+
+AJ_Status HandleOvenCyclePhaseCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 extern int Encoder_OvenCyclePhase_CyclePhaseDescriptor(FILE* fp, void* value);

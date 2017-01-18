@@ -32,7 +32,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
 #include <unistd.h>
 
 #include <ajtcl/aj_status.h>
@@ -44,6 +43,7 @@
 
 #include "DeviceConfig.h"
 #include "InterfaceFactory.h"
+#include "DeviceCommand.h"
 #include "../Utils/HAL.h"
 
 /**
@@ -56,37 +56,55 @@ static const uint32_t suites[4] = { AUTH_SUITE_ECDHE_ECDSA, AUTH_SUITE_ECDHE_SPE
 static const char ecspeke_password[] = "1234";
 static const char psk_password[] = "faaa0af3dd3f1e0379da046a3ab6ca44";
 
-static void* irq_handler()
-{
-    int i = 0;
-    while(1)
-    {
-        char buf[100];
-        fgets(buf, 99, stdin);
-        fprintf(stdout, "%d %s\n", i, buf);
-        ++i;
-    }
-}
+static DEM_Config* theConfig;
 
-static void CreateInterfaces(DEM_Config* config)
+
+static void InitProperties(bool force)
 {
-    for (int i = 0; i < config->numObjects; ++i) {
-        DEM_Object* obj = &config->objects[i];
+    for (int i = 0; i < theConfig->numObjects; ++i) {
+        DEM_Object* obj = &theConfig->objects[i];
 
         for (int j = 0; j < obj->numInterfaces; ++j) {
             DEM_Interface* iface = &obj->interfaces[j];
-            createInterface(obj->objectPath, iface->name);
 
             /* Set some initial property values. */
             for (int k = 0; k < iface->numProperties; ++k) {
                 DEM_Property* prop = &iface->properties[k];
                 if (prop->initialState) {
-                    HAL_WritePropertyXml(obj->objectPath, iface->name, prop->name, prop->initialState, !prop->defaultOnly);
+                    HAL_WritePropertyXml(obj->objectPath, iface->name, prop->name, prop->initialState, force || !prop->defaultOnly);
                 }
             }
         }
     }
 }
+
+
+
+static void CreateInterfaces()
+{
+    for (int i = 0; i < theConfig->numObjects; ++i) {
+        DEM_Object* obj = &theConfig->objects[i];
+
+        for (int j = 0; j < obj->numInterfaces; ++j) {
+            DEM_Interface* iface = &obj->interfaces[j];
+            createInterface(obj->objectPath, iface->name);
+        }
+    }
+}
+
+
+
+static AJ_Status MainCommandHandler(const Command* cmd)
+{
+    if (strcmp(cmd->name, "reset") == 0) {
+        InitProperties(true);
+        return AJ_OK;
+    }
+
+    return DeviceCommandHandler(cmd);
+}
+
+
 
 static int ArgExists(int argc, char **argv, const char *arg)
 {
@@ -115,25 +133,17 @@ int main(int argc, char *argv[])
     char *certsDir;
     char *stateDir;
     bool emitOnSet;
+    bool noCommands = false;
 
     CDM_AboutIconParams iconParams;
     CDM_RoutingNodeParams routingNodeParams;
     CDM_BusAttachment bus;
-
-    DEM_Config *config;
     CDM_AboutDataBuf aboutData;
-
-    pthread_t irq;
-
-    if (pthread_create(&irq, NULL, &irq_handler, NULL) != 0)
-    {
-        fprintf(stdout, "Error setting up IRQ\n");
-        return 1;
-    }
 
     FindArgValue(argc, argv, "--state-dir", "emulated_device_state", &stateDir);
     FindArgValue(argc, argv, "--certs-dir", "device_emulator_certs", &certsDir);
     emitOnSet = (ArgExists(argc, argv, "--emit-on-set") > 0);
+    noCommands = (ArgExists(argc, argv, "--no-commands") > 0);
 
     HAL_Init(stateDir, "");
 
@@ -147,14 +157,14 @@ int main(int argc, char *argv[])
     Cdm_EnableSPEKE(ecspeke_password);
     Cdm_EnablePSK(psk_password);
 
-    config = DEM_CreateConfig(argv[1]);
+    theConfig = DEM_CreateConfig(argv[1]);
 
-    if (!config) {
+    if (!theConfig) {
         fprintf(stderr, "Invalid XML file\n");
         return 1;
     }
 
-    aboutData = CDM_CreateAboutDataFromXml(config->aboutData);
+    aboutData = CDM_CreateAboutDataFromXml(theConfig->aboutData);
 
     CDM_SetDefaultAboutIconParams(&iconParams);
     status = CDM_SystemInit(&iconParams, emitOnSet);
@@ -165,7 +175,13 @@ int main(int argc, char *argv[])
         goto CLEANUP;
     }
 
-    CreateInterfaces(config);
+    CreateInterfaces();
+    InitProperties(false);
+
+    if (!noCommands)
+    {
+        StartCommands(MainCommandHandler);
+    }
 
     while(1) {
         bus.isConnected = 0;
@@ -198,7 +214,7 @@ SHUTDOWN:
 
 CLEANUP:
     CDM_DestroyAboutData(aboutData);
-    DEM_FreeConfig(config);
+    DEM_FreeConfig(theConfig);
 
     return retVal;
 }

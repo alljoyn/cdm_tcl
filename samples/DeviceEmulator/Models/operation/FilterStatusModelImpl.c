@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetExpectedLifeInDays(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -87,13 +88,16 @@ static AJ_Status GetOrderPercentage(void *context, const char *objPath, uint8_t 
 static AJ_Status GetManufacturer(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
-    char const* value = "";
+    char const* value = 0;
 
     Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.FilterStatus", "Manufacturer");
 
     if (elem) {
         value = HAL_Decode_String(elem);
         BSXML_FreeElement(elem);
+    }
+    else {
+        value = strdup("");
     }
 
     *out = value;
@@ -103,13 +107,16 @@ static AJ_Status GetManufacturer(void *context, const char *objPath, char const*
 static AJ_Status GetPartNumber(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
-    char const* value = "";
+    char const* value = 0;
 
     Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.FilterStatus", "PartNumber");
 
     if (elem) {
         value = HAL_Decode_String(elem);
         BSXML_FreeElement(elem);
+    }
+    else {
+        value = strdup("");
     }
 
     *out = value;
@@ -119,13 +126,16 @@ static AJ_Status GetPartNumber(void *context, const char *objPath, char const* *
 static AJ_Status GetUrl(void *context, const char *objPath, char const* *out)
 {
     AJ_Status result = AJ_OK;
-    char const* value = "";
+    char const* value = 0;
 
     Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.FilterStatus", "Url");
 
     if (elem) {
         value = HAL_Decode_String(elem);
         BSXML_FreeElement(elem);
+    }
+    else {
+        value = strdup("");
     }
 
     *out = value;
@@ -148,6 +158,61 @@ static AJ_Status GetLifeRemaining(void *context, const char *objPath, uint8_t *o
     return result;
 }
 
+
+
+
+AJ_Status HandleFilterStatusCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.FilterStatus") == 0)
+    {
+        if (strcmp(cmd->property, "ExpectedLifeInDays") == 0)
+        {
+            uint16_t value;
+            status = GetExpectedLifeInDays(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                FilterStatusModel* model = (FilterStatusModel*)context;
+                status = Cdm_FilterStatus_EmitExpectedLifeInDaysChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "IsCleanable") == 0)
+        {
+            bool value;
+            status = GetIsCleanable(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                FilterStatusModel* model = (FilterStatusModel*)context;
+                status = Cdm_FilterStatus_EmitIsCleanableChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "OrderPercentage") == 0)
+        {
+            uint8_t value;
+            status = GetOrderPercentage(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                FilterStatusModel* model = (FilterStatusModel*)context;
+                status = Cdm_FilterStatus_EmitOrderPercentageChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "LifeRemaining") == 0)
+        {
+            uint8_t value;
+            status = GetLifeRemaining(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                FilterStatusModel* model = (FilterStatusModel*)context;
+                status = Cdm_FilterStatus_EmitLifeRemainingChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

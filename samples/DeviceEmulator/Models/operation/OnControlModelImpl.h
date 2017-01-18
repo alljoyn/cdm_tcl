@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/OnControlModel.h>
 #include <ajtcl/cdm/interfaces/operation/OnControlInterface.h>
+#include "../../../Utils/Command.h"
 
 OnControlModel *GetOnControlModel(void);
+
+AJ_Status HandleOnControlCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

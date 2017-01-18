@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/LockedStatusModel.h>
 #include <ajtcl/cdm/interfaces/operation/LockedStatusInterface.h>
+#include "../../../Utils/Command.h"
 
 LockedStatusModel *GetLockedStatusModel(void);
+
+AJ_Status HandleLockedStatusCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

@@ -81,6 +81,7 @@ static void HAL_Decode_Array_MoistureOutputLevel_AutoMode(Element* elem, Array_M
 
 
 
+
 static AJ_Status GetMoistureOutputLevel(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -157,6 +158,50 @@ static AJ_Status SetAutoMode(void *context, const char *objPath, uint8_t input)
     return result;
 }
 
+
+
+
+AJ_Status HandleMoistureOutputLevelCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.MoistureOutputLevel") == 0)
+    {
+        if (strcmp(cmd->property, "MoistureOutputLevel") == 0)
+        {
+            uint8_t value;
+            status = GetMoistureOutputLevel(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                MoistureOutputLevelModel* model = (MoistureOutputLevelModel*)context;
+                status = Cdm_MoistureOutputLevel_EmitMoistureOutputLevelChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "MaxMoistureOutputLevel") == 0)
+        {
+            uint8_t value;
+            status = GetMaxMoistureOutputLevel(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                MoistureOutputLevelModel* model = (MoistureOutputLevelModel*)context;
+                status = Cdm_MoistureOutputLevel_EmitMaxMoistureOutputLevelChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "AutoMode") == 0)
+        {
+            uint8_t value;
+            status = GetAutoMode(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                MoistureOutputLevelModel* model = (MoistureOutputLevelModel*)context;
+                status = Cdm_MoistureOutputLevel_EmitAutoModeChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

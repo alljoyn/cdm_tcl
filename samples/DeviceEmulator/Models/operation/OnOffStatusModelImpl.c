@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetIsOn(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
@@ -52,6 +53,28 @@ static AJ_Status GetIsOn(void *context, const char *objPath, bool *out)
     return result;
 }
 
+
+
+
+AJ_Status HandleOnOffStatusCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.OnOffStatus") == 0)
+    {
+        if (strcmp(cmd->property, "IsOn") == 0)
+        {
+            bool value;
+            status = GetIsOn(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                OnOffStatusModel* model = (OnOffStatusModel*)context;
+                status = Cdm_OnOffStatus_EmitIsOnChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

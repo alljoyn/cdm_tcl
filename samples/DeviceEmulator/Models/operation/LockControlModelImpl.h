@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/LockControlModel.h>
 #include <ajtcl/cdm/interfaces/operation/LockControlInterface.h>
+#include "../../../Utils/Command.h"
 
 LockControlModel *GetLockControlModel(void);
+
+AJ_Status HandleLockControlCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/CycleControlModel.h>
 #include <ajtcl/cdm/interfaces/operation/CycleControlInterface.h>
+#include "../../../Utils/Command.h"
 
 CycleControlModel *GetCycleControlModel(void);
+
+AJ_Status HandleCycleControlCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

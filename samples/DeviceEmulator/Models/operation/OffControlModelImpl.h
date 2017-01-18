@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/OffControlModel.h>
 #include <ajtcl/cdm/interfaces/operation/OffControlInterface.h>
+#include "../../../Utils/Command.h"
 
 OffControlModel *GetOffControlModel(void);
+
+AJ_Status HandleOffControlCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

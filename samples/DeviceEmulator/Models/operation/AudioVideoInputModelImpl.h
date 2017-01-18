@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/AudioVideoInputModel.h>
 #include <ajtcl/cdm/interfaces/operation/AudioVideoInputInterface.h>
+#include "../../../Utils/Command.h"
 
 AudioVideoInputModel *GetAudioVideoInputModel(void);
+
+AJ_Status HandleAudioVideoInputCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 extern int Encoder_AudioVideoInput_InputSource(FILE* fp, void* value);

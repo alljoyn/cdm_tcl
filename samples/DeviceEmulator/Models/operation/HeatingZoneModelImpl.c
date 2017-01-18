@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetNumberOfHeatingZones(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -86,6 +87,50 @@ static AJ_Status GetHeatingLevels(void *context, const char *objPath, Array_uint
     return result;
 }
 
+
+
+
+AJ_Status HandleHeatingZoneCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.HeatingZone") == 0)
+    {
+        if (strcmp(cmd->property, "NumberOfHeatingZones") == 0)
+        {
+            uint8_t value;
+            status = GetNumberOfHeatingZones(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                HeatingZoneModel* model = (HeatingZoneModel*)context;
+                status = Cdm_HeatingZone_EmitNumberOfHeatingZonesChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "MaxHeatingLevels") == 0)
+        {
+            Array_uint8 value;
+            status = GetMaxHeatingLevels(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                HeatingZoneModel* model = (HeatingZoneModel*)context;
+                status = Cdm_HeatingZone_EmitMaxHeatingLevelsChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_uint8(&value);
+        }
+        if (strcmp(cmd->property, "HeatingLevels") == 0)
+        {
+            Array_uint8 value;
+            status = GetHeatingLevels(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                HeatingZoneModel* model = (HeatingZoneModel*)context;
+                status = Cdm_HeatingZone_EmitHeatingLevelsChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_uint8(&value);
+        }
+    }
+    return status;
+}
 
 
 

@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/HvacFanModeModel.h>
 #include <ajtcl/cdm/interfaces/operation/HvacFanModeInterface.h>
+#include "../../../Utils/Command.h"
 
 HvacFanModeModel *GetHvacFanModeModel(void);
+
+AJ_Status HandleHvacFanModeCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

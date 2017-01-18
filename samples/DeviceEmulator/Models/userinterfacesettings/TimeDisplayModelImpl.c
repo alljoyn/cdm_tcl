@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetDisplayTimeFormat(void *context, const char *objPath, uint8_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -83,6 +84,28 @@ static AJ_Status GetSupportedDisplayTimeFormats(void *context, const char *objPa
     return result;
 }
 
+
+
+
+AJ_Status HandleTimeDisplayCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.UserInterfaceSettings.TimeDisplay") == 0)
+    {
+        if (strcmp(cmd->property, "DisplayTimeFormat") == 0)
+        {
+            uint8_t value;
+            status = GetDisplayTimeFormat(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TimeDisplayModel* model = (TimeDisplayModel*)context;
+                status = Cdm_TimeDisplay_EmitDisplayTimeFormatChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

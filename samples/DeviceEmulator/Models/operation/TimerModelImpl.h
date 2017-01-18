@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/TimerModel.h>
 #include <ajtcl/cdm/interfaces/operation/TimerInterface.h>
+#include "../../../Utils/Command.h"
 
 TimerModel *GetTimerModel(void);
+
+AJ_Status HandleTimerCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

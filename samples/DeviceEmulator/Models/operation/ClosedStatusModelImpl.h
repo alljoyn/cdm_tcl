@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/ClosedStatusModel.h>
 #include <ajtcl/cdm/interfaces/operation/ClosedStatusInterface.h>
+#include "../../../Utils/Command.h"
 
 ClosedStatusModel *GetClosedStatusModel(void);
+
+AJ_Status HandleClosedStatusCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

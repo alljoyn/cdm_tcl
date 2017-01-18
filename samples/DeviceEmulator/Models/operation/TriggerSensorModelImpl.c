@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetCurrentlyTriggered(void *context, const char *objPath, bool *out)
 {
     AJ_Status result = AJ_OK;
@@ -52,6 +53,28 @@ static AJ_Status GetCurrentlyTriggered(void *context, const char *objPath, bool 
     return result;
 }
 
+
+
+
+AJ_Status HandleTriggerSensorCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.TriggerSensor") == 0)
+    {
+        if (strcmp(cmd->property, "CurrentlyTriggered") == 0)
+        {
+            bool value;
+            status = GetCurrentlyTriggered(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TriggerSensorModel* model = (TriggerSensorModel*)context;
+                status = Cdm_TriggerSensor_EmitCurrentlyTriggeredChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

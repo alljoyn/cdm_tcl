@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetReferenceTimer(void *context, const char *objPath, int32_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -165,6 +166,50 @@ static AJ_Status MethodSetTargetTimeToStop(void *context, const char *objPath, i
     }
 
     return AJ_OK;
+}
+
+
+
+AJ_Status HandleTimerCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.Timer") == 0)
+    {
+        if (strcmp(cmd->property, "TargetTimeToStart") == 0)
+        {
+            int32_t value;
+            status = GetTargetTimeToStart(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TimerModel* model = (TimerModel*)context;
+                status = Cdm_Timer_EmitTargetTimeToStartChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "TargetTimeToStop") == 0)
+        {
+            int32_t value;
+            status = GetTargetTimeToStop(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TimerModel* model = (TimerModel*)context;
+                status = Cdm_Timer_EmitTargetTimeToStopChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "TargetDuration") == 0)
+        {
+            int32_t value;
+            status = GetTargetDuration(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                TimerModel* model = (TimerModel*)context;
+                status = Cdm_Timer_EmitTargetDurationChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
 }
 
 

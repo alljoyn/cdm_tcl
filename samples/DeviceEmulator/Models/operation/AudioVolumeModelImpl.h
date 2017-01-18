@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/AudioVolumeModel.h>
 #include <ajtcl/cdm/interfaces/operation/AudioVolumeInterface.h>
+#include "../../../Utils/Command.h"
 
 AudioVolumeModel *GetAudioVolumeModel(void);
+
+AJ_Status HandleAudioVolumeCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

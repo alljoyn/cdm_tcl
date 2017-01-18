@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/MoistureOutputLevelModel.h>
 #include <ajtcl/cdm/interfaces/operation/MoistureOutputLevelInterface.h>
+#include "../../../Utils/Command.h"
 
 MoistureOutputLevelModel *GetMoistureOutputLevelModel(void);
+
+AJ_Status HandleMoistureOutputLevelCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

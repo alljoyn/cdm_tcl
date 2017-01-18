@@ -126,6 +126,7 @@ static void HAL_Decode_Array_ClimateControlMode_OperationalState(Element* elem, 
 
 
 
+
 static AJ_Status GetMode(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -189,6 +190,50 @@ static AJ_Status GetOperationalState(void *context, const char *objPath, uint16_
     return result;
 }
 
+
+
+
+AJ_Status HandleClimateControlModeCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.ClimateControlMode") == 0)
+    {
+        if (strcmp(cmd->property, "Mode") == 0)
+        {
+            uint16_t value;
+            status = GetMode(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                ClimateControlModeModel* model = (ClimateControlModeModel*)context;
+                status = Cdm_ClimateControlMode_EmitModeChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "SupportedModes") == 0)
+        {
+            Array_ClimateControlMode_Mode value;
+            status = GetSupportedModes(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                ClimateControlModeModel* model = (ClimateControlModeModel*)context;
+                status = Cdm_ClimateControlMode_EmitSupportedModesChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_ClimateControlMode_Mode(&value);
+        }
+        if (strcmp(cmd->property, "OperationalState") == 0)
+        {
+            uint16_t value;
+            status = GetOperationalState(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                ClimateControlModeModel* model = (ClimateControlModeModel*)context;
+                status = Cdm_ClimateControlMode_EmitOperationalStateChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

@@ -34,8 +34,11 @@
 
 #include <ajtcl/cdm/interfaces/operation/BatteryStatusModel.h>
 #include <ajtcl/cdm/interfaces/operation/BatteryStatusInterface.h>
+#include "../../../Utils/Command.h"
 
 BatteryStatusModel *GetBatteryStatusModel(void);
+
+AJ_Status HandleBatteryStatusCommand(const Command* cmd, void* context);
 
 /* REVISIT delete this */
 

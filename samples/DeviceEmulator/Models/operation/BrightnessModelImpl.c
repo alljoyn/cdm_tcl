@@ -36,6 +36,7 @@
 
 
 
+
 static AJ_Status GetBrightness(void *context, const char *objPath, double *out)
 {
     AJ_Status result = AJ_OK;
@@ -66,6 +67,28 @@ static AJ_Status SetBrightness(void *context, const char *objPath, double input)
     return result;
 }
 
+
+
+
+AJ_Status HandleBrightnessCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.Brightness") == 0)
+    {
+        if (strcmp(cmd->property, "Brightness") == 0)
+        {
+            double value;
+            status = GetBrightness(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                BrightnessModel* model = (BrightnessModel*)context;
+                status = Cdm_Brightness_EmitBrightnessChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

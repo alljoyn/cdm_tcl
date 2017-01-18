@@ -81,6 +81,7 @@ static void HAL_Decode_Array_WindDirection_AutoMode(Element* elem, Array_WindDir
 
 
 
+
 static AJ_Status GetHorizontalDirection(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -233,6 +234,83 @@ static AJ_Status SetVerticalAutoMode(void *context, const char *objPath, uint8_t
     return result;
 }
 
+
+
+
+AJ_Status HandleWindDirectionCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Environment.WindDirection") == 0)
+    {
+        if (strcmp(cmd->property, "HorizontalDirection") == 0)
+        {
+            uint16_t value;
+            status = GetHorizontalDirection(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                WindDirectionModel* model = (WindDirectionModel*)context;
+                status = Cdm_WindDirection_EmitHorizontalDirectionChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "HorizontalMax") == 0)
+        {
+            uint16_t value;
+            status = GetHorizontalMax(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                WindDirectionModel* model = (WindDirectionModel*)context;
+                status = Cdm_WindDirection_EmitHorizontalMaxChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "HorizontalAutoMode") == 0)
+        {
+            uint8_t value;
+            status = GetHorizontalAutoMode(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                WindDirectionModel* model = (WindDirectionModel*)context;
+                status = Cdm_WindDirection_EmitHorizontalAutoModeChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "VerticalDirection") == 0)
+        {
+            uint16_t value;
+            status = GetVerticalDirection(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                WindDirectionModel* model = (WindDirectionModel*)context;
+                status = Cdm_WindDirection_EmitVerticalDirectionChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "VerticalMax") == 0)
+        {
+            uint16_t value;
+            status = GetVerticalMax(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                WindDirectionModel* model = (WindDirectionModel*)context;
+                status = Cdm_WindDirection_EmitVerticalMaxChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "VerticalAutoMode") == 0)
+        {
+            uint8_t value;
+            status = GetVerticalAutoMode(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                WindDirectionModel* model = (WindDirectionModel*)context;
+                status = Cdm_WindDirection_EmitVerticalAutoModeChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+    }
+    return status;
+}
 
 
 

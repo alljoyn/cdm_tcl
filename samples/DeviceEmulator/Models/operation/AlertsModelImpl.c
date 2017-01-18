@@ -205,39 +205,6 @@ static void HAL_Decode_Array_Alerts_Severity(Element* elem, Array_Alerts_Severit
     }
 }
 
-static Array_Alerts_AlertCodesDescriptor* getAlertCodesDescriptor(void)
-{
-    static Array_Alerts_AlertCodesDescriptor s_descrs;
-
-    if (!s_descrs.elems) {
-        InitArray_Alerts_AlertCodesDescriptor(&s_descrs, 0);
-        size_t i = 0;
-
-        i = ExtendArray_Alerts_AlertCodesDescriptor(&s_descrs, 1);
-        s_descrs.elems[i].alertCode = 1;
-        s_descrs.elems[i].description = strdup("bad");
-
-        i = ExtendArray_Alerts_AlertCodesDescriptor(&s_descrs, 1);
-        s_descrs.elems[i].alertCode = 2;
-        s_descrs.elems[i].description = strdup("worse");
-
-        i = ExtendArray_Alerts_AlertCodesDescriptor(&s_descrs, 1);
-        s_descrs.elems[i].alertCode = 3;
-        s_descrs.elems[i].description = strdup("stuffed");
-    }
-
-    return &s_descrs;
-}
-
-
-static void CopyAlerts_AlertCodesDescriptor(Alerts_AlertCodesDescriptor* value, Alerts_AlertCodesDescriptor* copy) UNUSED_OK;
-
-static void CopyAlerts_AlertCodesDescriptor(Alerts_AlertCodesDescriptor* value, Alerts_AlertCodesDescriptor* copy)
-{
-    copy->alertCode = value->alertCode;
-    copy->description = strdup(value->description);
-}
-
 
 static AJ_Status WriteAlerts(const char *objPath, const Array_Alerts_AlertRecord* alerts)
 {
@@ -270,8 +237,15 @@ static AJ_Status GetAlerts(void *context, const char *objPath, Array_Alerts_Aler
 
 static AJ_Status MethodGetAlertCodesDescription(void *context, const char *objPath, char const* languageTag, Array_Alerts_AlertCodesDescriptor* description)
 {
-    CopyArray_Alerts_AlertCodesDescriptor(getAlertCodesDescriptor(), description);
-    return AJ_OK;
+    Element* elem = HAL_ReadProperty(objPath, "org.alljoyn.SmartSpaces.Operation.Alerts", "__AlertCodesDescriptor");
+
+    if (elem) {
+        HAL_Decode_Array_Alerts_AlertCodesDescriptor(elem, description);
+        BSXML_FreeElement(elem);
+        return AJ_OK;
+    }
+
+    return AJ_ERR_FAILURE;
 }
 
 
@@ -337,6 +311,28 @@ static AJ_Status MethodAcknowledgeAllAlerts(void *context, const char *objPath)
         status = Cdm_Alerts_EmitAlertsChanged(model->busAttachment, objPath, newAlerts);
     }
 
+    return status;
+}
+
+
+
+AJ_Status HandleAlertsCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.Alerts") == 0)
+    {
+        if (strcmp(cmd->property, "Alerts") == 0)
+        {
+            Array_Alerts_AlertRecord value;
+            status = GetAlerts(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                AlertsModel* model = (AlertsModel*)context;
+                status = Cdm_Alerts_EmitAlertsChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_Alerts_AlertRecord(&value);
+        }
+    }
     return status;
 }
 

@@ -81,6 +81,7 @@ static void HAL_Decode_Array_HvacFanMode_Mode(Element* elem, Array_HvacFanMode_M
 
 
 
+
 static AJ_Status GetMode(void *context, const char *objPath, uint16_t *out)
 {
     AJ_Status result = AJ_OK;
@@ -128,6 +129,39 @@ static AJ_Status GetSupportedModes(void *context, const char *objPath, Array_Hva
     return result;
 }
 
+
+
+
+AJ_Status HandleHvacFanModeCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.HvacFanMode") == 0)
+    {
+        if (strcmp(cmd->property, "Mode") == 0)
+        {
+            uint16_t value;
+            status = GetMode(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                HvacFanModeModel* model = (HvacFanModeModel*)context;
+                status = Cdm_HvacFanMode_EmitModeChanged(model->busAttachment, cmd->objPath, value);
+            }
+            
+        }
+        if (strcmp(cmd->property, "SupportedModes") == 0)
+        {
+            Array_HvacFanMode_Mode value;
+            status = GetSupportedModes(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                HvacFanModeModel* model = (HvacFanModeModel*)context;
+                status = Cdm_HvacFanMode_EmitSupportedModesChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_HvacFanMode_Mode(&value);
+        }
+    }
+    return status;
+}
 
 
 

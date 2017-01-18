@@ -102,6 +102,7 @@ static void HAL_Decode_Array_PlugInUnits_PlugInInfo(Element* elem, Array_PlugInU
 
 
 
+
 static AJ_Status GetPlugInUnits(void *context, const char *objPath, Array_PlugInUnits_PlugInInfo *out)
 {
     AJ_Status result = AJ_OK;
@@ -119,6 +120,28 @@ static AJ_Status GetPlugInUnits(void *context, const char *objPath, Array_PlugIn
     return result;
 }
 
+
+
+
+AJ_Status HandlePlugInUnitsCommand(const Command* cmd, void* context)
+{
+    AJ_Status status = AJ_OK;
+    if (strcmp(cmd->name, "changed") == 0 && strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.PlugInUnits") == 0)
+    {
+        if (strcmp(cmd->property, "PlugInUnits") == 0)
+        {
+            Array_PlugInUnits_PlugInInfo value;
+            status = GetPlugInUnits(context, cmd->objPath, &value);
+            if (status == AJ_OK)
+            {
+                PlugInUnitsModel* model = (PlugInUnitsModel*)context;
+                status = Cdm_PlugInUnits_EmitPlugInUnitsChanged(model->busAttachment, cmd->objPath, value);
+            }
+            FreeArray_PlugInUnits_PlugInInfo(&value);
+        }
+    }
+    return status;
+}
 
 
 
