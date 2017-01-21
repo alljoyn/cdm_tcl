@@ -40,6 +40,4 @@ SoilLevelModel *GetSoilLevelModel(void);
 
 AJ_Status HandleSoilLevelCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_SOILLEVEL_MODELIMPL_H */

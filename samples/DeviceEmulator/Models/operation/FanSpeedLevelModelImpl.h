@@ -40,6 +40,4 @@ FanSpeedLevelModel *GetFanSpeedLevelModel(void);
 
 AJ_Status HandleFanSpeedLevelCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_FANSPEEDLEVEL_MODELIMPL_H */

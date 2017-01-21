@@ -27,7 +27,7 @@
  *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
-#include <ajtcl/cdm/utils/CDM_Array.h>
+#include <ajtcl/cdm/utils/CdmArray.h>
 #include <string.h>
 
 #define MK_FREE_FUNC(TYPE, NAME) void FreeArray_ ## NAME(struct Array_ ## NAME* array) \
@@ -60,7 +60,7 @@ void FreeArray_string(Array_string* array)
 
 
 
-void Init_Array(CDM_Array* array, size_t elemSize, size_t numElems)
+void Init_Array(CdmArray* array, size_t elemSize, size_t numElems)
 {
     if (numElems == 0) {
         array->elems = NULL;
@@ -73,7 +73,7 @@ void Init_Array(CDM_Array* array, size_t elemSize, size_t numElems)
 
 
 
-void Copy_Array(CDM_Array* array, size_t elemSize, CDM_Array* copy)
+void Copy_Array(CdmArray* array, size_t elemSize, CdmArray* copy)
 {
     if (array->elems) {
         copy->elems = malloc(array->numElems * elemSize);
@@ -103,7 +103,7 @@ void CopyArray_string(Array_string* array, Array_string* copy)
 
 
 
-size_t Extend_Array(CDM_Array* array, size_t elemSize, size_t numElems)
+size_t Extend_Array(CdmArray* array, size_t elemSize, size_t numElems)
 {
     size_t old = array->numElems;
     array->elems = realloc(array->elems, elemSize * (numElems + array->numElems));

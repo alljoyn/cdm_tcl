@@ -40,6 +40,4 @@ LanguageDisplayModel *GetLanguageDisplayModel(void);
 
 AJ_Status HandleLanguageDisplayCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_LANGUAGEDISPLAY_MODELIMPL_H */

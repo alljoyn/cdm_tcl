@@ -34,6 +34,7 @@ if os.environ.has_key('CROSS_LINKFLAGS'):
 
 # Compiler flags
 env.Append(CFLAGS = [
+    '-std=c99',
     '-pipe',
     '-funsigned-char',
     '-fno-strict-aliasing',

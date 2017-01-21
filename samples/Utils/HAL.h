@@ -30,7 +30,7 @@
 #ifndef ALLJOYN_HAL_H
 #define ALLJOYN_HAL_H
 
-#include <ajtcl/cdm/utils/CDM_Array.h>
+#include <ajtcl/cdm/utils/CdmArray.h>
 #include <ajtcl/cdm/utils/BSXML.h>
 
 void HAL_Init(const char *base_path, const char *ext);

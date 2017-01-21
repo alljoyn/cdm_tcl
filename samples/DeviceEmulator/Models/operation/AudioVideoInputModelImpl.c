@@ -91,7 +91,8 @@ static Element* HAL_Encode_Array_AudioVideoInput_InputSource(Array_AudioVideoInp
 static Element* HAL_Encode_Array_AudioVideoInput_InputSource(Array_AudioVideoInput_InputSource value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_AudioVideoInput_InputSource(value.elems[i], array);
     }
     return array;
@@ -105,7 +106,8 @@ static void HAL_Decode_Array_AudioVideoInput_InputSource(Element* elem, Array_Au
     InitArray_AudioVideoInput_InputSource(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_AudioVideoInput_InputSource(value, 1);
             HAL_Decode_AudioVideoInput_InputSource(elem->children[i], &value->elems[j]);
         }
@@ -136,7 +138,8 @@ static Element* HAL_Encode_Array_AudioVideoInput_SourceType(Array_AudioVideoInpu
 static Element* HAL_Encode_Array_AudioVideoInput_SourceType(Array_AudioVideoInput_SourceType value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
@@ -150,7 +153,8 @@ static void HAL_Decode_Array_AudioVideoInput_SourceType(Element* elem, Array_Aud
     InitArray_AudioVideoInput_SourceType(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_AudioVideoInput_SourceType(value, 1);
             value->elems[j] = (uint16_t)HAL_Decode_UInt(elem->children[i]);
         }
@@ -181,7 +185,8 @@ static Element* HAL_Encode_Array_AudioVideoInput_SignalPresence(Array_AudioVideo
 static Element* HAL_Encode_Array_AudioVideoInput_SignalPresence(Array_AudioVideoInput_SignalPresence value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
@@ -195,7 +200,8 @@ static void HAL_Decode_Array_AudioVideoInput_SignalPresence(Element* elem, Array
     InitArray_AudioVideoInput_SignalPresence(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_AudioVideoInput_SignalPresence(value, 1);
             value->elems[j] = (uint8_t)HAL_Decode_UInt(elem->children[i]);
         }

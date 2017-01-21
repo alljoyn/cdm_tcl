@@ -40,6 +40,4 @@ ColorTemperatureModel *GetColorTemperatureModel(void);
 
 AJ_Status HandleColorTemperatureCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_COLORTEMPERATURE_MODELIMPL_H */

@@ -30,7 +30,7 @@
 #ifndef ALLJOYN_STRBUF_H
 #define ALLJOYN_STRBUF_H
 
-#include <ajtcl/cdm/utils/CDM_Array.h>
+#include <stdlib.h>
 
 typedef struct {
     char* chars;                /* never NULL, always NUL-terminated */

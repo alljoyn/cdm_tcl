@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/PlugInUnitsInterface.h>
 #include <ajtcl/cdm/interfaces/operation/PlugInUnitsModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME PLUG_IN_UNITS
@@ -60,7 +62,7 @@ void FreeFields_PlugInUnits_PlugInInfo(PlugInUnits_PlugInInfo* value)
 
 void InitArray_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugInInfo* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(PlugInUnits_PlugInInfo), numElems);
+    Init_Array((CdmArray*)value, sizeof(PlugInUnits_PlugInInfo), numElems);
 }
 
 
@@ -94,7 +96,7 @@ void FreeArray_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugInInfo* value)
 
 size_t ExtendArray_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugInInfo* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(PlugInUnits_PlugInInfo), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(PlugInUnits_PlugInInfo), numElems);
 }
 
 

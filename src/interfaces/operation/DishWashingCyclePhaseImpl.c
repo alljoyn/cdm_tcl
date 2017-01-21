@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/DishWashingCyclePhaseInterface.h>
 #include <ajtcl/cdm/interfaces/operation/DishWashingCyclePhaseModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME DISH_WASHING_CYCLE_PHASE
@@ -63,7 +65,7 @@ void FreeFields_DishWashingCyclePhase_CyclePhaseDescriptor(DishWashingCyclePhase
 
 void InitArray_DishWashingCyclePhase_CyclePhaseDescriptor(Array_DishWashingCyclePhase_CyclePhaseDescriptor* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(DishWashingCyclePhase_CyclePhaseDescriptor), numElems);
+    Init_Array((CdmArray*)value, sizeof(DishWashingCyclePhase_CyclePhaseDescriptor), numElems);
 }
 
 
@@ -97,7 +99,7 @@ void FreeArray_DishWashingCyclePhase_CyclePhaseDescriptor(Array_DishWashingCycle
 
 size_t ExtendArray_DishWashingCyclePhase_CyclePhaseDescriptor(Array_DishWashingCyclePhase_CyclePhaseDescriptor* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(DishWashingCyclePhase_CyclePhaseDescriptor), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(DishWashingCyclePhase_CyclePhaseDescriptor), numElems);
 }
 
 

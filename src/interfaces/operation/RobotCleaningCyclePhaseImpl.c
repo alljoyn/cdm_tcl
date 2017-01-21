@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/RobotCleaningCyclePhaseInterface.h>
 #include <ajtcl/cdm/interfaces/operation/RobotCleaningCyclePhaseModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME ROBOT_CLEANING_CYCLE_PHASE
@@ -63,7 +65,7 @@ void FreeFields_RobotCleaningCyclePhase_CyclePhaseDescriptor(RobotCleaningCycleP
 
 void InitArray_RobotCleaningCyclePhase_CyclePhaseDescriptor(Array_RobotCleaningCyclePhase_CyclePhaseDescriptor* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(RobotCleaningCyclePhase_CyclePhaseDescriptor), numElems);
+    Init_Array((CdmArray*)value, sizeof(RobotCleaningCyclePhase_CyclePhaseDescriptor), numElems);
 }
 
 
@@ -97,7 +99,7 @@ void FreeArray_RobotCleaningCyclePhase_CyclePhaseDescriptor(Array_RobotCleaningC
 
 size_t ExtendArray_RobotCleaningCyclePhase_CyclePhaseDescriptor(Array_RobotCleaningCyclePhase_CyclePhaseDescriptor* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(RobotCleaningCyclePhase_CyclePhaseDescriptor), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(RobotCleaningCyclePhase_CyclePhaseDescriptor), numElems);
 }
 
 

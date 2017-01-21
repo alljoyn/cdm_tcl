@@ -34,7 +34,7 @@
 
 typedef struct Command
 {
-    const char* name;            // typically 'changed'
+    const char* name;            /* typically 'changed' */
     const char* objPath;
     const char* interface;
     const char* property;

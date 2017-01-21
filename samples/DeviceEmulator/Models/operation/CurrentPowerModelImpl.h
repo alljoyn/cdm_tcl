@@ -40,6 +40,4 @@ CurrentPowerModel *GetCurrentPowerModel(void);
 
 AJ_Status HandleCurrentPowerCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_CURRENTPOWER_MODELIMPL_H */

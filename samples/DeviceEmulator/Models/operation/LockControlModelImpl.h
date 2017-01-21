@@ -40,6 +40,4 @@ LockControlModel *GetLockControlModel(void);
 
 AJ_Status HandleLockControlCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_LOCKCONTROL_MODELIMPL_H */

@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/AlertsInterface.h>
 #include <ajtcl/cdm/interfaces/operation/AlertsModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME ALERTS
@@ -62,7 +64,7 @@ void FreeFields_Alerts_AlertRecord(Alerts_AlertRecord* value)
 
 void InitArray_Alerts_AlertRecord(Array_Alerts_AlertRecord* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(Alerts_AlertRecord), numElems);
+    Init_Array((CdmArray*)value, sizeof(Alerts_AlertRecord), numElems);
 }
 
 
@@ -96,7 +98,7 @@ void FreeArray_Alerts_AlertRecord(Array_Alerts_AlertRecord* value)
 
 size_t ExtendArray_Alerts_AlertRecord(Array_Alerts_AlertRecord* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(Alerts_AlertRecord), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(Alerts_AlertRecord), numElems);
 }
 
 
@@ -111,7 +113,7 @@ void FreeFields_Alerts_AlertCodesDescriptor(Alerts_AlertCodesDescriptor* value)
 
 void InitArray_Alerts_AlertCodesDescriptor(Array_Alerts_AlertCodesDescriptor* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(Alerts_AlertCodesDescriptor), numElems);
+    Init_Array((CdmArray*)value, sizeof(Alerts_AlertCodesDescriptor), numElems);
 }
 
 
@@ -144,19 +146,19 @@ void FreeArray_Alerts_AlertCodesDescriptor(Array_Alerts_AlertCodesDescriptor* va
 
 size_t ExtendArray_Alerts_AlertCodesDescriptor(Array_Alerts_AlertCodesDescriptor* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(Alerts_AlertCodesDescriptor), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(Alerts_AlertCodesDescriptor), numElems);
 }
 
 
 void InitArray_Alerts_Severity(Array_Alerts_Severity* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(Alerts_Severity), numElems);
+    Init_Array((CdmArray*)value, sizeof(Alerts_Severity), numElems);
 }
 
 
 void CopyArray_Alerts_Severity(Array_Alerts_Severity* value, Array_Alerts_Severity* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(Alerts_Severity), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(Alerts_Severity), (CdmArray*)copy);
 }
 
 
@@ -169,7 +171,7 @@ void FreeArray_Alerts_Severity(Array_Alerts_Severity* value)
 
 size_t ExtendArray_Alerts_Severity(Array_Alerts_Severity* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(Alerts_Severity), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(Alerts_Severity), numElems);
 }
 
 

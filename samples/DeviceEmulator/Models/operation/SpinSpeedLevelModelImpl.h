@@ -40,6 +40,4 @@ SpinSpeedLevelModel *GetSpinSpeedLevelModel(void);
 
 AJ_Status HandleSpinSpeedLevelCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_SPINSPEEDLEVEL_MODELIMPL_H */

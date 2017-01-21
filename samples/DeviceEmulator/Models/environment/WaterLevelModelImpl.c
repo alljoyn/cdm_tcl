@@ -58,7 +58,8 @@ static Element* HAL_Encode_Array_WaterLevel_SupplySource(Array_WaterLevel_Supply
 static Element* HAL_Encode_Array_WaterLevel_SupplySource(Array_WaterLevel_SupplySource value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
@@ -72,7 +73,8 @@ static void HAL_Decode_Array_WaterLevel_SupplySource(Element* elem, Array_WaterL
     InitArray_WaterLevel_SupplySource(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_WaterLevel_SupplySource(value, 1);
             value->elems[j] = (uint8_t)HAL_Decode_UInt(elem->children[i]);
         }

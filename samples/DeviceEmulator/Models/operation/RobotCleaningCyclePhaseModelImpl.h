@@ -40,7 +40,4 @@ RobotCleaningCyclePhaseModel *GetRobotCleaningCyclePhaseModel(void);
 
 AJ_Status HandleRobotCleaningCyclePhaseCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-extern int Encoder_RobotCleaningCyclePhase_CyclePhaseDescriptor(FILE* fp, void* value);
-
 #endif /* ALLJOYN_ROBOTCLEANINGCYCLEPHASE_MODELIMPL_H */

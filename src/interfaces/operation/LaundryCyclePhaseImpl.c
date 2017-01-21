@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/LaundryCyclePhaseInterface.h>
 #include <ajtcl/cdm/interfaces/operation/LaundryCyclePhaseModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME LAUNDRY_CYCLE_PHASE
@@ -63,7 +65,7 @@ void FreeFields_LaundryCyclePhase_CyclePhaseDescriptor(LaundryCyclePhase_CyclePh
 
 void InitArray_LaundryCyclePhase_CyclePhaseDescriptor(Array_LaundryCyclePhase_CyclePhaseDescriptor* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(LaundryCyclePhase_CyclePhaseDescriptor), numElems);
+    Init_Array((CdmArray*)value, sizeof(LaundryCyclePhase_CyclePhaseDescriptor), numElems);
 }
 
 
@@ -97,7 +99,7 @@ void FreeArray_LaundryCyclePhase_CyclePhaseDescriptor(Array_LaundryCyclePhase_Cy
 
 size_t ExtendArray_LaundryCyclePhase_CyclePhaseDescriptor(Array_LaundryCyclePhase_CyclePhaseDescriptor* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(LaundryCyclePhase_CyclePhaseDescriptor), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(LaundryCyclePhase_CyclePhaseDescriptor), numElems);
 }
 
 

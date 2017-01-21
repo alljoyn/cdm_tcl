@@ -79,7 +79,8 @@ static Element* HAL_Encode_Array_RobotCleaningCyclePhase_CyclePhaseDescriptor(Ar
 static Element* HAL_Encode_Array_RobotCleaningCyclePhase_CyclePhaseDescriptor(Array_RobotCleaningCyclePhase_CyclePhaseDescriptor value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_RobotCleaningCyclePhase_CyclePhaseDescriptor(value.elems[i], array);
     }
     return array;
@@ -93,7 +94,8 @@ static void HAL_Decode_Array_RobotCleaningCyclePhase_CyclePhaseDescriptor(Elemen
     InitArray_RobotCleaningCyclePhase_CyclePhaseDescriptor(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_RobotCleaningCyclePhase_CyclePhaseDescriptor(value, 1);
             HAL_Decode_RobotCleaningCyclePhase_CyclePhaseDescriptor(elem->children[i], &value->elems[j]);
         }

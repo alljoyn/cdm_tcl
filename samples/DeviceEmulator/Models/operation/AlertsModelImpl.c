@@ -79,7 +79,8 @@ static Element* HAL_Encode_Array_Alerts_AlertRecord(Array_Alerts_AlertRecord val
 static Element* HAL_Encode_Array_Alerts_AlertRecord(Array_Alerts_AlertRecord value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_Alerts_AlertRecord(value.elems[i], array);
     }
     return array;
@@ -93,7 +94,8 @@ static void HAL_Decode_Array_Alerts_AlertRecord(Element* elem, Array_Alerts_Aler
     InitArray_Alerts_AlertRecord(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Alerts_AlertRecord(value, 1);
             HAL_Decode_Alerts_AlertRecord(elem->children[i], &value->elems[j]);
         }
@@ -139,7 +141,8 @@ static Element* HAL_Encode_Array_Alerts_AlertCodesDescriptor(Array_Alerts_AlertC
 static Element* HAL_Encode_Array_Alerts_AlertCodesDescriptor(Array_Alerts_AlertCodesDescriptor value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_Alerts_AlertCodesDescriptor(value.elems[i], array);
     }
     return array;
@@ -153,7 +156,8 @@ static void HAL_Decode_Array_Alerts_AlertCodesDescriptor(Element* elem, Array_Al
     InitArray_Alerts_AlertCodesDescriptor(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Alerts_AlertCodesDescriptor(value, 1);
             HAL_Decode_Alerts_AlertCodesDescriptor(elem->children[i], &value->elems[j]);
         }
@@ -184,7 +188,8 @@ static Element* HAL_Encode_Array_Alerts_Severity(Array_Alerts_Severity value, El
 static Element* HAL_Encode_Array_Alerts_Severity(Array_Alerts_Severity value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
@@ -198,7 +203,8 @@ static void HAL_Decode_Array_Alerts_Severity(Element* elem, Array_Alerts_Severit
     InitArray_Alerts_Severity(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Alerts_Severity(value, 1);
             value->elems[j] = (uint8_t)HAL_Decode_UInt(elem->children[i]);
         }

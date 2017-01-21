@@ -40,7 +40,4 @@ DishWashingCyclePhaseModel *GetDishWashingCyclePhaseModel(void);
 
 AJ_Status HandleDishWashingCyclePhaseCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-extern int Encoder_DishWashingCyclePhase_CyclePhaseDescriptor(FILE* fp, void* value);
-
 #endif /* ALLJOYN_DISHWASHINGCYCLEPHASE_MODELIMPL_H */

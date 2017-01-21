@@ -40,6 +40,4 @@ ClimateControlModeModel *GetClimateControlModeModel(void);
 
 AJ_Status HandleClimateControlModeCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_CLIMATECONTROLMODE_MODELIMPL_H */

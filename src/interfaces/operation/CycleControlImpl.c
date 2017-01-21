@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/CycleControlInterface.h>
 #include <ajtcl/cdm/interfaces/operation/CycleControlModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME CYCLE_CONTROL
@@ -53,13 +55,13 @@ const char* const intfDescOperationCycleControl[] = {
 
 void InitArray_CycleControl_OperationalState(Array_CycleControl_OperationalState* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(CycleControl_OperationalState), numElems);
+    Init_Array((CdmArray*)value, sizeof(CycleControl_OperationalState), numElems);
 }
 
 
 void CopyArray_CycleControl_OperationalState(Array_CycleControl_OperationalState* value, Array_CycleControl_OperationalState* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(CycleControl_OperationalState), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(CycleControl_OperationalState), (CdmArray*)copy);
 }
 
 
@@ -72,19 +74,19 @@ void FreeArray_CycleControl_OperationalState(Array_CycleControl_OperationalState
 
 size_t ExtendArray_CycleControl_OperationalState(Array_CycleControl_OperationalState* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(CycleControl_OperationalState), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(CycleControl_OperationalState), numElems);
 }
 
 
 void InitArray_CycleControl_OperationalCommands(Array_CycleControl_OperationalCommands* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(CycleControl_OperationalCommands), numElems);
+    Init_Array((CdmArray*)value, sizeof(CycleControl_OperationalCommands), numElems);
 }
 
 
 void CopyArray_CycleControl_OperationalCommands(Array_CycleControl_OperationalCommands* value, Array_CycleControl_OperationalCommands* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(CycleControl_OperationalCommands), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(CycleControl_OperationalCommands), (CdmArray*)copy);
 }
 
 
@@ -97,7 +99,7 @@ void FreeArray_CycleControl_OperationalCommands(Array_CycleControl_OperationalCo
 
 size_t ExtendArray_CycleControl_OperationalCommands(Array_CycleControl_OperationalCommands* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(CycleControl_OperationalCommands), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(CycleControl_OperationalCommands), numElems);
 }
 
 

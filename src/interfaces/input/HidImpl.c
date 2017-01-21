@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/input/HidInterface.h>
 #include <ajtcl/cdm/interfaces/input/HidModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME HID
@@ -60,7 +62,7 @@ void FreeFields_Hid_InputEvent(Hid_InputEvent* value)
 
 void InitArray_Hid_InputEvent(Array_Hid_InputEvent* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(Hid_InputEvent), numElems);
+    Init_Array((CdmArray*)value, sizeof(Hid_InputEvent), numElems);
 }
 
 
@@ -94,7 +96,7 @@ void FreeArray_Hid_InputEvent(Array_Hid_InputEvent* value)
 
 size_t ExtendArray_Hid_InputEvent(Array_Hid_InputEvent* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(Hid_InputEvent), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(Hid_InputEvent), numElems);
 }
 
 
@@ -110,7 +112,7 @@ void FreeFields_Hid_SupportedInputEvent(Hid_SupportedInputEvent* value)
 
 void InitArray_Hid_SupportedInputEvent(Array_Hid_SupportedInputEvent* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(Hid_SupportedInputEvent), numElems);
+    Init_Array((CdmArray*)value, sizeof(Hid_SupportedInputEvent), numElems);
 }
 
 
@@ -145,7 +147,7 @@ void FreeArray_Hid_SupportedInputEvent(Array_Hid_SupportedInputEvent* value)
 
 size_t ExtendArray_Hid_SupportedInputEvent(Array_Hid_SupportedInputEvent* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(Hid_SupportedInputEvent), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(Hid_SupportedInputEvent), numElems);
 }
 
 

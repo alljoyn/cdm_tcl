@@ -40,6 +40,4 @@ MoistureOutputLevelModel *GetMoistureOutputLevelModel(void);
 
 AJ_Status HandleMoistureOutputLevelCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_MOISTUREOUTPUTLEVEL_MODELIMPL_H */

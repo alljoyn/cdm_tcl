@@ -35,7 +35,7 @@
 #include <ajtcl/aj_link_timeout.h>
 
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/utils/CDM_System.h>
+#include <ajtcl/cdm/utils/CdmSystem.h>
 #include <ajtcl/cdm/utils/PropertyStoreOEMProvisioning.h>
 
 
@@ -196,7 +196,7 @@ static MessageProcessor messageProcessor = DefaultAppMessageProcessor;
 static AppDisconnectedHandler appDisconnectedHandler = DefaultAppDisconnectedHandler;
 
 
-void CDM_SetDefaultAboutIconParams(CDM_AboutIconParams *params)
+void Cdm_SetDefaultAboutIconParams(CdmAboutIconParams *params)
 {
     if (params != NULL) {
         params->mimeType = (const char*)AJ_LogoMimeType;
@@ -206,7 +206,7 @@ void CDM_SetDefaultAboutIconParams(CDM_AboutIconParams *params)
     }
 }
 
-void CDM_SetDefaultRoutingNodeParams(CDM_RoutingNodeParams *params)
+void Cdm_SetDefaultRoutingNodeParams(CdmRoutingNodeParams *params)
 {
     if (params != NULL) {
         params->name = ROUTING_NODE_NAME;
@@ -217,7 +217,7 @@ void CDM_SetDefaultRoutingNodeParams(CDM_RoutingNodeParams *params)
     }
 }
 
-AJ_Status CDM_SystemInit(CDM_AboutIconParams *iconParams, bool emitChangedOnSetProprty)
+AJ_Status Cdm_SystemInit(CdmAboutIconParams *iconParams, bool emitChangedOnSetProprty)
 {
     AJ_Status status;
     AJ_Initialize();
@@ -237,13 +237,13 @@ AJ_Status CDM_SystemInit(CDM_AboutIconParams *iconParams, bool emitChangedOnSetP
     return status;
 }
 
-AJ_Status CDM_SystemConnect(CDM_RoutingNodeParams *routingNodeParams, CDM_BusAttachment *busAttachment)
+AJ_Status Cdm_SystemConnect(CdmRoutingNodeParams *routingNodeParams, CdmBusAttachment *busAttachment)
 {
     AJ_Status status;
 
     if (routingNodeParams == NULL || busAttachment == NULL)
     {
-        AJ_ErrPrintf(("Invalid Parameter for CDM_SystemConnect\n"));
+        AJ_ErrPrintf(("Invalid Parameter for CdmSystemConnect\n"));
         return AJ_ERR_FAILURE;
     }
 
@@ -261,7 +261,7 @@ AJ_Status CDM_SystemConnect(CDM_RoutingNodeParams *routingNodeParams, CDM_BusAtt
                                     &busAttachment->isConnected);
 }
 
-AJ_Status Cdm_HandleMessageLoopExit(AJ_Status loopExitStatus, CDM_BusAttachment *busAttachment, CDM_RoutingNodeParams *routingNodeParams)
+AJ_Status Cdm_HandleMessageLoopExit(AJ_Status loopExitStatus, CdmBusAttachment *busAttachment, CdmRoutingNodeParams *routingNodeParams)
 {
     if (busAttachment->isConnected) {
         AJ_Status status;
@@ -289,7 +289,7 @@ AJ_Status Cdm_HandleMessageLoopExit(AJ_Status loopExitStatus, CDM_BusAttachment 
     return AJ_OK;
 }
 
-AJ_Status Cdm_MessageLoop(CDM_BusAttachment *busAttachment)
+AJ_Status Cdm_MessageLoop(CdmBusAttachment *busAttachment)
 {
     AJ_Status status = AJ_OK;
 
@@ -332,7 +332,7 @@ AJ_Status Cdm_MessageLoop(CDM_BusAttachment *busAttachment)
     return status;
 }
 
-void CDM_SystemStop(void)
+void Cdm_SystemStop(void)
 {
     Cdm_Deinit();
 }

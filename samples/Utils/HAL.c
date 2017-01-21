@@ -38,7 +38,7 @@
 #include <ctype.h>
 
 #include <ajtcl/aj_msg.h>
-#include <ajtcl/cdm/utils/CDM_Array.h>
+#include <ajtcl/cdm/utils/CdmArray.h>
 #include <ajtcl/cdm/utils/StrBuf.h>
 
 #include "HAL.h"
@@ -282,7 +282,8 @@ Element* HAL_Encode_String(const char* value, Element* parent)
 Element* HAL_Encode_Array_Bool(Array_Bool value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i)
+    size_t i = 0;
+    for (; i < value.numElems; ++i)
     {
         HAL_Encode_Bool(value.elems[i], array);
     }
@@ -294,7 +295,8 @@ Element* HAL_Encode_Array_Bool(Array_Bool value, Element* parent)
 Element* HAL_Encode_Array_string(Array_string value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i)
+    size_t i = 0;
+    for (; i < value.numElems; ++i)
     {
         HAL_Encode_String(value.elems[i], array);
     }
@@ -307,7 +309,8 @@ Element* HAL_Encode_Array_string(Array_string value, Element* parent)
 Element* HAL_Encode_Array_uint8(Array_uint8 value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i)
+    size_t i = 0;
+    for (; i < value.numElems; ++i)
     {
         HAL_Encode_UInt(value.elems[i], array);
     }
@@ -319,7 +322,8 @@ Element* HAL_Encode_Array_uint8(Array_uint8 value, Element* parent)
 Element* HAL_Encode_Array_uint16(Array_uint16 value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i)
+    size_t i = 0;
+    for (; i < value.numElems; ++i)
     {
         HAL_Encode_UInt(value.elems[i], array);
     }
@@ -331,7 +335,8 @@ Element* HAL_Encode_Array_uint16(Array_uint16 value, Element* parent)
 Element* HAL_Encode_Array_uint32(Array_uint32 value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i)
+    size_t i = 0;
+    for (; i < value.numElems; ++i)
     {
         HAL_Encode_UInt(value.elems[i], array);
     }
@@ -343,7 +348,8 @@ Element* HAL_Encode_Array_uint32(Array_uint32 value, Element* parent)
 Element* HAL_Encode_Array_uint64(Array_uint64 value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i)
+    size_t i = 0;
+    for (; i < value.numElems; ++i)
     {
         HAL_Encode_UInt(value.elems[i], array);
     }
@@ -355,7 +361,8 @@ Element* HAL_Encode_Array_uint64(Array_uint64 value, Element* parent)
 Element* HAL_Encode_Array_int16(Array_int16 value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i)
+    size_t i = 0;
+    for (; i < value.numElems; ++i)
     {
         HAL_Encode_Int(value.elems[i], array);
     }
@@ -367,7 +374,8 @@ Element* HAL_Encode_Array_int16(Array_int16 value, Element* parent)
 Element* HAL_Encode_Array_int32(Array_int32 value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i)
+    size_t i = 0;
+    for (; i < value.numElems; ++i)
     {
         HAL_Encode_Int(value.elems[i], array);
     }
@@ -379,7 +387,8 @@ Element* HAL_Encode_Array_int32(Array_int32 value, Element* parent)
 Element* HAL_Encode_Array_int64(Array_int64 value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i)
+    size_t i = 0;
+    for (; i < value.numElems; ++i)
     {
         HAL_Encode_Int(value.elems[i], array);
     }
@@ -490,10 +499,11 @@ void HAL_Decode_Array_Bool(Element* elem, Array_Bool *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(bool) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = (bool)(HAL_Decode_Int(child) & 1);
@@ -507,10 +517,11 @@ void HAL_Decode_Array_string(Element* elem, Array_string *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(char*) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = (char*)HAL_Decode_String(child);
@@ -524,10 +535,11 @@ void HAL_Decode_Array_double(Element* elem, Array_double *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(double) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = HAL_Decode_Double(child);
@@ -541,10 +553,11 @@ void HAL_Decode_Array_uint8(Element* elem, Array_uint8 *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(uint8_t) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = (uint8_t)HAL_Decode_UInt(child);
@@ -558,10 +571,11 @@ void HAL_Decode_Array_uint16(Element* elem, Array_uint16 *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(uint16_t) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = (uint16_t)HAL_Decode_UInt(child);
@@ -575,10 +589,11 @@ void HAL_Decode_Array_uint32(Element* elem, Array_uint32 *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(uint32_t) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = (uint32_t)HAL_Decode_UInt(child);
@@ -592,10 +607,11 @@ void HAL_Decode_Array_uint64(Element* elem, Array_uint64 *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(uint64_t) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = (uint64_t)HAL_Decode_UInt(child);
@@ -609,10 +625,11 @@ void HAL_Decode_Array_int16(Element* elem, Array_int16 *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(int16_t) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = (int16_t)HAL_Decode_UInt(child);
@@ -626,10 +643,11 @@ void HAL_Decode_Array_int32(Element* elem, Array_int32 *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(int32_t) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = (int32_t)HAL_Decode_UInt(child);
@@ -643,10 +661,11 @@ void HAL_Decode_Array_int64(Element* elem, Array_int64 *array)
 {
     if (strcmp(elem->name, "array") == 0)
     {
+        size_t i = 0;
         array->numElems = elem->numChildren;
         array->elems = malloc(sizeof(int64_t) * array->numElems);
 
-        for (size_t i = 0; i < elem->numChildren; ++i)
+        for (; i < elem->numChildren; ++i)
         {
             Element* child = elem->children[i];
             array->elems[i] = (int64_t)HAL_Decode_UInt(child);

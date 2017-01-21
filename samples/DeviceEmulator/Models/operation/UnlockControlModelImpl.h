@@ -40,6 +40,4 @@ UnlockControlModel *GetUnlockControlModel(void);
 
 AJ_Status HandleUnlockControlCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_UNLOCKCONTROL_MODELIMPL_H */

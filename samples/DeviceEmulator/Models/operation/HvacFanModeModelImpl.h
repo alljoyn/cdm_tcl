@@ -40,6 +40,4 @@ HvacFanModeModel *GetHvacFanModeModel(void);
 
 AJ_Status HandleHvacFanModeCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_HVACFANMODE_MODELIMPL_H */

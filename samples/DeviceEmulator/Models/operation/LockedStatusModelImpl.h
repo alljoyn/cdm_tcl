@@ -40,6 +40,4 @@ LockedStatusModel *GetLockedStatusModel(void);
 
 AJ_Status HandleLockedStatusCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_LOCKEDSTATUS_MODELIMPL_H */

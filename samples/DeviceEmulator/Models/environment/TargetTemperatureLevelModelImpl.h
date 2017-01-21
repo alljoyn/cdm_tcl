@@ -40,6 +40,4 @@ TargetTemperatureLevelModel *GetTargetTemperatureLevelModel(void);
 
 AJ_Status HandleTargetTemperatureLevelCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_TARGETTEMPERATURELEVEL_MODELIMPL_H */

@@ -40,8 +40,4 @@ AlertsModel *GetAlertsModel(void);
 
 AJ_Status HandleAlertsCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-extern int Encoder_Alerts_AlertRecord(FILE* fp, void* value);
-extern int Encoder_Alerts_AlertCodesDescriptor(FILE* fp, void* value);
-
 #endif /* ALLJOYN_ALERTS_MODELIMPL_H */

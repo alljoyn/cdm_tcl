@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/OvenCyclePhaseInterface.h>
 #include <ajtcl/cdm/interfaces/operation/OvenCyclePhaseModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME OVEN_CYCLE_PHASE
@@ -63,7 +65,7 @@ void FreeFields_OvenCyclePhase_CyclePhaseDescriptor(OvenCyclePhase_CyclePhaseDes
 
 void InitArray_OvenCyclePhase_CyclePhaseDescriptor(Array_OvenCyclePhase_CyclePhaseDescriptor* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(OvenCyclePhase_CyclePhaseDescriptor), numElems);
+    Init_Array((CdmArray*)value, sizeof(OvenCyclePhase_CyclePhaseDescriptor), numElems);
 }
 
 
@@ -97,7 +99,7 @@ void FreeArray_OvenCyclePhase_CyclePhaseDescriptor(Array_OvenCyclePhase_CyclePha
 
 size_t ExtendArray_OvenCyclePhase_CyclePhaseDescriptor(Array_OvenCyclePhase_CyclePhaseDescriptor* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(OvenCyclePhase_CyclePhaseDescriptor), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(OvenCyclePhase_CyclePhaseDescriptor), numElems);
 }
 
 

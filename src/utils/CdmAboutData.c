@@ -28,7 +28,7 @@
  ******************************************************************************/
 
 #include <stdio.h>
-#include <ajtcl/cdm/utils/CDM_AboutData.h>
+#include <ajtcl/cdm/utils/CdmAboutData.h>
 #include <ajtcl/cdm/utils/PropertyStoreOEMProvisioning.h>
 
 #include <ajtcl/cdm/utils/BSXML.h>
@@ -240,8 +240,8 @@ ELEM_MISSING_ERROR:
 
 typedef struct
 {
-    CDM_AboutDataBuf buf;
-    CDM_AboutDataBuf dataSegStart;
+    CdmAboutDataBuf buf;
+    CdmAboutDataBuf dataSegStart;
     long dataItr;
     long arrayItr;
     long bufSize;
@@ -381,7 +381,7 @@ static int WriteDeviceTypesDescriptions(const ABOUT_ANALYSIS *analysis, void *de
 }
 
 
-const CDM_AboutDataBuf CDM_CreateAboutDataFromXml(const char *aboutData)
+const CdmAboutDataBuf Cdm_CreateAboutDataFromXml(const char *aboutData)
 {
     static ABOUT_ANALYSIS analysis;
     static ArrayToPropertyStoreMap mapping[] = {
@@ -469,7 +469,7 @@ ERROR:
     return NULL;
 }
 
-void CDM_DestroyAboutData(CDM_AboutDataBuf aboutData)
+void Cdm_DestroyAboutData(CdmAboutDataBuf aboutData)
 {
     if (aboutData != NULL)
         free(aboutData);

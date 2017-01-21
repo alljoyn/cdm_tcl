@@ -40,6 +40,4 @@ CurrentAirQualityLevelModel *GetCurrentAirQualityLevelModel(void);
 
 AJ_Status HandleCurrentAirQualityLevelCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_CURRENTAIRQUALITYLEVEL_MODELIMPL_H */

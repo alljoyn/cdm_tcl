@@ -40,6 +40,4 @@ TimerModel *GetTimerModel(void);
 
 AJ_Status HandleTimerCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_TIMER_MODELIMPL_H */

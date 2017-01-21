@@ -40,6 +40,4 @@ BrightnessModel *GetBrightnessModel(void);
 
 AJ_Status HandleBrightnessCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_BRIGHTNESS_MODELIMPL_H */

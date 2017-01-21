@@ -40,6 +40,4 @@ CycleControlModel *GetCycleControlModel(void);
 
 AJ_Status HandleCycleControlCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_CYCLECONTROL_MODELIMPL_H */

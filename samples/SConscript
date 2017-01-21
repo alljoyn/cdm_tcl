@@ -39,7 +39,7 @@ samples_env.Append(CPPDEFINES = {
 samples_env.Append(CPPPATH = './inc')
 
 samples_env.Append(LIBPATH = ['#dist/../../../core/ajtcl/dist/lib', '#dist/../../base_tcl/dist/lib', '#dist/lib'])
-samples_env.Prepend(LIBS = ['ajtcl', 'ajtcl_services', 'ajtcl_services_config', 'ajtcl_cdm', 'libexpat'])
+samples_env.Prepend(LIBS = ['ajtcl', 'ajtcl_services', 'ajtcl_services_config', 'ajtcl_cdm', 'ajtcl_cdm_interfaces'])
 
 # Sample programs
 
@@ -50,6 +50,9 @@ sample_dirs = [
 exports = { 'env': samples_env }
 
 progs = [ samples_env.SConscript('%s/SConscript' % sampleapp, exports = exports) for sampleapp in sample_dirs ]
+
+certs = env.Glob('certificates/*.*')
+env.Install('#dist/bin/certificates', certs)
 
 for prog in progs:
     env.Install('#dist/bin', prog)

@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/MoistureOutputLevelInterface.h>
 #include <ajtcl/cdm/interfaces/operation/MoistureOutputLevelModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME MOISTURE_OUTPUT_LEVEL
@@ -52,13 +54,13 @@ const char* const intfDescOperationMoistureOutputLevel[] = {
 
 void InitArray_MoistureOutputLevel_AutoMode(Array_MoistureOutputLevel_AutoMode* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(MoistureOutputLevel_AutoMode), numElems);
+    Init_Array((CdmArray*)value, sizeof(MoistureOutputLevel_AutoMode), numElems);
 }
 
 
 void CopyArray_MoistureOutputLevel_AutoMode(Array_MoistureOutputLevel_AutoMode* value, Array_MoistureOutputLevel_AutoMode* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(MoistureOutputLevel_AutoMode), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(MoistureOutputLevel_AutoMode), (CdmArray*)copy);
 }
 
 
@@ -71,7 +73,7 @@ void FreeArray_MoistureOutputLevel_AutoMode(Array_MoistureOutputLevel_AutoMode* 
 
 size_t ExtendArray_MoistureOutputLevel_AutoMode(Array_MoistureOutputLevel_AutoMode* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(MoistureOutputLevel_AutoMode), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(MoistureOutputLevel_AutoMode), numElems);
 }
 
 

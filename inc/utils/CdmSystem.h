@@ -43,7 +43,7 @@ typedef struct {
     const uint8_t* content;
     size_t contentSize;
     const char* url;
-} CDM_AboutIconParams;
+} CdmAboutIconParams;
 
 typedef struct {
     const char* name;
@@ -52,28 +52,28 @@ typedef struct {
     uint32_t connectPause;
     uint32_t preDisconnectPause;
     uint32_t postDisconnectPause;
-} CDM_RoutingNodeParams;
+} CdmRoutingNodeParams;
 
 typedef struct {
     AJ_BusAttachment bus;
     uint8_t isConnected;
-} CDM_BusAttachment;
+} CdmBusAttachment;
 
 typedef AJ_Status (*AppUpdateHandler)(AJ_BusAttachment* busAttachment);
 typedef AJSVC_ServiceStatus (*MessageProcessor)(AJ_BusAttachment* busAttachment, AJ_Message* msg, AJ_Status* status);
 typedef AJ_Status (*SessionAcceptedHandler) (uint16_t port, uint32_t sessionId, const char* joiner);
 typedef AJ_Status (*AppDisconnectedHandler) (AJ_BusAttachment* busAttachment, uint8_t restart);
 
-void CDM_SetDefaultAboutIconParams(CDM_AboutIconParams *params);
-void CDM_SetDefaultRoutingNodeParams(CDM_RoutingNodeParams *params);
+void Cdm_SetDefaultAboutIconParams(CdmAboutIconParams *params);
+void Cdm_SetDefaultRoutingNodeParams(CdmRoutingNodeParams *params);
 
-AJ_Status CDM_SystemInit(CDM_AboutIconParams *iconParams, bool emitChangedOnSetProprty);
-AJ_Status CDM_SystemConnect(CDM_RoutingNodeParams *routingNodeParams, CDM_BusAttachment *busAttachment);
+AJ_Status Cdm_SystemInit(CdmAboutIconParams *iconParams, bool emitChangedOnSetProprty);
+AJ_Status Cdm_SystemConnect(CdmRoutingNodeParams *routingNodeParams, CdmBusAttachment *busAttachment);
 
-AJ_Status Cdm_MessageLoop(CDM_BusAttachment *busAttachment);
-AJ_Status Cdm_HandleMessageLoopExit(AJ_Status loopExitStatus, CDM_BusAttachment *busAttachment, CDM_RoutingNodeParams *routingNodeParams);
+AJ_Status Cdm_MessageLoop(CdmBusAttachment *busAttachment);
+AJ_Status Cdm_HandleMessageLoopExit(AJ_Status loopExitStatus, CdmBusAttachment *busAttachment, CdmRoutingNodeParams *routingNodeParams);
 
-void CDM_SystemStop(void);
+void Cdm_SystemStop(void);
 
 
 #endif /* ALLJOYN_CDM_SYSTEM_H */

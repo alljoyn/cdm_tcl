@@ -35,7 +35,7 @@
 #include <ajtcl/aj_status.h>
 #include <ajtcl/aj_bus.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/utils/CDM_Array.h>
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define WIND_DIRECTION "org.alljoyn.SmartSpaces.Environment.WindDirection"
 

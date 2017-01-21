@@ -40,6 +40,4 @@ RemoteControllabilityModel *GetRemoteControllabilityModel(void);
 
 AJ_Status HandleRemoteControllabilityCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_REMOTECONTROLLABILITY_MODELIMPL_H */

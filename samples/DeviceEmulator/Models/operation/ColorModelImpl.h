@@ -40,6 +40,4 @@ ColorModel *GetColorModel(void);
 
 AJ_Status HandleColorCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_COLOR_MODELIMPL_H */

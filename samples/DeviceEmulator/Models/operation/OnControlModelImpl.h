@@ -40,6 +40,4 @@ OnControlModel *GetOnControlModel(void);
 
 AJ_Status HandleOnControlCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_ONCONTROL_MODELIMPL_H */

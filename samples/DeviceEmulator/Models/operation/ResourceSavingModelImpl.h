@@ -40,6 +40,4 @@ ResourceSavingModel *GetResourceSavingModel(void);
 
 AJ_Status HandleResourceSavingCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_RESOURCESAVING_MODELIMPL_H */

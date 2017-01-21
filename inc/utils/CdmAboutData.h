@@ -33,9 +33,9 @@
 #include <ajtcl/aj_status.h>
 
 
-typedef char* CDM_AboutDataBuf;
+typedef char* CdmAboutDataBuf;
 
-const CDM_AboutDataBuf CDM_CreateAboutDataFromXml(const char *aboutData);
-void CDM_DestroyAboutData(CDM_AboutDataBuf aboutData);
+const CdmAboutDataBuf Cdm_CreateAboutDataFromXml(const char *aboutData);
+void Cdm_DestroyAboutData(CdmAboutDataBuf aboutData);
 
 #endif /* ALLJOYN_CDM_ABOUTDATA_H */

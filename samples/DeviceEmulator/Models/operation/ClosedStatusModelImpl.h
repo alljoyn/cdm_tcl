@@ -40,6 +40,4 @@ ClosedStatusModel *GetClosedStatusModel(void);
 
 AJ_Status HandleClosedStatusCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_CLOSEDSTATUS_MODELIMPL_H */

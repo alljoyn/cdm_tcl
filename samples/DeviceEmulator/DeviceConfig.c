@@ -41,11 +41,14 @@
 DEM_Config *DEM_CreateConfig(const char *deviceXmlPath)
 {
     StrBuf buf;
-    StrBuf_Init(&buf);
-
     Element* root = NULL;
+    Element** about;
+    Element** objects;
+    Element** objPtr;
+
     DEM_Config* config = calloc(1, sizeof(DEM_Config));
 
+    StrBuf_Init(&buf);
     if (!ReadFile(deviceXmlPath, &buf)) {
         goto error;
     }
@@ -57,7 +60,7 @@ DEM_Config *DEM_CreateConfig(const char *deviceXmlPath)
     }
 
     // Extract the About data
-    Element** about = BSXML_GetPath(root, "AboutData");
+    about = BSXML_GetPath(root, "AboutData");
 
     if (!about[0]) {
         goto error;
@@ -67,10 +70,11 @@ DEM_Config *DEM_CreateConfig(const char *deviceXmlPath)
     free((void*)about);
 
     // Extract the interfaces
-    Element** objects = BSXML_GetPath(root, "InterfaceList/Object");
+    objects = BSXML_GetPath(root, "InterfaceList/Object");
 
-    for (Element** objPtr = objects; *objPtr; ++objPtr) {
+    for (objPtr = objects; *objPtr; ++objPtr) {
         Element* obj = *objPtr;
+        Element** ifPtr;
 
         /** Each is 
          *      <Object path='/CDM/Lamp'>
@@ -92,8 +96,9 @@ DEM_Config *DEM_CreateConfig(const char *deviceXmlPath)
 
         Element** ifaces = BSXML_GetPath(obj, "Interface");
 
-        for (Element** ifPtr = ifaces; *ifPtr; ++ifPtr) {
+        for (ifPtr = ifaces; *ifPtr; ++ifPtr) {
             Element* iface = *ifPtr;
+            Element** propPtr;
             const char* ifaceName = BSXML_GetAttribute(iface, "name");
 
             if (!ifaceName) {
@@ -109,7 +114,7 @@ DEM_Config *DEM_CreateConfig(const char *deviceXmlPath)
 
             Element** props = BSXML_GetPath(iface, "Property");
 
-            for (Element** propPtr = props; *propPtr; ++propPtr) {
+            for (propPtr = props; *propPtr; ++propPtr) {
                 Element* prop = *propPtr;
 
                 const char* propName = BSXML_GetAttribute(prop, "name");
@@ -165,11 +170,13 @@ static void FreeProperty(DEM_Property* prop)
 
 static void FreeInterface(DEM_Interface* iface)
 {
+    size_t i = 0;
+
     if (iface->name) {
         free((void*)iface->name);
     }
 
-    for (size_t i = 0; i < iface->numProperties; ++i) {
+    for (; i < iface->numProperties; ++i) {
         FreeProperty(&iface->properties[i]);
     }
 
@@ -182,11 +189,13 @@ static void FreeInterface(DEM_Interface* iface)
 
 static void FreeObject(DEM_Object* obj)
 {
+    size_t i = 0;
+
     if (obj->objectPath) {
         free((void*)obj->objectPath);
     }
 
-    for (size_t i = 0; i < obj->numInterfaces; ++i) {
+    for (; i < obj->numInterfaces; ++i) {
         FreeInterface(&obj->interfaces[i]);
     }
 
@@ -199,6 +208,8 @@ static void FreeObject(DEM_Object* obj)
 void DEM_FreeConfig(DEM_Config *config)
 {
     if (config != NULL) {
+        size_t i = 0;
+
         if (config->deviceName) {
             free((void*)config->deviceName);
         }
@@ -207,7 +218,7 @@ void DEM_FreeConfig(DEM_Config *config)
             free((void*)config->aboutData);
         }
 
-        for (size_t i = 0; i < config->numObjects; ++i) {
+        for (; i < config->numObjects; ++i) {
             FreeObject(&config->objects[i]);
         }
 

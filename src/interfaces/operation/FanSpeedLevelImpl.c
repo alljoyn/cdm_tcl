@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/FanSpeedLevelInterface.h>
 #include <ajtcl/cdm/interfaces/operation/FanSpeedLevelModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME FAN_SPEED_LEVEL
@@ -52,13 +54,13 @@ const char* const intfDescOperationFanSpeedLevel[] = {
 
 void InitArray_FanSpeedLevel_AutoMode(Array_FanSpeedLevel_AutoMode* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(FanSpeedLevel_AutoMode), numElems);
+    Init_Array((CdmArray*)value, sizeof(FanSpeedLevel_AutoMode), numElems);
 }
 
 
 void CopyArray_FanSpeedLevel_AutoMode(Array_FanSpeedLevel_AutoMode* value, Array_FanSpeedLevel_AutoMode* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(FanSpeedLevel_AutoMode), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(FanSpeedLevel_AutoMode), (CdmArray*)copy);
 }
 
 
@@ -71,7 +73,7 @@ void FreeArray_FanSpeedLevel_AutoMode(Array_FanSpeedLevel_AutoMode* value)
 
 size_t ExtendArray_FanSpeedLevel_AutoMode(Array_FanSpeedLevel_AutoMode* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(FanSpeedLevel_AutoMode), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(FanSpeedLevel_AutoMode), numElems);
 }
 
 

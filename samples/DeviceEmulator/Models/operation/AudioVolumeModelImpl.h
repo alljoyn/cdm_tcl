@@ -40,6 +40,4 @@ AudioVolumeModel *GetAudioVolumeModel(void);
 
 AJ_Status HandleAudioVolumeCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_AUDIOVOLUME_MODELIMPL_H */

@@ -31,7 +31,7 @@
 #define ALLJOYN_CDMINTERFACEVALIDATION_H
 
 #include <stdint.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+#include <ajtcl/cdm/utils/CdmArray.h>
 #include <ajtcl/cdm/interfaces/operation/AudioVideoInputInterface.h>
 #include <ajtcl/cdm/interfaces/operation/ChannelInterface.h>
 #include <ajtcl/cdm/interfaces/operation/ClimateControlModeInterface.h>

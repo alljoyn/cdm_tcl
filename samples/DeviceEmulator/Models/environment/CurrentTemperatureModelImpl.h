@@ -40,6 +40,4 @@ CurrentTemperatureModel *GetCurrentTemperatureModel(void);
 
 AJ_Status HandleCurrentTemperatureCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_CURRENTTEMPERATURE_MODELIMPL_H */

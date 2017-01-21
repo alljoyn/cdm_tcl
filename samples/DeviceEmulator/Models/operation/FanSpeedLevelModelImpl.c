@@ -58,7 +58,8 @@ static Element* HAL_Encode_Array_FanSpeedLevel_AutoMode(Array_FanSpeedLevel_Auto
 static Element* HAL_Encode_Array_FanSpeedLevel_AutoMode(Array_FanSpeedLevel_AutoMode value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_UInt(value.elems[i], array);
     }
     return array;
@@ -72,7 +73,8 @@ static void HAL_Decode_Array_FanSpeedLevel_AutoMode(Element* elem, Array_FanSpee
     InitArray_FanSpeedLevel_AutoMode(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_FanSpeedLevel_AutoMode(value, 1);
             value->elems[j] = (uint8_t)HAL_Decode_UInt(elem->children[i]);
         }

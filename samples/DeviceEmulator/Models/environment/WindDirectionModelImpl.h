@@ -40,6 +40,4 @@ WindDirectionModel *GetWindDirectionModel(void);
 
 AJ_Status HandleWindDirectionCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_WINDDIRECTION_MODELIMPL_H */

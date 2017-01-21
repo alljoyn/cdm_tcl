@@ -40,6 +40,4 @@ TimeDisplayModel *GetTimeDisplayModel(void);
 
 AJ_Status HandleTimeDisplayCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_TIMEDISPLAY_MODELIMPL_H */

@@ -40,6 +40,4 @@ CurrentHumidityModel *GetCurrentHumidityModel(void);
 
 AJ_Status HandleCurrentHumidityCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_CURRENTHUMIDITY_MODELIMPL_H */

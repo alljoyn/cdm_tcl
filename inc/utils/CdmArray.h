@@ -37,10 +37,10 @@
 /* This is the generic carrier for an array.
  * The user must know the type of the elements.
  */
-typedef struct CDM_Array {
+typedef struct CdmArray {
     void* elems;
     size_t numElems;
-} CDM_Array;
+} CdmArray;
 
 
 /*
@@ -49,15 +49,15 @@ typedef struct CDM_Array {
 #define UNUSED_OK __attribute__((unused))
 
 
-extern void Init_Array(CDM_Array* array, size_t elemSize, size_t numElems);
-extern void Copy_Array(CDM_Array* array, size_t elemSize, CDM_Array* copy);
-extern size_t Extend_Array(CDM_Array* array, size_t elemSize, size_t numElems);
+extern void Init_Array(CdmArray* array, size_t elemSize, size_t numElems);
+extern void Copy_Array(CdmArray* array, size_t elemSize, CdmArray* copy);
+extern size_t Extend_Array(CdmArray* array, size_t elemSize, size_t numElems);
 
 #define FREE_ARRAY(TYPE, NAME) UNUSED_OK extern void FreeArray_##NAME(Array_##NAME* array);
-#define INIT_ARRAY(TYPE, NAME) UNUSED_OK static void InitArray_##NAME(Array_##NAME* array, size_t numElems){Init_Array((CDM_Array*)array, sizeof(TYPE), numElems);}
-#define EXTEND_ARRAY(TYPE, NAME) UNUSED_OK static size_t ExtendArray_ ## NAME(Array_ ## NAME* array, size_t numElems){return Extend_Array((CDM_Array*)array, sizeof(TYPE), numElems);}
+#define INIT_ARRAY(TYPE, NAME) UNUSED_OK static void InitArray_##NAME(Array_##NAME* array, size_t numElems){Init_Array((CdmArray*)array, sizeof(TYPE), numElems);}
+#define EXTEND_ARRAY(TYPE, NAME) UNUSED_OK static size_t ExtendArray_ ## NAME(Array_ ## NAME* array, size_t numElems){return Extend_Array((CdmArray*)array, sizeof(TYPE), numElems);}
 
-/* These structs must match CDM_Array. */
+/* These structs must match CdmArray. */
 #define MK_ARRAY(TYPE, NAME) typedef struct Array_##NAME {TYPE* elems; size_t numElems;} Array_##NAME; \
 FREE_ARRAY(TYPE, NAME) \
 INIT_ARRAY(TYPE, NAME) \
@@ -80,7 +80,7 @@ MK_ARRAY(double, double)
 MAKE_ARRAYS
 
 /* We only need some of these and strings are a special case */
-#define COPY_ARRAY(TYPE, NAME) UNUSED_OK static void CopyArray_ ## NAME(Array_ ## NAME* array, Array_ ## NAME* copy){Copy_Array((CDM_Array*)array, sizeof(TYPE), (CDM_Array*)copy);}
+#define COPY_ARRAY(TYPE, NAME) UNUSED_OK static void CopyArray_ ## NAME(Array_ ## NAME* array, Array_ ## NAME* copy){Copy_Array((CdmArray*)array, sizeof(TYPE), (CdmArray*)copy);}
 
 COPY_ARRAY(bool, Bool) \
 COPY_ARRAY(uint8_t, uint8) \

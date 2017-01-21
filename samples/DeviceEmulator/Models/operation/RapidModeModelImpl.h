@@ -40,6 +40,4 @@ RapidModeModel *GetRapidModeModel(void);
 
 AJ_Status HandleRapidModeCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_RAPIDMODE_MODELIMPL_H */

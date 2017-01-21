@@ -40,7 +40,4 @@ OvenCyclePhaseModel *GetOvenCyclePhaseModel(void);
 
 AJ_Status HandleOvenCyclePhaseCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-extern int Encoder_OvenCyclePhase_CyclePhaseDescriptor(FILE* fp, void* value);
-
 #endif /* ALLJOYN_OVENCYCLEPHASE_MODELIMPL_H */

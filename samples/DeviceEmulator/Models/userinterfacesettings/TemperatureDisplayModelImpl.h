@@ -40,6 +40,4 @@ TemperatureDisplayModel *GetTemperatureDisplayModel(void);
 
 AJ_Status HandleTemperatureDisplayCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_TEMPERATUREDISPLAY_MODELIMPL_H */

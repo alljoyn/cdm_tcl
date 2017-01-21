@@ -28,10 +28,13 @@
  ******************************************************************************/
 
 #include <ajtcl/aj_msg.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/CdmControllee.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
+
 #include <stdbool.h>
 #include <stdlib.h>
+
 
 typedef enum {
     SIGNATURE_BASIC = 0,        /* Basic type, length of 1 (e.g. 'n') */
@@ -40,7 +43,7 @@ typedef enum {
     SIGNATURE_ARRAY_STRUCT,     /* Array of structs, prefixes struct with 'a' (e.g. 'a(nnn)') */
 
     SIGNATURE_TYPE_COUNT,
-    
+
     SIGNATURE_UNSUPPORTED
 } PropSignatureType;
 

@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/ChannelInterface.h>
 #include <ajtcl/cdm/interfaces/operation/ChannelModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME CHANNEL
@@ -65,7 +67,7 @@ void FreeFields_Channel_ChannelInfoRecord(Channel_ChannelInfoRecord* value)
 
 void InitArray_Channel_ChannelInfoRecord(Array_Channel_ChannelInfoRecord* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(Channel_ChannelInfoRecord), numElems);
+    Init_Array((CdmArray*)value, sizeof(Channel_ChannelInfoRecord), numElems);
 }
 
 
@@ -99,7 +101,7 @@ void FreeArray_Channel_ChannelInfoRecord(Array_Channel_ChannelInfoRecord* value)
 
 size_t ExtendArray_Channel_ChannelInfoRecord(Array_Channel_ChannelInfoRecord* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(Channel_ChannelInfoRecord), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(Channel_ChannelInfoRecord), numElems);
 }
 
 

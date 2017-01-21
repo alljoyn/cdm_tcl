@@ -40,7 +40,4 @@ LaundryCyclePhaseModel *GetLaundryCyclePhaseModel(void);
 
 AJ_Status HandleLaundryCyclePhaseCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-extern int Encoder_LaundryCyclePhase_CyclePhaseDescriptor(FILE* fp, void* value);
-
 #endif /* ALLJOYN_LAUNDRYCYCLEPHASE_MODELIMPL_H */

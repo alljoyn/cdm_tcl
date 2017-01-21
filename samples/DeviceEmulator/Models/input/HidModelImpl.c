@@ -79,7 +79,8 @@ static Element* HAL_Encode_Array_Hid_InputEvent(Array_Hid_InputEvent value, Elem
 static Element* HAL_Encode_Array_Hid_InputEvent(Array_Hid_InputEvent value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_Hid_InputEvent(value.elems[i], array);
     }
     return array;
@@ -93,7 +94,8 @@ static void HAL_Decode_Array_Hid_InputEvent(Element* elem, Array_Hid_InputEvent*
     InitArray_Hid_InputEvent(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Hid_InputEvent(value, 1);
             HAL_Decode_Hid_InputEvent(elem->children[i], &value->elems[j]);
         }
@@ -151,7 +153,8 @@ static Element* HAL_Encode_Array_Hid_SupportedInputEvent(Array_Hid_SupportedInpu
 static Element* HAL_Encode_Array_Hid_SupportedInputEvent(Array_Hid_SupportedInputEvent value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_Hid_SupportedInputEvent(value.elems[i], array);
     }
     return array;
@@ -165,7 +168,8 @@ static void HAL_Decode_Array_Hid_SupportedInputEvent(Element* elem, Array_Hid_Su
     InitArray_Hid_SupportedInputEvent(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Hid_SupportedInputEvent(value, 1);
             HAL_Decode_Hid_SupportedInputEvent(elem->children[i], &value->elems[j]);
         }

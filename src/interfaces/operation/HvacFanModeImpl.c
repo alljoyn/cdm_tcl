@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/HvacFanModeInterface.h>
 #include <ajtcl/cdm/interfaces/operation/HvacFanModeModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME HVAC_FAN_MODE
@@ -51,13 +53,13 @@ const char* const intfDescOperationHvacFanMode[] = {
 
 void InitArray_HvacFanMode_Mode(Array_HvacFanMode_Mode* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(HvacFanMode_Mode), numElems);
+    Init_Array((CdmArray*)value, sizeof(HvacFanMode_Mode), numElems);
 }
 
 
 void CopyArray_HvacFanMode_Mode(Array_HvacFanMode_Mode* value, Array_HvacFanMode_Mode* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(HvacFanMode_Mode), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(HvacFanMode_Mode), (CdmArray*)copy);
 }
 
 
@@ -70,7 +72,7 @@ void FreeArray_HvacFanMode_Mode(Array_HvacFanMode_Mode* value)
 
 size_t ExtendArray_HvacFanMode_Mode(Array_HvacFanMode_Mode* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(HvacFanMode_Mode), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(HvacFanMode_Mode), numElems);
 }
 
 

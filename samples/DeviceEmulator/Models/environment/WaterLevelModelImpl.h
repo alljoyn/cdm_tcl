@@ -40,6 +40,4 @@ WaterLevelModel *GetWaterLevelModel(void);
 
 AJ_Status HandleWaterLevelCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_WATERLEVEL_MODELIMPL_H */

@@ -40,6 +40,4 @@ HeatingZoneModel *GetHeatingZoneModel(void);
 
 AJ_Status HandleHeatingZoneCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_HEATINGZONE_MODELIMPL_H */

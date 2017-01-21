@@ -40,7 +40,4 @@ AudioVideoInputModel *GetAudioVideoInputModel(void);
 
 AJ_Status HandleAudioVideoInputCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-extern int Encoder_AudioVideoInput_InputSource(FILE* fp, void* value);
-
 #endif /* ALLJOYN_AUDIOVIDEOINPUT_MODELIMPL_H */

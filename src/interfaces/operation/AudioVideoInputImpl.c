@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/AudioVideoInputInterface.h>
 #include <ajtcl/cdm/interfaces/operation/AudioVideoInputModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME AUDIO_VIDEO_INPUT
@@ -63,7 +65,7 @@ void FreeFields_AudioVideoInput_InputSource(AudioVideoInput_InputSource* value)
 
 void InitArray_AudioVideoInput_InputSource(Array_AudioVideoInput_InputSource* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(AudioVideoInput_InputSource), numElems);
+    Init_Array((CdmArray*)value, sizeof(AudioVideoInput_InputSource), numElems);
 }
 
 
@@ -99,19 +101,19 @@ void FreeArray_AudioVideoInput_InputSource(Array_AudioVideoInput_InputSource* va
 
 size_t ExtendArray_AudioVideoInput_InputSource(Array_AudioVideoInput_InputSource* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(AudioVideoInput_InputSource), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(AudioVideoInput_InputSource), numElems);
 }
 
 
 void InitArray_AudioVideoInput_SourceType(Array_AudioVideoInput_SourceType* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(AudioVideoInput_SourceType), numElems);
+    Init_Array((CdmArray*)value, sizeof(AudioVideoInput_SourceType), numElems);
 }
 
 
 void CopyArray_AudioVideoInput_SourceType(Array_AudioVideoInput_SourceType* value, Array_AudioVideoInput_SourceType* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(AudioVideoInput_SourceType), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(AudioVideoInput_SourceType), (CdmArray*)copy);
 }
 
 
@@ -124,19 +126,19 @@ void FreeArray_AudioVideoInput_SourceType(Array_AudioVideoInput_SourceType* valu
 
 size_t ExtendArray_AudioVideoInput_SourceType(Array_AudioVideoInput_SourceType* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(AudioVideoInput_SourceType), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(AudioVideoInput_SourceType), numElems);
 }
 
 
 void InitArray_AudioVideoInput_SignalPresence(Array_AudioVideoInput_SignalPresence* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(AudioVideoInput_SignalPresence), numElems);
+    Init_Array((CdmArray*)value, sizeof(AudioVideoInput_SignalPresence), numElems);
 }
 
 
 void CopyArray_AudioVideoInput_SignalPresence(Array_AudioVideoInput_SignalPresence* value, Array_AudioVideoInput_SignalPresence* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(AudioVideoInput_SignalPresence), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(AudioVideoInput_SignalPresence), (CdmArray*)copy);
 }
 
 
@@ -149,7 +151,7 @@ void FreeArray_AudioVideoInput_SignalPresence(Array_AudioVideoInput_SignalPresen
 
 size_t ExtendArray_AudioVideoInput_SignalPresence(Array_AudioVideoInput_SignalPresence* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(AudioVideoInput_SignalPresence), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(AudioVideoInput_SignalPresence), numElems);
 }
 
 

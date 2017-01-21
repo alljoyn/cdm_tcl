@@ -40,6 +40,4 @@ TriggerSensorModel *GetTriggerSensorModel(void);
 
 AJ_Status HandleTriggerSensorCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_TRIGGERSENSOR_MODELIMPL_H */

@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/environment/CurrentAirQualityLevelInterface.h>
 #include <ajtcl/cdm/interfaces/environment/CurrentAirQualityLevelModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME CURRENT_AIR_QUALITY_LEVEL
@@ -52,13 +54,13 @@ const char* const intfDescEnvironmentCurrentAirQualityLevel[] = {
 
 void InitArray_CurrentAirQualityLevel_ContaminantType(Array_CurrentAirQualityLevel_ContaminantType* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(CurrentAirQualityLevel_ContaminantType), numElems);
+    Init_Array((CdmArray*)value, sizeof(CurrentAirQualityLevel_ContaminantType), numElems);
 }
 
 
 void CopyArray_CurrentAirQualityLevel_ContaminantType(Array_CurrentAirQualityLevel_ContaminantType* value, Array_CurrentAirQualityLevel_ContaminantType* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(CurrentAirQualityLevel_ContaminantType), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(CurrentAirQualityLevel_ContaminantType), (CdmArray*)copy);
 }
 
 
@@ -71,7 +73,7 @@ void FreeArray_CurrentAirQualityLevel_ContaminantType(Array_CurrentAirQualityLev
 
 size_t ExtendArray_CurrentAirQualityLevel_ContaminantType(Array_CurrentAirQualityLevel_ContaminantType* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(CurrentAirQualityLevel_ContaminantType), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(CurrentAirQualityLevel_ContaminantType), numElems);
 }
 
 

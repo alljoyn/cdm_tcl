@@ -40,6 +40,4 @@ BatteryStatusModel *GetBatteryStatusModel(void);
 
 AJ_Status HandleBatteryStatusCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_BATTERYSTATUS_MODELIMPL_H */

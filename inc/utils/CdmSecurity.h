@@ -36,6 +36,7 @@
 #include <ajtcl/aj_status.h>
 #include <ajtcl/aj_bus.h>
 
+
 void Cdm_SetSuites(const uint32_t *suites, int numSuites);
 
 void Cdm_EnablePSK(const char *password);
@@ -47,7 +48,13 @@ void Cdm_DisableSPEKE(void);
 void Cdm_EnableECDSA(const char *privateKey, const char *certificate);
 void Cdm_DisableECDSA(void);
 
-/* AJ_Status Cdm_EnableFromFile(const char* pathPrefix); */
+/**
+ * Load the security parameters from the PREFIX.pub and PREFIX.priv files.
+ * @param[in] pathPrefix directory and file prefix
+ * @return AJ_OK on success
+ */
+AJ_Status Cdm_LoadFiles(const char* pathPrefix);
+
 
 /**
  * Enable security.

@@ -30,6 +30,7 @@
 #ifndef ALLJOYN_FILEIO_H
 #define ALLJOYN_FILEIO_H
 
+#include <stdbool.h>
 #include <ajtcl/cdm/utils/StrBuf.h>
 
 /**

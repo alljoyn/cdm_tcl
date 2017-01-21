@@ -79,7 +79,8 @@ static Element* HAL_Encode_Array_Channel_ChannelInfoRecord(Array_Channel_Channel
 static Element* HAL_Encode_Array_Channel_ChannelInfoRecord(Array_Channel_ChannelInfoRecord value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_Channel_ChannelInfoRecord(value.elems[i], array);
     }
     return array;
@@ -93,7 +94,8 @@ static void HAL_Decode_Array_Channel_ChannelInfoRecord(Element* elem, Array_Chan
     InitArray_Channel_ChannelInfoRecord(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_Channel_ChannelInfoRecord(value, 1);
             HAL_Decode_Channel_ChannelInfoRecord(elem->children[i], &value->elems[j]);
         }
@@ -178,7 +180,8 @@ static AJ_Status MethodGetChannelList(void *context, const char *objPath, uint16
 
         if (startingRecord < channels.numElems)
         {
-            for (size_t i = startingRecord; i < startingRecord + numRecords && i < channels.numElems; ++i)
+            size_t i = startingRecord;
+            for (; i < startingRecord + numRecords && i < channels.numElems; ++i)
             {
                 size_t j = ExtendArray_Channel_ChannelInfoRecord(listOfChannelInfoRecords, 1);
                 listOfChannelInfoRecords->elems[j] = channels.elems[i];

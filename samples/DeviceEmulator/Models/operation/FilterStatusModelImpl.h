@@ -40,6 +40,4 @@ FilterStatusModel *GetFilterStatusModel(void);
 
 AJ_Status HandleFilterStatusCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_FILTERSTATUS_MODELIMPL_H */

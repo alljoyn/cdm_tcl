@@ -40,6 +40,4 @@ EnergyUsageModel *GetEnergyUsageModel(void);
 
 AJ_Status HandleEnergyUsageCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_ENERGYUSAGE_MODELIMPL_H */

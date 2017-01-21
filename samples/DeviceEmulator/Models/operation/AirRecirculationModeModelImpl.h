@@ -40,6 +40,4 @@ AirRecirculationModeModel *GetAirRecirculationModeModel(void);
 
 AJ_Status HandleAirRecirculationModeCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_AIRRECIRCULATIONMODE_MODELIMPL_H */

@@ -40,8 +40,4 @@ HidModel *GetHidModel(void);
 
 AJ_Status HandleHidCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-extern int Encoder_Hid_InputEvent(FILE* fp, void* value);
-extern int Encoder_Hid_SupportedInputEvent(FILE* fp, void* value);
-
 #endif /* ALLJOYN_HID_MODELIMPL_H */

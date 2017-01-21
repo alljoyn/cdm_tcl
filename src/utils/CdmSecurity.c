@@ -27,15 +27,18 @@
  *     PERFORMANCE OF THIS SOFTWARE.
  ******************************************************************************/
 
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #include <ajtcl/aj_debug.h>
 #include <ajtcl/aj_cert.h>
 
-#include <ajtcl/cdm/utils/CDM_Security.h>
+#include <ajtcl/cdm/utils/CdmSecurity.h>
 
-static const char *pskPassword = NULL;
-static const char *spekePassword = NULL;
+static const char *anyPassword = NULL;
 static const char *ecdsaPEMPrivateKey = NULL;
 static const char *ecdsaPEMCertificate = NULL;
 static uint32_t keyExpiration =  0xFFFFFFFF;
@@ -56,22 +59,22 @@ void Cdm_SetSuites(const uint32_t *suites, int numSuites)
 
 void Cdm_EnablePSK(const char *password)
 {
-    pskPassword = password;
+    anyPassword = password;
 }
 
 void Cdm_DisablePSK(void)
 {
-    pskPassword = NULL;
+    anyPassword = NULL;
 }
 
 void Cdm_EnableSPEKE(const char *password)
 {
-    spekePassword = password;
+    anyPassword = password;
 }
 
 void Cdm_DisableSPEKE(void)
 {
-    spekePassword = NULL;
+    anyPassword = NULL;
 }
 
 void Cdm_EnableECDSA(const char *privateKey, const char *certificate)
@@ -86,18 +89,197 @@ void Cdm_DisableECDSA(void)
     ecdsaPEMCertificate = NULL;
 }
 
-/* AJ_Status Cdm_EnableFromFile(const char* pathPrefix)
+/*======================================================================*/
+
+enum FilePart {PartNone, PartIdentity, PartRoot, PartPassword, PartKey};
+
+
+static void AppendTo(char c, char** chunk, size_t* length, size_t* capacity)
 {
-    return AJ_OK;
-}*/
+    /*  Append c to the string buffer. Keep a NUL byte at the end.
+    */
+    if (*length + 2 > *capacity) {
+        *capacity = (*capacity + 2) * 2;
+        *chunk = realloc(*chunk, *capacity);
+    }
+    (*chunk)[*length] = c;
+    (*length)++;
+    (*chunk)[*length] = 0;
+}
+
+
+
+static bool Getline(FILE* fp, char** line, size_t* length, size_t* capacity)
+{
+    for(size_t n = 0; ; ++n) {
+        int c = fgetc(fp);
+
+        if (c == EOF) {
+            return n > 0;
+        }
+
+        AppendTo((char)c, line, length, capacity);
+        if (c == '\n') {
+            return true;
+        }
+    }
+}
+
+
+
+static void FlushPart(enum FilePart part, char* chunk)
+{
+    if (strlen(chunk) == 0) {
+        return;
+    }
+
+    switch (part)
+    {
+    case PartIdentity:
+        ecdsaPEMCertificate = strdup(chunk);
+        break;
+
+    case PartRoot:
+        // Not used
+        break;
+
+    case PartPassword:
+    {
+        char* p = strchr(chunk, '\n');
+        if (p) {
+            *p = 0;
+        }
+        anyPassword = strdup(chunk);
+        break;
+    }
+
+    case PartKey:
+        ecdsaPEMPrivateKey = strdup(chunk);
+        break;
+
+    case PartNone:
+        break;
+    }
+}
+
+
+
+static bool LoadOneFile(const char* path)
+{
+    FILE* fp;
+    char* chunk;
+    size_t chunkLen;
+    size_t chunkCap;
+    char* line;
+    size_t lineLen;
+    size_t lineCap;
+    size_t lnum;
+    enum FilePart which;
+
+    fp = fopen(path, "r");
+
+    if (!fp) {
+        return false;
+    }
+
+    chunk = strdup("");
+    chunkLen = 0;
+    chunkCap = 0;
+    line = strdup("");
+    lineCap = 0;
+    lnum = 0;
+    which = PartNone;
+
+    for (;;) {
+        lineLen = 0;
+
+        if (!Getline(fp, &line, &lineLen, &lineCap)) {
+            break;
+        }
+        ++lnum;
+
+        if (strncmp(line, "identity", 8) == 0) {
+            FlushPart(which, chunk);
+            chunkLen = 0;
+            which = PartIdentity;
+        } else if (strncmp(line, "root", 4) == 0) {
+            FlushPart(which, chunk);
+            chunkLen = 0;
+            which = PartRoot;
+        } else if (strncmp(line, "password", 8) == 0) {
+            FlushPart(which, chunk);
+            chunkLen = 0;
+            which = PartPassword;
+        } else if (strncmp(line, "key", 3) == 0) {
+            FlushPart(which, chunk);
+            chunkLen = 0;
+            which = PartKey;
+        } else if (lineLen > 0 && (line[0] == ' ' || line[0] == '\t')) {
+            // An indented piece that is part of the chunk.
+            // Trim leading and trailing space
+            char* left = line;
+            char* right = &line[lineLen - 1];
+
+            while (isspace(*left)) {
+                ++left;
+            }
+
+            while (right >= left && isspace(*right)) {
+                --right;
+            }
+
+            right[1] = 0;
+            
+            if (*left == 0 || *left == '#') {
+                continue;
+            }
+
+            for (; left <= right; ++left) {
+                AppendTo(*left, &chunk, &chunkLen, &chunkCap);
+            }
+
+            AppendTo('\n', &chunk, &chunkLen, &chunkCap);
+        } else if (lineLen > 0 && line[0] != '\n') {
+            fprintf(stderr, "%s: line %zu: Unrecognised line\n", path, lnum);
+        }
+    }
+
+    if (chunkLen > 0) {
+        FlushPart(which, chunk);
+    }
+    fclose(fp);
+    free((void*)chunk);
+    return true;
+}
+
+
+
+AJ_Status Cdm_LoadFiles(const char* pathPrefix)
+{
+    bool ok = true;
+    size_t plen = strlen(pathPrefix);
+    char* path = malloc(plen + 5 + 1);    // room for .priv
+
+    strcpy(path, pathPrefix);
+    strcat(path, ".pub");
+    ok &= LoadOneFile(path);
+
+    strcpy(path + plen, ".priv");
+    ok &= LoadOneFile(path);
+
+    return ok? AJ_OK : AJ_ERR_FAILURE;
+}
+
+
+/*======================================================================*/
 
 static AJ_Status retreiveSPEKE(AJ_Credential* cred)
 {
     AJ_Status status = AJ_ERR_INVALID;
-    if (spekePassword != NULL)
+    if (anyPassword != NULL)
     {
-        cred->data = (uint8_t*)spekePassword;
-        cred->len = strlen(spekePassword);
+        cred->data = (uint8_t*)anyPassword;
+        cred->len = strlen(anyPassword);
         cred->expiration = keyExpiration;
         status = AJ_OK;
     }
@@ -108,10 +290,10 @@ static AJ_Status retreiveSPEKE(AJ_Credential* cred)
 static AJ_Status retreivePSK(AJ_Credential* cred)
 {
     AJ_Status status = AJ_ERR_INVALID;
-    if (pskPassword != NULL)
+    if (anyPassword != NULL)
     {
-        cred->data = (uint8_t*)pskPassword;
-        cred->len = strlen(pskPassword);
+        cred->data = (uint8_t*)anyPassword;
+        cred->len = strlen(anyPassword);
         cred->expiration = keyExpiration;
         status = AJ_OK;
     }

@@ -40,6 +40,4 @@ OffControlModel *GetOffControlModel(void);
 
 AJ_Status HandleOffControlCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_OFFCONTROL_MODELIMPL_H */

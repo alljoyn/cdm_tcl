@@ -79,7 +79,8 @@ static Element* HAL_Encode_Array_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugIn
 static Element* HAL_Encode_Array_PlugInUnits_PlugInInfo(Array_PlugInUnits_PlugInInfo value, Element* parent)
 {
     Element* array = BSXML_NewElement("array", parent);
-    for (size_t i = 0; i < value.numElems; ++i) {
+    size_t i = 0;
+    for (; i < value.numElems; ++i) {
         HAL_Encode_PlugInUnits_PlugInInfo(value.elems[i], array);
     }
     return array;
@@ -93,7 +94,8 @@ static void HAL_Decode_Array_PlugInUnits_PlugInInfo(Element* elem, Array_PlugInU
     InitArray_PlugInUnits_PlugInInfo(value, 0);
 
     if (strcmp(elem->name, "array") == 0) {
-        for (size_t i = 0; i < elem->numChildren; ++i) {
+        size_t i = 0;
+        for (; i < elem->numChildren; ++i) {
             size_t j = ExtendArray_PlugInUnits_PlugInInfo(value, 1);
             HAL_Decode_PlugInUnits_PlugInInfo(elem->children[i], &value->elems[j]);
         }

@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/environment/WaterLevelInterface.h>
 #include <ajtcl/cdm/interfaces/environment/WaterLevelModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME WATER_LEVEL
@@ -52,13 +54,13 @@ const char* const intfDescEnvironmentWaterLevel[] = {
 
 void InitArray_WaterLevel_SupplySource(Array_WaterLevel_SupplySource* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(WaterLevel_SupplySource), numElems);
+    Init_Array((CdmArray*)value, sizeof(WaterLevel_SupplySource), numElems);
 }
 
 
 void CopyArray_WaterLevel_SupplySource(Array_WaterLevel_SupplySource* value, Array_WaterLevel_SupplySource* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(WaterLevel_SupplySource), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(WaterLevel_SupplySource), (CdmArray*)copy);
 }
 
 
@@ -71,7 +73,7 @@ void FreeArray_WaterLevel_SupplySource(Array_WaterLevel_SupplySource* value)
 
 size_t ExtendArray_WaterLevel_SupplySource(Array_WaterLevel_SupplySource* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(WaterLevel_SupplySource), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(WaterLevel_SupplySource), numElems);
 }
 
 

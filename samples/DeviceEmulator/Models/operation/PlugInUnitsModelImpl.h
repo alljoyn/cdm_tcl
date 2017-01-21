@@ -40,7 +40,4 @@ PlugInUnitsModel *GetPlugInUnitsModel(void);
 
 AJ_Status HandlePlugInUnitsCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-extern int Encoder_PlugInUnits_PlugInInfo(FILE* fp, void* value);
-
 #endif /* ALLJOYN_PLUGINUNITS_MODELIMPL_H */

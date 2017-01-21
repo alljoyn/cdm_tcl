@@ -31,11 +31,13 @@
 #include <string.h>
 #include <ajtcl/alljoyn.h>
 #include <ajtcl/cdm/CdmControllee.h>
-#include <ajtcl/cdm/CdmInterfaceCommon.h>
-#include <ajtcl/cdm/utils/Cdm_Array.h>
+
+#include <ajtcl/cdm/interfaces/CdmInterfaceCommon.h>
 #include <ajtcl/cdm/interfaces/CdmInterfaceValidation.h>
 #include <ajtcl/cdm/interfaces/operation/ClimateControlModeInterface.h>
 #include <ajtcl/cdm/interfaces/operation/ClimateControlModeModel.h>
+
+#include <ajtcl/cdm/utils/CdmArray.h>
 
 #define INTERFACE_VERSION 1
 #define INTERFACE_NAME CLIMATE_CONTROL_MODE
@@ -52,13 +54,13 @@ const char* const intfDescOperationClimateControlMode[] = {
 
 void InitArray_ClimateControlMode_Mode(Array_ClimateControlMode_Mode* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(ClimateControlMode_Mode), numElems);
+    Init_Array((CdmArray*)value, sizeof(ClimateControlMode_Mode), numElems);
 }
 
 
 void CopyArray_ClimateControlMode_Mode(Array_ClimateControlMode_Mode* value, Array_ClimateControlMode_Mode* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(ClimateControlMode_Mode), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(ClimateControlMode_Mode), (CdmArray*)copy);
 }
 
 
@@ -71,19 +73,19 @@ void FreeArray_ClimateControlMode_Mode(Array_ClimateControlMode_Mode* value)
 
 size_t ExtendArray_ClimateControlMode_Mode(Array_ClimateControlMode_Mode* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(ClimateControlMode_Mode), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(ClimateControlMode_Mode), numElems);
 }
 
 
 void InitArray_ClimateControlMode_OperationalState(Array_ClimateControlMode_OperationalState* value, size_t numElems)
 {
-    Init_Array((CDM_Array*)value, sizeof(ClimateControlMode_OperationalState), numElems);
+    Init_Array((CdmArray*)value, sizeof(ClimateControlMode_OperationalState), numElems);
 }
 
 
 void CopyArray_ClimateControlMode_OperationalState(Array_ClimateControlMode_OperationalState* value, Array_ClimateControlMode_OperationalState* copy)
 {
-    Copy_Array((CDM_Array*)value, sizeof(ClimateControlMode_OperationalState), (CDM_Array*)copy);
+    Copy_Array((CdmArray*)value, sizeof(ClimateControlMode_OperationalState), (CdmArray*)copy);
 }
 
 
@@ -96,7 +98,7 @@ void FreeArray_ClimateControlMode_OperationalState(Array_ClimateControlMode_Oper
 
 size_t ExtendArray_ClimateControlMode_OperationalState(Array_ClimateControlMode_OperationalState* value, size_t numElems)
 {
-    return Extend_Array((CDM_Array*)value, sizeof(ClimateControlMode_OperationalState), numElems);
+    return Extend_Array((CdmArray*)value, sizeof(ClimateControlMode_OperationalState), numElems);
 }
 
 

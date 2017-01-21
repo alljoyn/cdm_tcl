@@ -40,6 +40,4 @@ OnOffStatusModel *GetOnOffStatusModel(void);
 
 AJ_Status HandleOnOffStatusCommand(const Command* cmd, void* context);
 
-/* REVISIT delete this */
-
 #endif /* ALLJOYN_ONOFFSTATUS_MODELIMPL_H */

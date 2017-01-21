@@ -35,9 +35,9 @@
 #include <unistd.h>
 
 #include <ajtcl/aj_status.h>
-#include <ajtcl/cdm/utils/CDM_System.h>
-#include <ajtcl/cdm/utils/CDM_AboutData.h>
-#include <ajtcl/cdm/utils/CDM_Security.h>
+#include <ajtcl/cdm/utils/CdmSystem.h>
+#include <ajtcl/cdm/utils/CdmAboutData.h>
+#include <ajtcl/cdm/utils/CdmSecurity.h>
 
 #include <ajtcl/cdm/CdmControllee.h>
 
@@ -46,29 +46,24 @@
 #include "DeviceCommand.h"
 #include "../Utils/HAL.h"
 
-/**
- * Security authentication suites.
- * - DO NOT REUSE THESE VALUES. They are copied from ajtcl/samples/secure/SecureServiceECDHE.c.
- */
 
 static const uint32_t suites[4] = { AUTH_SUITE_ECDHE_ECDSA, AUTH_SUITE_ECDHE_SPEKE, AUTH_SUITE_ECDHE_PSK, AUTH_SUITE_ECDHE_NULL };
-
-static const char ecspeke_password[] = "1234";
-static const char psk_password[] = "faaa0af3dd3f1e0379da046a3ab6ca44";
-
 static DEM_Config* theConfig;
 
 
 static void InitProperties(bool force)
 {
-    for (int i = 0; i < theConfig->numObjects; ++i) {
+    int i = 0;
+    for (; i < theConfig->numObjects; ++i) {
         DEM_Object* obj = &theConfig->objects[i];
 
-        for (int j = 0; j < obj->numInterfaces; ++j) {
+        int j = 0;
+        for (; j < obj->numInterfaces; ++j) {
             DEM_Interface* iface = &obj->interfaces[j];
 
+            int k = 0;
             /* Set some initial property values. */
-            for (int k = 0; k < iface->numProperties; ++k) {
+            for (; k < iface->numProperties; ++k) {
                 DEM_Property* prop = &iface->properties[k];
                 if (prop->initialState) {
                     HAL_WritePropertyXml(obj->objectPath, iface->name, prop->name, prop->initialState, force || !prop->defaultOnly);
@@ -78,21 +73,19 @@ static void InitProperties(bool force)
     }
 }
 
-
-
 static void CreateInterfaces()
 {
-    for (int i = 0; i < theConfig->numObjects; ++i) {
+    int i = 0;
+    for (; i < theConfig->numObjects; ++i) {
         DEM_Object* obj = &theConfig->objects[i];
 
-        for (int j = 0; j < obj->numInterfaces; ++j) {
+        int j = 0;
+        for (; j < obj->numInterfaces; ++j) {
             DEM_Interface* iface = &obj->interfaces[j];
             createInterface(obj->objectPath, iface->name);
         }
     }
 }
-
-
 
 static AJ_Status MainCommandHandler(const Command* cmd)
 {
@@ -104,11 +97,10 @@ static AJ_Status MainCommandHandler(const Command* cmd)
     return DeviceCommandHandler(cmd);
 }
 
-
-
 static int ArgExists(int argc, char **argv, const char *arg)
 {
-    for (int i=0; i<argc; ++i)
+    int i=0;
+    for (; i<argc; ++i)
     {
         if (strcmp(arg, argv[i]) == 0)
         {
@@ -135,13 +127,13 @@ int main(int argc, char *argv[])
     bool emitOnSet;
     bool noCommands = false;
 
-    CDM_AboutIconParams iconParams;
-    CDM_RoutingNodeParams routingNodeParams;
-    CDM_BusAttachment bus;
-    CDM_AboutDataBuf aboutData;
+    CdmAboutIconParams iconParams;
+    CdmRoutingNodeParams routingNodeParams;
+    CdmBusAttachment bus;
+    CdmAboutDataBuf aboutData;
 
     FindArgValue(argc, argv, "--state-dir", "emulated_device_state", &stateDir);
-    FindArgValue(argc, argv, "--certs-dir", "device_emulator_certs", &certsDir);
+    FindArgValue(argc, argv, "--certs-dir", "certificates/security", &certsDir);
     emitOnSet = (ArgExists(argc, argv, "--emit-on-set") > 0);
     noCommands = (ArgExists(argc, argv, "--no-commands") > 0);
 
@@ -154,8 +146,10 @@ int main(int argc, char *argv[])
     }
 
     Cdm_SetSuites(suites, 4);
-    Cdm_EnableSPEKE(ecspeke_password);
-    Cdm_EnablePSK(psk_password);
+    if (AJ_OK != Cdm_LoadFiles(certsDir)) {
+        fprintf(stderr, "Invalid certificate files\n");
+        return 1;
+    }
 
     theConfig = DEM_CreateConfig(argv[1]);
 
@@ -164,10 +158,10 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    aboutData = CDM_CreateAboutDataFromXml(theConfig->aboutData);
+    aboutData = Cdm_CreateAboutDataFromXml(theConfig->aboutData);
 
-    CDM_SetDefaultAboutIconParams(&iconParams);
-    status = CDM_SystemInit(&iconParams, emitOnSet);
+    Cdm_SetDefaultAboutIconParams(&iconParams);
+    status = Cdm_SystemInit(&iconParams, emitOnSet);
     if (status != AJ_OK)
     {
         fprintf(stderr, "SystemInit failed: %s\n", AJ_StatusText(status));
@@ -185,8 +179,8 @@ int main(int argc, char *argv[])
 
     while(1) {
         bus.isConnected = 0;
-        CDM_SetDefaultRoutingNodeParams(&routingNodeParams);
-        status = CDM_SystemConnect(&routingNodeParams, &bus);
+        Cdm_SetDefaultRoutingNodeParams(&routingNodeParams);
+        status = Cdm_SystemConnect(&routingNodeParams, &bus);
         if (status!=AJ_OK || bus.isConnected==0) {
             fprintf(stderr, "SystemConnect failed: %s\n", AJ_StatusText(status));
             retVal = 1;
@@ -210,10 +204,10 @@ int main(int argc, char *argv[])
     }
 
 SHUTDOWN:
-    CDM_SystemStop();
+    Cdm_SystemStop();
 
 CLEANUP:
-    CDM_DestroyAboutData(aboutData);
+    Cdm_DestroyAboutData(aboutData);
     DEM_FreeConfig(theConfig);
 
     return retVal;
