@@ -1,0 +1,48 @@
+<DeviceEmulator name="WaterSensor">
+    <AboutData>
+        <AppId><!-- Runtime Generated --></AppId>
+        <DefaultLanguage>en</DefaultLanguage>
+        <DeviceName>Virtual Temperature Sensor</DeviceName>
+        <DeviceId><!-- Runtime Generated --></DeviceId>
+        <AppName>AllJoyn CDM Controllee</AppName>
+        <Manufacturer>AllJoyn Sample</Manufacturer>
+        <ModelNumber>temperature-sensor</ModelNumber>
+        <Description>Simulated AllJoyn Device</Description>
+        <DateOfManufacture>2016-10-01</DateOfManufacture>
+        <SoftwareVersion>1.0.0</SoftwareVersion>
+        <HardwareVersion>1.0.0</HardwareVersion>
+        <SupportUrl>https://allseenalliance.org/</SupportUrl>
+        <CountryOfProduction>Nowhere</CountryOfProduction>
+        <Location>Sample Location</Location>
+        <ProductBrand>AllJoyn Sample</ProductBrand>
+        <DeviceTypeDescription>
+            <TypeDescription>
+                <device_type>1</device_type>
+                <object_path>/Cdm/TempSensor</object_path>
+            </TypeDescription>
+        </DeviceTypeDescription>
+    </AboutData>
+    <InterfaceList>
+        <Object path='/Cdm/TempSensor'>
+            <Interface name='org.alljoyn.SmartSpaces.Environment.CurrentHumidity'>
+                <Property name='CurrentValue' mode='default'>
+                    <scalar type='unsigned' value='0'/>
+                </Property>
+                <Property name='MaxValue' mode='default'>
+                    <scalar type='unsigned' value='100'/>
+                </Property>
+            </Interface>
+            <Interface name='org.alljoyn.SmartSpaces.Environment.CurrentTemperature'>
+                <Property name='CurrentValue' mode='default'>
+                    <scalar type='double' value='3.0'/>
+                </Property>
+                <Property name='Precision' mode='default'>
+                    <scalar type='double' value='0.5'/>
+                </Property>
+                <Property name='UpdateMinTime' mode='default'>
+                    <scalar type='unsigned' value='1'/>
+                </Property>
+            </Interface>
+        </Object>
+    </InterfaceList>
+</DeviceEmulator>
