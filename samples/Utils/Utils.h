@@ -39,4 +39,8 @@
  */
 extern bool ReadFile(const char *filepath, StrBuf* outBuf);
 
+extern int ArgExists(int argc, char **argv, const char *arg);
+
+extern void FindArgValue(int argc, char **argv, const char *arg, const char *defValue, char **out);
+
 #endif /* ALLJOYN_FILEIO_H */

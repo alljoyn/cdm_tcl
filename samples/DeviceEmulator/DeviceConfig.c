@@ -35,7 +35,7 @@
 #include <ajtcl/cdm/utils/StrBuf.h>
 
 #include "DeviceConfig.h"
-#include "../Utils/FileIO.h"
+#include "../Utils/Utils.h"
 
 
 DEM_Config *DEM_CreateConfig(const char *deviceXmlPath)

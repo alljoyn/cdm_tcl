@@ -41,40 +41,54 @@
 
 #include <ajtcl/cdm/CdmControllee.h>
 
-#include "../Utils/Utils.h"
 #include "../Utils/HAL.h"
-#include "CurrentTemperatureModelImpl.h"
+#include "../Utils/Utils.h"
 
-static const char* ObjPath = "/Cdm/TempSensor";
+#include "SwitchModelImpl.h"
+#include "HSVModelImpl.h"
+
+static const char* ObjPath = "/Cdm/Lamp";
 
 
-static const char* AboutData = 
-"<AboutData>"
-"    <AppId>5CE75C2B-3C3D-48B6-AA8C-C551F30B5F5C</AppId>"
-"    <DefaultLanguage>en</DefaultLanguage>"
-"    <DeviceName>Virtual Temperature Sensor</DeviceName>"
-"    <DeviceId>5CE75C2B-3C3D-48B6-AA8C-C551F30B5F5C</DeviceId>"
-"    <AppName>Room Temperature</AppName>"
-"    <Manufacturer>Raspberry Pi</Manufacturer>"
-"    <ModelNumber>1.0</ModelNumber>"
-"    <Description>Raspberry Pi Temperature/Humidity Sensor using the Sense Hat</Description>"
-"    <DateOfManufacture>2015-01-08</DateOfManufacture>"
-"    <SoftwareVersion>1.0.0</SoftwareVersion>"
-"    <HardwareVersion>3.0.0</HardwareVersion>"
-"    <SupportUrl>www.example.com</SupportUrl>"
-"    <CountryOfProduction>Australia</CountryOfProduction>"
-"    <CorporateBrand>Brand1</CorporateBrand>"
-"    <ProductBrand>Brand2</ProductBrand>"
-"    <Location>Kitchen</Location>"
-"    <DeviceTypeDescription>"
-"        <TypeDescription>"
-"            <device_type>1</device_type>"
-"            <object_path>/Cdm/TempSensor</object_path>"
-"        </TypeDescription>"
-"    </DeviceTypeDescription>"
-"</AboutData>";
+static const char* AboutData =
+    "<AboutData>"
+        "  <AppId></AppId>"
+        "  <DefaultLanguage>en</DefaultLanguage>"
+        "  <DeviceName>Virtual Lamp (Color)</DeviceName>"
+        "  <DeviceId></DeviceId>"
+        "  <AppName>AllJoyn CDM Controllee</AppName>"
+        "  <Manufacturer>Alljoyn Sample</Manufacturer>"
+        "  <ModelNumber>Wxfy388i</ModelNumber>"
+        "  <Description>This is a Full Featured Lamp Controllee Application</Description>"
+        "  <DateOfManufacture>10/1/2199</DateOfManufacture>"
+        "  <SoftwareVersion>12.20.44 build 44454</SoftwareVersion>"
+        "  <HardwareVersion>355.499.b</HardwareVersion>"
+        "  <SupportUrl>http://www.alljoyn.org</SupportUrl>"
+        "  <CountryOfProduction>USA</CountryOfProduction>"
+        "  <CorporateBrand>Lamp Corportate Brand</CorporateBrand>"
+        "  <ProductBrand>Lamp Product Brand</ProductBrand>"
+        "  <Location>Room1</Location>"
+        "  <DeviceTypeDescription>"
+        "      <TypeDescription>"
+        "          <device_type>23</device_type>"
+        "          <object_path>/Cdm/Lamp</object_path>"
+        "      </TypeDescription>"
+        "  </DeviceTypeDescription>"
+        "</AboutData>";
 
 static const uint32_t suites[4] = { AUTH_SUITE_ECDHE_ECDSA, AUTH_SUITE_ECDHE_SPEKE, AUTH_SUITE_ECDHE_PSK, AUTH_SUITE_ECDHE_NULL };
+
+static void InitProperties(void)
+{
+    OnControlModel *onControlsModel = GetOnControlModel();
+    BrightnessModel *brightnessModel = GetBrightnessModel();
+    ColorModel *colorModel = GetColorModel();
+
+    onControlsModel->MethodSwitchOn(NULL, ObjPath);
+    brightnessModel->SetBrightness(NULL, ObjPath, 0.5);
+    colorModel->SetHue(NULL, ObjPath, 0.0);
+    colorModel->SetSaturation(NULL, ObjPath, 0.1);
+}
 
 
 static AJ_Status MainCommandHandler(const Command* cmd)
@@ -88,14 +102,22 @@ static AJ_Status MainCommandHandler(const Command* cmd)
 
     if (strcmp(cmd->name, "changed") == 0)
     {
-        if (strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Environment.CurrentHumidity") == 0)
+        if (strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.OnOffStatus") == 0)
         {
-            status = HandleCurrentHumidityCommand(cmd, NULL);
+            OnOffStatusModel *onOffStatusModel = GetOnOffStatusModel();
+            status = HandleOnOffStatusCommand(cmd, onOffStatusModel);
         }
         else
-        if (strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Environment.CurrentTemperature") == 0)
+        if (strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.Brightness") == 0)
         {
-            status = HandleCurrentTemperatureCommand(cmd, NULL);
+            BrightnessModel *brightnessModel = GetBrightnessModel();
+            status = HandleBrightnessCommand(cmd, brightnessModel);
+        }
+        else
+        if (strcmp(cmd->interface, "org.alljoyn.SmartSpaces.Operation.Color") == 0)
+        {
+            ColorModel *colorModel = GetColorModel();
+            status = HandleColorCommand(cmd, colorModel);
         }
     }
     else
@@ -114,6 +136,7 @@ int main(int argc, char *argv[])
 
     char *certsDir;
     char *stateDir;
+    bool emitOnSet;
     bool useCommands = false;
 
     CdmAboutIconParams iconParams;
@@ -124,7 +147,10 @@ int main(int argc, char *argv[])
     FindArgValue(argc, argv, "--certs-dir", "certificates/security", &certsDir);
     FindArgValue(argc, argv, "--state-dir", "emulated_device_state", &stateDir);
     useCommands = (ArgExists(argc, argv, "--use-commands") > 0);
+    emitOnSet = (ArgExists(argc, argv, "--emit-on-set") > 0);
     HAL_Init(stateDir, "");
+
+    InitProperties();
 
     Cdm_SetSuites(suites, 4);
 
@@ -136,7 +162,7 @@ int main(int argc, char *argv[])
     aboutData = Cdm_CreateAboutDataFromXml(AboutData);
 
     Cdm_SetDefaultAboutIconParams(&iconParams);
-    status = Cdm_SystemInit(&iconParams, true);
+    status = Cdm_SystemInit(&iconParams, emitOnSet);
     if (status != AJ_OK)
     {
         fprintf(stderr, "SystemInit failed: %s\n", AJ_StatusText(status));
@@ -144,7 +170,7 @@ int main(int argc, char *argv[])
         goto CLEANUP;
     }
 
-    status = Cdm_AddInterface(ObjPath, CURRENT_TEMPERATURE, intfDescEnvironmentCurrentTemperature, &intfHandlerEnvironmentCurrentTemperature, GetCurrentTemperatureModel());
+    status = Cdm_AddInterface(ObjPath, ON_OFF_STATUS, intfDescOperationOnOffStatus, &intfHandlerOperationOnOffStatus, GetOnOffStatusModel());
     if (status != AJ_OK)
     {
         fprintf(stderr, "Cdm_AddInterface failed: %s\n", AJ_StatusText(status));
@@ -152,7 +178,7 @@ int main(int argc, char *argv[])
         goto CLEANUP;
     }
 
-    status = Cdm_AddInterface(ObjPath, CURRENT_HUMIDITY, intfDescEnvironmentCurrentHumidity, &intfHandlerEnvironmentCurrentHumidity, GetCurrentHumidityModel());
+    status = Cdm_AddInterface(ObjPath, OFF_CONTROL, intfDescOperationOffControl, &intfHandlerOperationOffControl, GetOffControlModel());
     if (status != AJ_OK)
     {
         fprintf(stderr, "Cdm_AddInterface failed: %s\n", AJ_StatusText(status));
@@ -160,7 +186,29 @@ int main(int argc, char *argv[])
         goto CLEANUP;
     }
 
-    InitProperties();
+    status = Cdm_AddInterface(ObjPath, ON_CONTROL, intfDescOperationOnControl, &intfHandlerOperationOnControl, GetOnControlModel());
+    if (status != AJ_OK)
+    {
+        fprintf(stderr, "Cdm_AddInterface failed: %s\n", AJ_StatusText(status));
+        retVal = 1;
+        goto CLEANUP;
+    }
+
+    status = Cdm_AddInterface(ObjPath, BRIGHTNESS, intfDescOperationBrightness, &intfHandlerOperationBrightness, GetBrightnessModel());
+    if (status != AJ_OK)
+    {
+        fprintf(stderr, "Cdm_AddInterface failed: %s\n", AJ_StatusText(status));
+        retVal = 1;
+        goto CLEANUP;
+    }
+
+    status = Cdm_AddInterface(ObjPath, COLOR, intfDescOperationColor, &intfHandlerOperationColor, GetColorModel());
+    if (status != AJ_OK)
+    {
+        fprintf(stderr, "Cdm_AddInterface failed: %s\n", AJ_StatusText(status));
+        retVal = 1;
+        goto CLEANUP;
+    }
 
     if (useCommands)
     {
@@ -183,8 +231,6 @@ int main(int argc, char *argv[])
             retVal = 1;
             goto SHUTDOWN;
         }
-
-        InitCurrentTemperatureModel(&bus.bus, ObjPath);
 
         status = Cdm_MessageLoop(&bus);
 

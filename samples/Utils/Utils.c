@@ -34,7 +34,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include "FileIO.h"
+#include "Utils.h"
 
 
 bool ReadFile(const char *filepath, StrBuf* outBuf)
@@ -64,4 +64,25 @@ bool ReadFile(const char *filepath, StrBuf* outBuf)
     }
 
     return ok;
+}
+
+
+int ArgExists(int argc, char **argv, const char *arg)
+{
+    int i=0;
+    for (; i<argc; ++i)
+    {
+        if (strcmp(arg, argv[i]) == 0)
+        {
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+void FindArgValue(int argc, char **argv, const char *arg, const char *defValue, char **out)
+{
+    int index = ArgExists(argc, argv, arg);
+    *out = (index != 0 && index + 1 < argc) ? argv[index + 1] : (char*)defValue;
 }
